@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Commander | Sojainnovation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar is-white" role="navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item has-text-weight-bold" href="#">🌱 Sojainnovation</a>
+    <a role="button" class="navbar-burger" aria-label="menu" data-target="mainNavbar">
+      <span></span><span></span><span></span>
+    </a>
+  </div>
+  <div id="mainNavbar" class="navbar-menu">
+    <div class="navbar-end">
+      <a class="navbar-item" href="#">Accueil</a>
+      <a class="navbar-item" href="#">À propos</a>
+      <a class="navbar-item" href="#">Produits</a>
+      <a class="navbar-item is-active" href="#">Commander</a>
+      <a class="navbar-item" href="#">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero is-primary is-medium">
+  <div class="hero-body has-text-centered">
+    <p class="title is-2">Passez votre commande</p>
+    <p class="subtitle is-5">Remplissez le formulaire ci-dessous pour commander nos produits</p>
+  </div>
+</section>
+
+<!-- Order Form -->
+<section class="section">
+  <div class="container">
+    <div class="box">
+      <form action="#" method="POST">
+        <div class="columns is-multiline">
+
+          <!-- Personal Info -->
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Nom complet</label>
+              <div class="control">
+                <input class="input" type="text" name="name" placeholder="Votre nom complet" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Adresse email</label>
+              <div class="control">
+                <input class="input" type="email" name="email" placeholder="email@example.com" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Numéro de téléphone</label>
+              <div class="control">
+                <input class="input" type="tel" name="phone" placeholder="+229 90 00 00 00" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Product Selection -->
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Produit</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="product" required>
+                    <option value="">-- Sélectionnez un produit --</option>
+                    <option value="pain">Pain au manioc</option>
+                    <option value="snacks">Snacks au manioc</option>
+                    <option value="farine">Farine de manioc</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quantity -->
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" min="1" value="1" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="column is-12">
+            <div class="field">
+              <label class="label">Notes / Adresse de livraison</label>
+              <div class="control">
+                <textarea class="textarea" name="notes" placeholder="Ajoutez des précisions sur votre commande..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="column is-12 has-text-centered">
+            <button class="button is-primary is-medium">Valider la commande</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer has-background-light">
+  <div class="content has-text-centered">
+    <p>
+      <strong>Sojainnovation</strong> © 2025 — Moussa DARI | Tous droits réservés.
+      <br>
+      Email : <a href="mailto:contact@sojainnovation.com">contact@sojainnovation.com</a>
+    </p>
+  </div>
+</footer>
+
+<!-- Navbar toggle -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const burger = document.querySelector('.navbar-burger');
+    const menu = document.querySelector('#mainNavbar');
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('is-active');
+      menu.classList.toggle('is-active');
+    });
+  });
+</script>
+
+</body>
+</html>
