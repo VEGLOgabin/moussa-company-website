@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'accounts',
     'products',
+    'notifications',
 ]
 
 MIDDLEWARE = [
@@ -175,5 +176,5 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 LOGIN_REDIRECT_URL_ADMIN = 'home'
 LOGIN_REDIRECT_URL_USER = 'home'
-LOGIN_URL = 'login-page'
+# LOGIN_URL = 'login-page'
 # AUTH_USER_MODEL = 'accounts.User'

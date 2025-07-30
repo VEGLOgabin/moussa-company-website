@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from notifications.signals import notify
+from notifications.signals import notify  # You can access a user’s notifications like this: request.user.notifications.unread()
 
 class UserManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, password=None, **extra_fields):
@@ -39,13 +39,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    sexe = models.CharField(max_length=50)
+    sex = models.CharField(max_length=50)
     user_type = models.CharField(max_length=20, choices=USER_TYPES, default='customer')
-    lieu_de_residence = models.CharField(max_length=100, blank=True, null=True)
-    date_naissance = models.DateField(blank=True, null=True)
-    date_inscription = models.DateField(auto_now_add=True)
-    telephone = models.CharField(max_length=20)
-    promotion = models.CharField(max_length=255, blank=True, null=True)
+    birthdate = models.DateField(blank=True, null=True)
+    registration_date = models.DateField(auto_now_add=True)
+    phone_number = models.CharField(max_length=20)
     photo = models.ImageField(upload_to='PROFIL_IMG', blank=True, null=True)
 
     is_active = models.BooleanField(default=True)
