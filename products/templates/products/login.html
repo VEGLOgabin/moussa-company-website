@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}Connexion | Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
+
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-5">
+        <h1 class="title has-text-centered">Connexion</h1>
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="notification is-danger is-light">
+              {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+          {% csrf_token %}
+          <div class="field">
+            <label class="label">Adresse email</label>
+            <div class="control">
+              <input class="input" type="email" name="email" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Mot de passe</label>
+            <div class="control">
+              <input class="input" type="password" name="password" required>
+            </div>
+          </div>
+
+          <div class="field mt-4">
+            <button type="submit" class="button is-success is-fullwidth">Se connecter</button>
+          </div>
+        </form>
+
+        <p class="has-text-centered mt-4">
+          Pas encore de compte ? <a href="{% url 'register' %}">Créer un compte</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

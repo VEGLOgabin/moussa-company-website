@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil | Sojainnovation{% endblock %}
+
+
+{% block style %}
+<style>
+
+
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<section class="section">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="box">
+          <h1 class="title has-text-centered">Mon Profil</h1>
+
+          {% if messages %}
+            {% for message in messages %}
+              <div class="notification is-info is-light">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="columns is-multiline">
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Prénom</label>
+                  <div class="control">
+                    <input class="input" type="text" name="first_name" value="{{ request.user.first_name }}" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Nom</label>
+                  <div class="control">
+                    <input class="input" type="text" name="last_name" value="{{ request.user.last_name }}" required>
+                  </div>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Sexe</label>
+                  <div class="control">
+                    <div class="select is-fullwidth">
+                      <select name="sex">
+                        <option value="Homme" {% if request.user.sex == "Homme" %}selected{% endif %}>Homme</option>
+                        <option value="Femme" {% if request.user.sex == "Femme" %}selected{% endif %}>Femme</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Date de naissance</label>
+                  <div class="control">
+                    <input class="input" type="date" name="birthdate" value="{{ request.user.birthdate|date:'Y-m-d' }}">
+                  </div>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Téléphone</label>
+                  <div class="control">
+                    <input class="input" type="tel" name="phone_number" value="{{ request.user.phone_number }}">
+                  </div>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Email</label>
+                  <input class="input is-static" type="email" value="{{ request.user.email }}" readonly>
+                </div>
+              </div>
+
+              <div class="column is-6">
+                <div class="field">
+                  <label class="label">Photo de profil</label>
+                  <div class="file has-name is-boxed is-fullwidth">
+                    <label class="file-label">
+                      <input class="file-input" type="file" name="photo">
+                      <span class="file-cta">
+                        <span class="icon"><i class="fas fa-upload"></i></span>
+                        <span class="file-label">Choisir un fichier</span>
+                      </span>
+                      <span class="file-name">
+                        {{ request.user.photo.name|default:"Aucun fichier choisi" }}
+                      </span>
+                    </label>
+                  </div>
+                  {% if request.user.photo %}
+                    <figure class="image is-128x128 mt-3">
+                      <img class="is-rounded" src="{{ request.user.photo.url }}">
+                    </figure>
+                  {% endif %}
+                </div>
+              </div>
+
+            </div>
+
+            <div class="field is-grouped is-grouped-centered mt-5">
+              <div class="control">
+                <button class="button is-primary" type="submit">Mettre à jour</button>
+              </div>
+              <div class="control">
+                <a href="{% url 'home' %}" class="button is-light">Annuler</a>
+              </div>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

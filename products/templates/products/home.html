@@ -47,24 +47,14 @@
 
 
 
+
       {% if user.is_authenticated %}
-        <a class="navbar-item has-text-success" href="">Mon profil</a>
-        <a class="navbar-item has-text-danger" href="">Se déconnecter</a>
-      {% else %}
-        <a class="navbar-item" href="">Connexion</a>
-        <a class="navbar-item" href="">Créer un compte</a>
-      {% endif %}
-
-
-
-
-      {% comment %} {% if user.is_authenticated %}
         <a class="navbar-item has-text-success" href="{% url 'profile' %}">Mon profil</a>
         <a class="navbar-item has-text-danger" href="{% url 'logout' %}">Se déconnecter</a>
       {% else %}
         <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
         <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
-      {% endif %} {% endcomment %}
+      {% endif %} 
     </div>
   </div>
 </nav>

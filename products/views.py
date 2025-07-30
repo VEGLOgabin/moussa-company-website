@@ -145,72 +145,98 @@ def testimonials(request):
 def partners(request):
     return render(request, "products/partenaires.html", {"partners": Partner.objects.all()})
 
+
+
+
+
 # Contact
 def contact(request):
     return render(request, "products/contact.html")
 
+
+
+
+
+
+
 # Authentication
 
-# def register(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         first_name = request.POST.get('first_name')
-#         last_name = request.POST.get('last_name')
-#         password = request.POST.get('password')
-#         phone_number = request.POST.get('phone_number')
-#         sex = request.POST.get('sex')
-#         birthdate = request.POST.get('birthdate')
-#         photo = request.FILES.get('photo')
+def register(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        password = request.POST.get('password')
+        phone_number = request.POST.get('phone_number')
+        sex = request.POST.get('sex')
+        birthdate = request.POST.get('birthdate')
+        photo = request.FILES.get('photo')
 
-#         if User.objects.filter(email=email).exists():
-#             messages.error(request, "Email déjà utilisé")
-#             return redirect('register')
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Email déjà utilisé")
+            return redirect('register')
 
-#         user = User.objects.create_user(
-#             email=email,
-#             first_name=first_name,
-#             last_name=last_name,
-#             password=password,
-#             phone_number=phone_number,
-#             sex=sex,
-#             birthdate=birthdate,
-#             photo=photo
-#         )
-#         login(request, user)
-#         return redirect('home')
-#     return render(request, 'accounts/register.html')
+        user = User.objects.create_user(
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            password=password,
+            phone_number=phone_number,
+            sex=sex,
+            birthdate=birthdate,
+            photo=photo
+        )
+        login(request, user)
+        return redirect('home')
+    return render(request, 'products/register.html')
 
-# def login_view(request):
-#     if request.method == 'POST':
-#         email = request.POST.get('email')
-#         password = request.POST.get('password')
-#         user = authenticate(request, email=email, password=password)
-#         if user is not None:
-#             login(request, user)
-#             return redirect('home')
-#         else:
-#             messages.error(request, 'Identifiants invalides')
-#             return redirect('login')
-#     return render(request, 'accounts/login.html')
 
-# def logout_view(request):
-#     logout(request)
-#     return redirect('home')
 
-# @login_required
-# def profile(request):
-#     if request.method == 'POST':
-#         request.user.first_name = request.POST.get('first_name')
-#         request.user.last_name = request.POST.get('last_name')
-#         request.user.phone_number = request.POST.get('phone_number')
-#         request.user.sex = request.POST.get('sex')
-#         request.user.birthdate = request.POST.get('birthdate')
-#         if request.FILES.get('photo'):
-#             request.user.photo = request.FILES.get('photo')
-#         request.user.save()
-#         messages.success(request, 'Profil mis à jour.')
-#         return redirect('profile')
-#     return render(request, 'accounts/profile.html')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('home')
+        else:
+            messages.error(request, 'Identifiants invalides')
+            return redirect('login')
+    return render(request, 'products/login.html')
+
+
+
+
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+
+
+
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        request.user.first_name = request.POST.get('first_name')
+        request.user.last_name = request.POST.get('last_name')
+        request.user.phone_number = request.POST.get('phone_number')
+        request.user.sex = request.POST.get('sex')
+        request.user.birthdate = request.POST.get('birthdate')
+        if request.FILES.get('photo'):
+            request.user.photo = request.FILES.get('photo')
+        request.user.save()
+        messages.success(request, 'Profil mis à jour.')
+        return redirect('profile')
+    context = {
+        'user': request.user,  # optional, `request.user` is available by default
+    }
+    return render(request, 'products/profile.html', context)
 
 
 

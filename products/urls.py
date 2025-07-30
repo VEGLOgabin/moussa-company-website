@@ -11,6 +11,9 @@ urlpatterns = [
     path('testimonials/',views.testimonials,name="testimonials"),
     path('contact/',views.contact,name="contact"),
     path('partners/',views.partners,name="partners"),
+    path('login/',views.login_view,name="login"),
+    path('register/',views.register,name="register"),
+    path('profile/',views.profile,name="profile"),
 
 
     # #Admin actions
