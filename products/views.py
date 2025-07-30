@@ -1,147 +1,216 @@
-from django.shortcuts import render,redirect,get_object_or_404
-from django.contrib.auth.decorators import user_passes_test
-from django.conf import settings
-from .models import User
-from django.contrib.auth import login, logout, authenticate 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-import logging
-import os
-import glob
-from django.db.models import Q
-from django.utils import timezone
+from django.contrib import messages
 from django.urls import reverse
-# from collegeEntrepreneur.models import Entreprise,specialites,Distinctions,Activite,Partenaire,ProduitService,Certification
-# from collegeEntrepreneur.models import Notification,Annexe
-from django.core.serializers import serialize
-# from products.serializers import ENTREPRISESerializer,DistinctionSerializer
+from django.http import JsonResponse
+from django.contrib.auth.forms import AuthenticationForm
+from django.views.decorators.http import require_POST
+from .models import Product, Order, About, Testimonial, Partner, ContactMessage, BlogPost
+from accounts.models import User
+import logging
 
-#Variable that can be everytime overrite to register the connected users actions
 user_actions_logger = logging.getLogger('user_actions')
 
-import datetime
 
 
-
-
-# @login_required
+# Home page
 def home(request):
-    
+    context = {
+        'user': request.user,  # Optional: request.user is already available in templates
+        'products': Product.objects.all(),
+        'testimonials': Testimonial.objects.all(),
+        'blogs': BlogPost.objects.order_by('-published_at')[:3],
+        'partners': Partner.objects.all()
+    }
+    return render(request, "products/home.html", context)
 
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/home.html",context)
-    
 
-
-# @login_required
+# Product listing
 def products(request):
-    
+    context = {
+        'products': Product.objects.all(),
+        'is_admin': request.user.is_authenticated and request.user.user_type == 'admin'
+    }
+    return render(request, "products/produits.html", context)
 
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/produits.html",context)
-    
+@login_required
+def add_product(request):
+    if request.method == 'POST' and request.user.user_type == 'admin':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        image = request.FILES.get('image')
+        Product.objects.create(name=name, description=description, price=price, image=image)
+    return redirect('products')
 
+@login_required
+def update_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    if request.method == 'POST' and request.user.user_type == 'admin':
+        product.name = request.POST.get('name')
+        product.description = request.POST.get('description')
+        product.price = request.POST.get('price')
+        if request.FILES.get('image'):
+            product.image = request.FILES.get('image')
+        product.save()
+    return redirect('products')
 
+@login_required
+def delete_product(request, product_id):
+    if request.user.user_type == 'admin':
+        product = get_object_or_404(Product, id=product_id)
+        product.delete()
+    return redirect('products')
 
+# Cart view
+def cart_view(request):
+    cart = request.session.get('cart', {})
+    product_ids = cart.keys()
+    products = Product.objects.filter(id__in=product_ids)
+    cart_items = []
+    total = 0
+    for product in products:
+        quantity = cart[str(product.id)]
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'subtotal': product.price * quantity
+        })
+        total += product.price * quantity
+    return render(request, 'products/cart.html', {'cart_items': cart_items, 'total': total})
 
+# Add to cart
+@require_POST
+def add_to_cart(request, product_id):
+    cart = request.session.get('cart', {})
+    cart[str(product_id)] = cart.get(str(product_id), 0) + 1
+    request.session['cart'] = cart
+    return JsonResponse({'success': True})
 
+# Remove from cart
+def remove_from_cart(request, product_id):
+    cart = request.session.get('cart', {})
+    if str(product_id) in cart:
+        del cart[str(product_id)]
+    request.session['cart'] = cart
+    return redirect('cart')
 
-# @login_required
-def order(request):
-    
+# Checkout
+@login_required
+def checkout(request):
+    cart = request.session.get('cart', {})
+    products = Product.objects.filter(id__in=cart.keys())
+    if request.method == 'POST':
+        for product in products:
+            quantity = cart[str(product.id)]
+            Order.objects.create(
+                full_name=f"{request.user.first_name} {request.user.last_name}",
+                email=request.user.email,
+                phone=request.user.phone_number,
+                address="-",
+                product=product,
+                quantity=quantity
+            )
+        del request.session['cart']
+        return render(request, 'products/order_success.html')
 
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/commander.html",context)
-    
+    cart_items = []
+    total = 0
+    for product in products:
+        quantity = cart[str(product.id)]
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'subtotal': product.price * quantity
+        })
+        total += product.price * quantity
+    return render(request, 'products/checkout.html', {'cart_items': cart_items, 'total': total})
 
+# About
 
-
-
-
-
-# @login_required
-def blog(request):
-    
-
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/blog.html",context)
-
-
-
-
-
-
-
-
-
-# @login_required
 def about(request):
-    
+    context = {'about': About.objects.first()}
+    return render(request, "products/about.html", context)
 
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/about.html",context)
-    
+# Blog
+def blog(request):
+    return render(request, "products/blog.html", {"posts": BlogPost.objects.all()})
 
-
-
-
-
-
-
-
-
-# @login_required
-def contact(request):
-    
-
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/contact.html",context)
-    
-
-
-
-
-
-
-# @login_required
-def partners(request):
-    
-
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/partenaires.html",context)
-
-
-
-
-
-
-
-
-
-
-# @login_required
+# Testimonials
 def testimonials(request):
-    
+    return render(request, "products/temoignages.html", {"testimonials": Testimonial.objects.all()})
 
-    user_actions_logger.info(f"")
-    context={}
-    
-    return render(request,"products/temoignages.html",context)
+# Partners
+def partners(request):
+    return render(request, "products/partenaires.html", {"partners": Partner.objects.all()})
 
+# Contact
+def contact(request):
+    return render(request, "products/contact.html")
 
+# Authentication
+
+# def register(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         first_name = request.POST.get('first_name')
+#         last_name = request.POST.get('last_name')
+#         password = request.POST.get('password')
+#         phone_number = request.POST.get('phone_number')
+#         sex = request.POST.get('sex')
+#         birthdate = request.POST.get('birthdate')
+#         photo = request.FILES.get('photo')
+
+#         if User.objects.filter(email=email).exists():
+#             messages.error(request, "Email déjà utilisé")
+#             return redirect('register')
+
+#         user = User.objects.create_user(
+#             email=email,
+#             first_name=first_name,
+#             last_name=last_name,
+#             password=password,
+#             phone_number=phone_number,
+#             sex=sex,
+#             birthdate=birthdate,
+#             photo=photo
+#         )
+#         login(request, user)
+#         return redirect('home')
+#     return render(request, 'accounts/register.html')
+
+# def login_view(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+#         user = authenticate(request, email=email, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('home')
+#         else:
+#             messages.error(request, 'Identifiants invalides')
+#             return redirect('login')
+#     return render(request, 'accounts/login.html')
+
+# def logout_view(request):
+#     logout(request)
+#     return redirect('home')
+
+# @login_required
+# def profile(request):
+#     if request.method == 'POST':
+#         request.user.first_name = request.POST.get('first_name')
+#         request.user.last_name = request.POST.get('last_name')
+#         request.user.phone_number = request.POST.get('phone_number')
+#         request.user.sex = request.POST.get('sex')
+#         request.user.birthdate = request.POST.get('birthdate')
+#         if request.FILES.get('photo'):
+#             request.user.photo = request.FILES.get('photo')
+#         request.user.save()
+#         messages.success(request, 'Profil mis à jour.')
+#         return redirect('profile')
+#     return render(request, 'accounts/profile.html')
 
 
 
