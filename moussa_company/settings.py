@@ -177,4 +177,4 @@ CORS_ALLOW_CREDENTIALS = True
 LOGIN_REDIRECT_URL_ADMIN = 'home'
 LOGIN_REDIRECT_URL_USER = 'home'
 # LOGIN_URL = 'login-page'
-# AUTH_USER_MODEL = 'accounts.User'
+AUTH_USER_MODEL = 'accounts.User'
