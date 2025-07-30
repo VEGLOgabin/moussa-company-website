@@ -29,6 +29,19 @@
       <a class="navbar-item is-active" href="#">Témoignages</a>
       <a class="navbar-item" href="#">Contact</a>
       <a class="navbar-item" href="#">Partenaires</a>
+
+
+
+
+
+
+      {% if user.is_authenticated %}
+        <a class="navbar-item has-text-success" href="{% url 'profile' %}">Mon profil</a>
+        <a class="navbar-item has-text-danger" href="{% url 'logout' %}">Se déconnecter</a>
+      {% else %}
+        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
+        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
+      {% endif %} 
     </div>
   </div>
 </nav>
