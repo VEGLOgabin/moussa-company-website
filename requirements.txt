@@ -6,12 +6,15 @@ cryptography==44.0.0
 defusedxml==0.8.0rc2
 Django==4.2.19
 django-cors-headers==4.7.0
+django-model-utils==5.0.0
+django-notifications-hq==1.8.3
 djangorestframework==3.15.2
 djangorestframework_simplejwt==5.4.0
 djoser==2.3.1
 drf-yasg==1.21.8
 idna==3.10
 inflection==0.5.1
+jsonfield==3.1.0
 oauthlib==3.2.2
 packaging==24.2
 pillow==11.1.0
@@ -26,6 +29,7 @@ simplejwt==2.0.1
 social-auth-app-django==5.4.2
 social-auth-core==4.5.4
 sqlparse==0.5.3
+swapper==1.4.0
 typing==3.7.4.3
 typing_extensions==4.12.2
 uritemplate==4.1.1

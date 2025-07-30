@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil | Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div>
+  <!-- Navbar -->
+<nav class="navbar is-white" role="navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item has-text-weight-bold" href="#">🌱 Sojainnovation</a>
+    <a role="button" class="navbar-burger" aria-label="menu" data-target="mainNavbar">
+      <span></span><span></span><span></span>
+    </a>
+  </div>
+  <div id="mainNavbar" class="navbar-menu">
+    <div class="navbar-end">
+      <a class="navbar-item" href="#">Accueil</a>
+      <a class="navbar-item" href="#">À propos</a>
+      <a class="navbar-item" href="#">Produits</a>
+      <a class="navbar-item" href="#">Commander</a>
+      <a class="navbar-item is-active" href="#">Actualités</a>
+      <a class="navbar-item" href="#">Témoignages</a>
+      <a class="navbar-item" href="#">Contact</a>
+      <a class="navbar-item" href="#">Partenaires</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero is-light is-medium">
+  <div class="hero-body has-text-centered">
+    <p class="title is-2">Actualités & Blog</p>
+    <p class="subtitle is-5">Découvrez nos dernières nouvelles, événements et projets innovants</p>
+  </div>
+</section>
+
+<!-- Blog Articles -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-multiline">
+
+      <!-- Blog Post 1 -->
+      <div class="column is-4">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="https://source.unsplash.com/800x600/?organic,food" alt="Article 1">
+            </figure>
+          </div>
+          <div class="card-content">
+            <p class="title is-5">Lancement officiel de nos snacks au manioc</p>
+            <p class="subtitle is-7 has-text-grey">Publié le 10 juillet 2025</p>
+            <div class="content">
+              Nous avons lancé une nouvelle gamme de snacks 100% bio à base de manioc. Découvrez les bienfaits de cette innovation...
+              <br><br>
+              <a href="#" class="button is-small is-link mt-2">Lire la suite</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Post 2 -->
+      <div class="column is-4">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="https://source.unsplash.com/800x600/?cassava,farming" alt="Article 2">
+            </figure>
+          </div>
+          <div class="card-content">
+            <p class="title is-5">Sojainnovation participe au Salon de l’agroalimentaire</p>
+            <p class="subtitle is-7 has-text-grey">Publié le 3 juillet 2025</p>
+            <div class="content">
+              Nous étions présents au plus grand salon agricole du Bénin. Un événement riche en échanges et en partenariats prometteurs...
+              <br><br>
+              <a href="#" class="button is-small is-link mt-2">Lire la suite</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Blog Post 3 -->
+      <div class="column is-4">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="https://source.unsplash.com/800x600/?youth,entrepreneurship" alt="Article 3">
+            </figure>
+          </div>
+          <div class="card-content">
+            <p class="title is-5">Formation sur l'entrepreneuriat agroalimentaire</p>
+            <p class="subtitle is-7 has-text-grey">Publié le 20 juin 2025</p>
+            <div class="content">
+              Retour sur notre atelier de formation destiné aux jeunes entrepreneurs intéressés par le secteur agroalimentaire...
+              <br><br>
+              <a href="#" class="button is-small is-link mt-2">Lire la suite</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add more posts dynamically via Django later -->
+
+    </div>
+  </div>
+</section>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% endblock scripts %}

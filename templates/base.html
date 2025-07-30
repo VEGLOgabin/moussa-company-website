@@ -1,0 +1,47 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Sojainnovation{% endblock title %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  {% block style %}
+  {% endblock style %}
+</head>
+<body>
+
+  {% block content %}
+  {% endblock content %}
+
+  {% block scripts %}
+  {% endblock scripts %}
+
+  <!-- Footer -->
+  <footer class="footer has-background-light">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Sojainnovation</strong> © 2025 — Moussa DARI | Tous droits réservés.<br>
+        Email : <a href="mailto:contact@sojainnovation.com">contact@sojainnovation.com</a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Navbar toggle -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const burger = document.querySelector('.navbar-burger');
+      const menu = document.querySelector('#mainNavbar');
+      if (burger && menu) {
+        burger.addEventListener('click', () => {
+          burger.classList.toggle('is-active');
+          menu.classList.toggle('is-active');
+        });
+      }
+    });
+  </script>
+
+</body>
+</html>

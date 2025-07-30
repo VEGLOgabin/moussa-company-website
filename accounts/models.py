@@ -1,151 +1,63 @@
 from django.db import models
-from django.utils import timezone
-from django.contrib.auth.models import AbstractBaseUser,BaseUserManager,PermissionsMixin,AbstractUser
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from notifications.signals import notify
-from notifications.models import Notification  # Assurez-vous d'importer le modèle Notification de l'application de notifications
+
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, last_name, password,email,sexe,user_category,lieu_de_residence,date_naissance,date_inscription,telephone,promotion,photo, **kwargs):
-        """
-        Creates and saves a User with the given phone and password.
-        """
-        email=self.normalize_email(email)
+    def create_user(self, email, first_name, last_name, password=None, **extra_fields):
         if not email:
-            raise ValueError('Users must have email')
-        
+            raise ValueError("Email is required")
+        email = self.normalize_email(email)
         user = self.model(
-            first_name = first_name,
-            last_name = last_name,
             email=email,
-            sexe=sexe,
-            user_category=user_category,
-            lieu_de_residence=lieu_de_residence,
-            date_naissance=date_naissance,
-            date_inscription=date_inscription,
-            telephone=telephone,
-            promotion=promotion,
-            photo=photo
+            first_name=first_name,
+            last_name=last_name,
+            **extra_fields
         )
-
-        user.is_active = True
-        user.admin = False
-        user.staff = False
-
         user.set_password(password)
         user.save()
-
-        return user
-    
-
-    def create_staffuser(self, first_name, last_name,password,email,sexe,user_category,lieu_de_residence,date_naissance,date_inscription,telephone,promotion,photo):
-
-        email=self.normalize_email(email)
-        user = self.create_user(
-            first_name = first_name,
-            last_name = last_name,
-            email=email,
-            sexe=sexe,
-            user_category=user_category,
-            lieu_de_residence=lieu_de_residence,
-            date_naissance=date_naissance,
-            date_inscription=date_inscription,
-            telephone=telephone,
-            promotion=promotion,
-            photo=photo,
-            password=password
-        )
-
-        user.staff = True
-        user.is_active = True
-
-
-        user.save()
-        return user
-    
-    def create_superuser(self, first_name, last_name, email,password,sexe,user_category,lieu_de_residence,date_naissance,date_inscription,telephone,promotion,photo):
-        email=self.normalize_email(email)
-        user = self.create_user(
-            
-            first_name = first_name,
-            last_name = last_name,
-            email=email,
-            sexe=sexe,
-            user_category=user_category,
-            lieu_de_residence=lieu_de_residence,
-            date_naissance=date_naissance,
-            date_inscription=date_inscription,
-            telephone=telephone,
-            promotion=promotion,
-            photo=photo,
-            password=password
-            
-            
-        )
-        
-        
-
-        user.admin = True
-        user.staff = True
-        user.is_active = True
-        
-        user.save()
         return user
 
+    def create_superuser(self, email, first_name, last_name, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("user_type", "admin")
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True")
+
+        return self.create_user(email, first_name, last_name, password, **extra_fields)
 
 
+class User(AbstractBaseUser, PermissionsMixin):
+    USER_TYPES = (
+        ('admin', 'Admin'),
+        ('customer', 'Customer'),
+    )
 
-class User(AbstractBaseUser,PermissionsMixin):
-    # ROLES = (('student', 'Student'), ('FORMATEUR EXTAINE', 'FORMATEUR EXTAINE'),('PERSONNEL','PERSONNEL'),('STAGIAIRE','STAGIAIRE'))
-    first_name=models.CharField(max_length=255)
-    last_name=models.CharField(max_length=255)
-    email=models.EmailField(max_length=255,unique=True)
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    sexe = models.CharField(max_length=50)
+    user_type = models.CharField(max_length=20, choices=USER_TYPES, default='customer')
+    lieu_de_residence = models.CharField(max_length=100, blank=True, null=True)
+    date_naissance = models.DateField(blank=True, null=True)
+    date_inscription = models.DateField(auto_now_add=True)
+    telephone = models.CharField(max_length=20)
+    promotion = models.CharField(max_length=255, blank=True, null=True)
+    photo = models.ImageField(upload_to='PROFIL_IMG', blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
-    staff = models.BooleanField(default=False)
-    user_category=models.CharField(max_length=25,blank=False,null=False)
-    sexe=models.CharField(blank=False,max_length=50)
-    lieu_de_residence=models.CharField(max_length=100,null=True,blank=True)
-    date_naissance=models.DateField(blank=True,null=True)
-    date_inscription=models.DateField(blank=True,null=True)
-    telephone=models.IntegerField()
-    promotion=models.CharField(max_length=255,null=True,blank=True)
-    photo=models.ImageField(upload_to='PROFIL_IMG')
+    is_staff = models.BooleanField(default=False)  # Needed for Django admin
 
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'last_name','sexe',"user_categlory",'lieu_de_residence','date_naissance','date_inscription','telephone',"promotion"]
-
-    @property
-    def is_admin(self):
-        "Is the user a admin member?"
-        return self.admin
-
-
-    def has_perm(self, perm, obj=None):
-        "Does the user have a specific permission?"
-        # Simplest possible answer: Yes, always
-        return True
-
-    def has_module_perms(self, app_label):
-        "Does the user have permissions to view the app `app_label`?"
-        # Simplest possible answer: Yes, always
-        return True
-    
-    def send_notification(self, message):
-        notify.send(
-            self,
-            recipient=self,
-            verb=message
-        )
-
-    @property
-    def is_staff(self):
-        "Is the user a member of staff?"
-        return self.staff
-
-    def get_full_name(self):
-        return f"{self.first_name} {self.last_name}"
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
     def __str__(self):
-       return self.first_name
+        return f"{self.first_name} {self.last_name} ({self.email})"
 
-    
+    def send_notification(self, message):
+        notify.send(self, recipient=self, verb=message)
