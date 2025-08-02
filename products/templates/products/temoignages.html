@@ -21,14 +21,14 @@
   </div>
   <div id="mainNavbar" class="navbar-menu">
     <div class="navbar-end">
-      <a class="navbar-item" href="#">Accueil</a>
-      <a class="navbar-item" href="#">À propos</a>
-      <a class="navbar-item" href="#">Produits</a>
+      <a class="navbar-item" href="{% url 'home' %}">Accueil</a>
+      <a class="navbar-item" href="{% url 'about' %}">À propos</a>
+      <a class="navbar-item" href="{% url 'products' %}">Produits</a>
       <a class="navbar-item" href="#">Commander</a>
-      <a class="navbar-item" href="#">Actualités</a>
-      <a class="navbar-item is-active" href="#">Témoignages</a>
-      <a class="navbar-item" href="#">Contact</a>
-      <a class="navbar-item" href="#">Partenaires</a>
+      <a class="navbar-item" href="{% url 'blog' %}">Actualités</a>
+      <a class="navbar-item has-text-success is-active" href="{% url 'testimonials' %}">Témoignages</a>
+      <a class="navbar-item" href="{% url 'contact' %}">Contact</a>
+      <a class="navbar-item" href="{% url 'partners' %}">Partenaires</a>
 
 
 
