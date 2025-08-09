@@ -35,7 +35,7 @@ def products(request):
         'products': Product.objects.all(),
         'is_admin': request.user.is_authenticated and request.user.user_type == 'admin'
     }
-    return render(request, "products/produits_1.html", context)
+    return render(request, "products/produits_2.html", context)
 
 
 @login_required

@@ -1,7 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Produits | The Future Nakouahan Sojainnovation{% endblock %}
+
+
 {% block style %}
 <style>
   .hero.is-primary {
-    background-image: url('https://source.unsplash.com/1600x600/?cassava,food');
+    background-image: url('/media/products/prod_decor.png');
     background-size: cover;
     background-position: center;
     color: white;
@@ -131,13 +136,17 @@
 </div>
 {% endif %}
 
+
+
+
 <!-- Hero Section -->
 <section class="hero is-medium is-primary">
   <div class="hero-body has-text-centered">
-    <p class="title is-1">Nos Produits</p>
-    <p class="subtitle is-4">Sains. Locaux. Sans gluten. Naturellement bons.</p>
+    <p class="title is-1 has-text-white">Nos Produits</p>
+    <p class="subtitle is-4 has-text-white">Sains. Locaux. Sans gluten. Naturellement bons.</p>
   </div>
 </section>
+
 
 <!-- Floating Buttons -->
 {% if user.is_authenticated %}
@@ -208,6 +217,42 @@
 
   </div>
 </section>
+
+
+
+
+<!-- Modal Form -->
+<div class="modal" id="productModal">
+  <div class="modal-background" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un produit</p>
+      <button class="delete" aria-label="close" onclick="closeModal()"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'add_product' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field"><label class="label">Nom</label><input class="input" type="text" name="name" required></div>
+        <div class="field"><label class="label">Description</label><textarea class="textarea" name="description" required></textarea></div>
+        <div class="field"><label class="label">Prix</label><input class="input" type="number" name="price" required></div>
+        <div class="field"><label class="label">Quantité</label><input class="input" type="number" name="quantity" value="1" min="1" required></div>
+        <div class="field"><label class="label">Devise</label><input class="input" type="text" name="currency" value="XOF" required></div>
+        <div class="field"><label class="label">Image</label>
+          <div class="file is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" required>
+              <span class="file-cta"><span class="file-icon"><i class="fas fa-upload"></i></span><span class="file-label">Choisir un fichier</span></span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">Ajouter</button>
+        <button class="button" type="button" onclick="closeModal()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
