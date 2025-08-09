@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Finaliser la commande | Sojainnovation{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">🛒 Finaliser ma commande</h1>
+
+    {% if cart_items %}
+    <div class="box">
+      <h2 class="subtitle">Résumé de votre panier :</h2>
+
+      <table class="table is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Prix unitaire</th>
+            <th>Sous-total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+          <tr>
+            <td>
+              <strong>{{ item.product.name }}</strong><br>
+              <small>{{ item.product.description|truncatechars:60 }}</small>
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.price }} {{ item.product.currency }}</td>
+            <td>{{ item.subtotal }} {{ item.product.currency }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="has-text-right">Total :</th>
+            <th>{{ total }} XOF</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Kkiapay Payment Button -->
+    <div class="has-text-centered mt-4">
+      <button class="button is-success is-large" onclick="openKkiapay()">
+        <span class="icon"><i class="fas fa-check-circle"></i></span>
+        <span>Payer avec Kkiapay</span>
+      </button>
+    </div>
+
+    {% else %}
+    <article class="message is-warning">
+      <div class="message-body has-text-centered">
+        Votre panier est vide. <a href="{% url 'products' %}">Voir nos produits</a>
+      </div>
+    </article>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Kkiapay Widget Script -->
+<script src="https://cdn.kkiapay.me/kkiapay.js"></script>
+<script>
+  const transactionId = "{{ transaction_id }}";
+  const amount = {{ total }};
+  const apiKey = "{{ public_key }}";
+  const phone = "{{ user.phone_number|default:'22900000000' }}";
+
+  function openKkiapay() {
+    openKkiapayWidget({
+      amount: amount,
+      api_key: apiKey,
+      sandbox: true,
+      phone: phone,
+      name: "{{ user.first_name|default:'Client' }}",
+      email: "{{ user.email|default:'client@example.com' }}",
+      transactionId: transactionId
+    });
+  }
+
+  addKkiapayListener('success', function (transactionId) {
+    console.log("Paiement réussi :", transactionId);
+
+    fetch("{% url 'verify_kkiapay_payment' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: `transaction_id=${transactionId}`
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === 'success') {
+        alert("Paiement confirmé !");
+        window.location.href = "{% url 'products' %}";
+      } else {
+        alert("Échec de la vérification du paiement.");
+      }
+    })
+    .catch(err => {
+      alert("Une erreur s'est produite pendant la vérification.");
+      console.error(err);
+    });
+  });
+
+  addKkiapayListener('error', function (error) {
+    alert("Erreur de paiement. Veuillez réessayer.");
+    console.error("Erreur Kkiapay :", error);
+  });
+</script>
+
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Finaliser la commande | Sojainnovation{% endblock %}
+
+{% block content %}
+
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
+
+
+<section class="section">
+  <div class="container">
+    <h1 class="title has-text-centered">🛒 Finaliser ma commande</h1>
+
+
+
+
+    {% if cart_items %}
+    <div class="box">
+      <h2 class="subtitle">Résumé de votre panier :</h2>
+
+      <table class="table is-fullwidth is-striped">
+        <thead>
+          <tr>
+            <th>Produit</th>
+            <th>Quantité</th>
+            <th>Prix unitaire</th>
+            <th>Sous-total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+          <tr>
+            <td>
+              <strong>{{ item.product.name }}</strong><br>
+              <small>{{ item.product.description|truncatechars:60 }}</small>
+            </td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.product.price }} {{ item.product.currency }}</td>
+            <td>{{ item.subtotal }} {{ item.product.currency }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" class="has-text-right">Total :</th>
+            <th>{{ total }} XOF</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="has-text-centered">
+        <button class="button is-success is-large">
+          <span class="icon"><i class="fas fa-check-circle"></i></span>
+          <span>Payer maintenant</span>
+        </button>
+      </div>
+    </form>
+    
+
+
+
+    {% else %}
+    <article class="message is-warning">
+      <div class="message-body has-text-centered">
+        Votre panier est vide. <a href="{% url 'products' %}">Voir nos produits</a>
+      </div>
+    </article>
+    {% endif %}
+  </div>
+</section>
+
+
+
+
+
+{% endblock %}
+
+
+

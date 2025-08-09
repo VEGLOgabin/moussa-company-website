@@ -29,7 +29,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV "/home/admin1/Musique/PortfolioProject/moussa-company-website/env"
+set -gx VIRTUAL_ENV "/home/admin1/Musique/My-Portfolio/moussa-company-website-main/env"
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/bin" $PATH

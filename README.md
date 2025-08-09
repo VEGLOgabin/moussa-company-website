@@ -1,1 +1,10 @@
 # moussa-company-website
+
+
+API_KEY: 148133187668959dff214fc6.84072680
+
+
+Secret Key : 1936657066895a05329ec64.52806992
+
+
+SITE_ID: 105904752

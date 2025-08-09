@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+
+{% block title %}Produits | The Future Nakouahan Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
+  .hero.is-primary {
+    background-image: url('https://source.unsplash.com/1600x600/?cassava,food');
+    background-size: cover;
+    background-position: center;
+    color: white;
+  }
+
+  .add-product-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+  }
+
+  .modal.is-active {
+    display: flex;
+  }
+
+  .payment-history-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    z-index: 1000;
+  }
+
+  .add-product-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+  }
+</style>
+
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navbar -->
+  <!-- Navbar -->
+<nav class="navbar is-white" role="navigation">
+  <div class="navbar-brand">
+    <a class="navbar-item has-text-weight-bold" href="#">🌱 Sojainnovation</a>
+    <a role="button" class="navbar-burger" aria-label="menu" data-target="mainNavbar">
+      <span></span><span></span><span></span>
+    </a>
+  </div>
+  <div id="mainNavbar" class="navbar-menu">
+    <div class="navbar-end">
+      <a class="navbar-item" href="{% url 'home' %}">Accueil</a>
+      <a class="navbar-item" href="{% url 'about' %}">À propos</a>
+      <a class="navbar-item has-text-success is-active" href="{% url 'products' %}">Produits</a>
+      <a class="navbar-item" href="#">Commander</a>
+      <a class="navbar-item" href="{% url 'blog' %}">Actualités</a>
+      <a class="navbar-item" href="{% url 'testimonials' %}">Témoignages</a>
+      <a class="navbar-item" href="{% url 'contact' %}">Contact</a>
+      <a class="navbar-item" href="{% url 'partners' %}">Partenaires</a>
+
+
+
+      <a class="navbar-item" href="{% url 'cart' %}">
+      <span class="icon">
+        <i class="fas fa-shopping-cart"></i>
+      </span>
+      <span>Panier ({{ request.session.cart|length|default:"0" }})</span>
+    </a>
+
+
+
+      {% if user.is_authenticated %}
+        <a class="navbar-item has-text-success" href="{% url 'profile' %}">Mon profil</a>
+        <a class="navbar-item has-text-danger" href="{% url 'logout' %}">Se déconnecter</a>
+      {% else %}
+        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
+        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
+      {% endif %} 
+    </div>
+  </div>
+</nav>
+
+
+
+
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
+
+<!-- Hero Section -->
+<section class="hero is-medium is-primary">
+  <div class="hero-body has-text-centered">
+    <p class="title is-1 has-text-white">Nos Produits</p>
+    <p class="subtitle is-4 has-text-white">Sains. Locaux. Sans gluten. Naturellement bons.</p>
+  </div>
+</section>
+
+<!-- Add Product Button (Admins only) -->
+{% if user.is_authenticated %}
+  <button class="button is-success is-medium add-product-btn" onclick="openModal()">
+    <span class="icon"><i class="fas fa-plus-circle"></i></span>
+    <span>Ajouter un produit</span>
+  </button>
+{% endif %}
+
+
+
+{% if user.is_authenticated %}
+  <a href="{% url 'payment_history' %}" class="button is-info is-medium payment-history-btn">
+    <span class="icon"><i class="fas fa-receipt"></i></span>
+    <span>Mes paiements</span>
+  </a>
+{% endif %}
+
+
+<!-- Products List -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-multiline is-centered">
+      {% for product in products %}
+      <div class="column is-4">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            </figure>
+          </div>
+          <div class="card-content">
+            <p class="title is-5">{{ product.name }}</p>
+            <p class="content">{{ product.description|truncatechars:120 }}</p>
+            <p class="has-text-weight-semibold mt-2">
+              {{ product.price }} {{ product.currency }}
+            </p>
+            
+
+            <form method="POST" action="{% url 'add_to_cart' product.id %}">
+              {% csrf_token %}
+              <button class="button is-primary is-small mt-2" type="submit">
+                <span class="icon"><i class="fas fa-cart-plus"></i></span>
+                <span>Ajouter au panier</span>
+              </button>
+            </form>
+
+
+
+
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Modal Form -->
+<div class="modal" id="productModal">
+  <div class="modal-background" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un nouveau produit</p>
+      <button class="delete" aria-label="close" onclick="closeModal()"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'add_product' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" required></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Prix</label>
+          <div class="control">
+            <input class="input" type="number" name="price" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Quantité</label>
+          <div class="control">
+            <input class="input" type="number" name="quantity" value="1" min="1" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Devise</label>
+          <div class="control">
+            <input class="input" type="text" name="currency" value="XOF" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image du produit</label>
+          <div class="file is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" required>
+              <span class="file-cta">
+                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                <span class="file-label">Choisir un fichier</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">Ajouter</button>
+        <button class="button" type="button" onclick="closeModal()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function openModal() {
+    document.getElementById("productModal").classList.add("is-active");
+  }
+
+  function closeModal() {
+    document.getElementById("productModal").classList.remove("is-active");
+  }
+</script>
+{% endblock scripts %}
