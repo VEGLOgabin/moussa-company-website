@@ -1,4 +1,4 @@
-#!/home/admin1/Musique/My-Portfolio/moussa-company-website-main/env/bin/python
+#!/home/admin1/Musique/My-Portfolio/moussa-company-website/env/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys
