@@ -4,7 +4,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}Sojainnovation{% endblock title %}</title>
+  <title>{% block title %}ecofeed{% endblock title %}</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
@@ -13,6 +13,53 @@
 </head>
 <body>
 
+  <!-- Navbar -->
+<nav class="navbar is-fixed-top is-spaced" role="navigation" aria-label="main navigation">
+<div class="navbar-brand">
+    <a class="navbar-item logo" href="{% url 'home' %}">
+      <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo" style="height:40px;">
+    </a>
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="mainNavbar" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}" href="{% url 'home' %}">Accueil</a>
+      <a class="navbar-item {% if request.resolver_match.url_name == 'products' %}is-active{% endif %}" href="{% url 'products' %}">Produits</a>
+      <a class="navbar-item {% if request.resolver_match.url_name == 'blog' %}is-active{% endif %}" href="{% url 'blog' %}">Actualités</a>
+      <a class="navbar-item {% if request.resolver_match.url_name == 'testimonials' %}is-active{% endif %}" href="{% url 'testimonials' %}">Témoignages</a>
+      <a class="navbar-item {% if request.resolver_match.url_name == 'partners' %}is-active{% endif %}" href="{% url 'partners' %}">Partenaires</a>
+      <a class="navbar-item {% if request.resolver_match.url_name == 'about' %}is-active{% endif %}" href="{% url 'about' %}">À propos</a>
+      <a class="navbar-item {% if request.resolver_match.url_name == 'contact' %}is-active{% endif %}" href="{% url 'contact' %}">Contact</a>
+    </div>
+
+    <div class="navbar-end">
+      <a class="navbar-item cart-link" href="{% url 'cart' %}">
+        <span class="icon"><i class="fas fa-shopping-cart"></i></span>
+        <span>({{ request.session.cart|length|default:"0" }})</span>
+      </a>
+      {% if user.is_authenticated %}
+        <div class="navbar-item has-dropdown is-hoverable">
+          <a class="navbar-link has-text-success">Mon compte</a>
+          <div class="navbar-dropdown is-right">
+            <a class="navbar-item" href="{% url 'profile' %}"><i class="fas fa-user mr-2"></i> Profil</a>
+            <a class="navbar-item" href="{% url 'payment_history' %}"><i class="fas fa-receipt mr-2"></i> Mes paiements</a>
+            <hr class="navbar-divider">
+            <a class="navbar-item has-text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt mr-2"></i> Déconnexion</a>
+          </div>
+        </div>
+      {% else %}
+        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
+        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
   {% block content %}
   {% endblock content %}
 
@@ -20,27 +67,138 @@
   {% endblock scripts %}
 
   <!-- Footer -->
-  <footer class="footer has-background-light">
-    <div class="content has-text-centered">
-      <p>
-        <strong>Sojainnovation</strong> © 2025 — Moussa DARI | Tous droits réservés.<br>
-        Email : <a href="mailto:contact@sojainnovation.com">contact@sojainnovation.com</a>
+<footer class="footer has-background-dark has-text-light">
+  <div class="container">
+    <div class="columns is-multiline">
+      
+      <!-- About -->
+      <div class="column is-3">
+        <a class="navbar-item logo" href="{% url 'home' %}">
+      <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo" style="height:40px;">
+      </a>
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+        <p class="is-size-7">
+          Produits sains, locaux et naturels pour une vie meilleure.
+        </p>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="column is-3">
+        <h4 class="title is-6 has-text-white">Navigation</h4>
+        <ul>
+          <li><a href="{% url 'products' %}" class="has-text-light">Produits</a></li>
+          <li><a href="{% url 'blog' %}" class="has-text-light">Actualités</a></li>
+          <li><a class="has-text-light" href="{% url 'partners' %}">Partenaires</a></li>
+          <li><a href="{% url 'about' %}" class="has-text-light">À propos</a></li>
+          <li><a href="{% url 'contact' %}" class="has-text-light">Contact</a></li>
+          
+        </ul>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="column is-3">
+        <h4 class="title is-6 has-text-white">Newsletter</h4>
+        <p class="is-size-7">Recevez nos dernières offres et actualités.</p>
+        <form>
+          <div class="field has-addons">
+            <div class="control is-expanded">
+              <input class="input" type="email" placeholder="Votre email">
+            </div>
+            <div class="control">
+              <button class="button is-success">S'abonner</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Social Media -->
+      <div class="column is-3">
+        <h4 class="title is-6 has-text-white">Suivez-nous</h4>
+        <div class="social-icons">
+          <a href="#" class="icon has-text-light"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="icon has-text-light"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="icon has-text-light"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="icon has-text-light"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="has-text-centered mt-5">
+      <p class="is-size-7">
+        <strong>Ecofeed</strong> © 2025 — Moussa DARI | Tous droits réservés.
+        <br>Email : <a href="mailto:contact@ecofeed.com" class="has-text-light">contact@ecofeed.com</a>
       </p>
     </div>
-  </footer>
+  </div>
+</footer>
+
+<style>
+
+      /* Navbar Styling */
+  .navbar {
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .navbar .logo {
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  .navbar-item.is-active {
+    border-bottom: 2px solid #23a455;
+    color: #23a455 !important;
+  }
+  .navbar-item:hover {
+    background-color: transparent !important;
+    color: #23a455 !important;
+  }
+  .cart-link {
+    font-weight: bold;
+    color: #23a455 !important;
+  }
+  .navbar-dropdown a.navbar-item:hover {
+    background-color: #f9f9f9;
+    color: #23a455 !important;
+  }
+
+
+
+
+
+  .footer ul li {
+    margin-bottom: 0.5rem;
+  }
+  .footer .social-icons a {
+    margin-right: 10px;
+    font-size: 1.2rem;
+  }
+  .footer input.input {
+    border-radius: 4px 0 0 4px;
+  }
+  .footer button.button {
+    border-radius: 0 4px 4px 0;
+  }
+</style>
+
 
   <!-- Navbar toggle -->
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const burger = document.querySelector('.navbar-burger');
-      const menu = document.querySelector('#mainNavbar');
-      if (burger && menu) {
-        burger.addEventListener('click', () => {
-          burger.classList.toggle('is-active');
-          menu.classList.toggle('is-active');
-        });
-      }
+  // Mobile navbar toggle
+  document.addEventListener('DOMContentLoaded', () => {
+    const burger = document.querySelector('.navbar-burger');
+    const menu = document.getElementById(burger.dataset.target);
+    burger.addEventListener('click', () => {
+      burger.classList.toggle('is-active');
+      menu.classList.toggle('is-active');
     });
+  });
+
   </script>
 
 </body>

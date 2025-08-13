@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+
+{% block title %}Messages de contact | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Optional custom styles */
+
+    /* Hero Section */
+    .hero.is-light {
+        position: relative;
+        background-image: url('{{ MEDIA_URL }}products/prod_decor1.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        overflow: hidden;
+    }
+
+    /* Add blur overlay */
+    .hero.is-light::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: inherit; /* use same image */
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+        filter: blur(6px) brightness(0.5); /* blur + darken for readability */
+        z-index: 0;
+    }
+
+    /* Ensure text is above the overlay */
+    .hero.is-light .hero-body {
+        position: relative;
+        z-index: 1;
+    }
+
+
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+
+  <!-- Hero Section -->
+  <section class="hero is-light is-medium">
+    <div class="hero-body has-text-centered">
+      <p class="title is-2 has-text-white">Messages de contact</p>
+      <p class="subtitle is-5 has-text-white">Gestion des messages envoyés via le formulaire de contact</p>
+    </div>
+  </section>
+
+
+
+  {% comment %} <!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %} {% endcomment %}
+
+
+
+
+
+  <!-- Add Message Button -->
+  {% comment %} <div class="section has-text-centered">
+    <button class="button is-primary js-modal-trigger" data-target="createModal">
+      <span class="icon"><i class="fas fa-plus"></i></span>
+      <span>Ajouter un message</span>
+    </button>
+  </div> {% endcomment %}
+
+  <!-- Messages List -->
+  <section class="section">
+    <div class="container">
+      {% if messages %}
+        <div class="columns is-multiline">
+          {% for msg in messages %}
+            <div class="column is-4">
+              <div class="box">
+                <p><strong>Nom:</strong> {{ msg.name }}</p>
+                <p><strong>Email:</strong> {{ msg.email }}</p>
+                <p><strong>Sujet:</strong> {{ msg.subject }}</p>
+                <p><strong>Message:</strong> {{ msg.message|linebreaksbr }}</p>
+                <p class="is-size-7 has-text-grey mt-2">Envoyé le {{ msg.sent_at|date:"d/m/Y H:i" }}</p>
+
+                <div class="buttons mt-3">
+                  <button 
+                    class="button is-warning is-small js-modal-trigger-edit" 
+                    data-target="editModal"
+                    data-id="{{ msg.id }}"
+                    data-name="{{ msg.name|escape }}"
+                    data-email="{{ msg.email|escape }}"
+                    data-subject="{{ msg.subject|escape }}"
+                    data-message="{{ msg.message|escape }}"
+                  >
+                    <span class="icon"><i class="fas fa-edit"></i></span>
+                    <span>Modifier</span>
+                  </button>
+
+                  <button 
+                    class="button is-danger is-small js-modal-trigger-delete" 
+                    data-target="deleteModal" 
+                    data-id="{{ msg.id }}"
+                  >
+                    <span class="icon"><i class="fas fa-trash"></i></span>
+                    <span>Supprimer</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>Aucun message pour le moment.</p>
+      {% endif %}
+    </div>
+  </section>
+
+</div>
+
+<!-- Create Modal -->
+<div id="createModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un message</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form method="POST" action="{% url 'contact_message_add' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Email</label>
+          <div class="control">
+            <input class="input" type="email" name="email" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Sujet</label>
+          <div class="control">
+            <input class="input" type="text" name="subject" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Message</label>
+          <div class="control">
+            <textarea class="textarea" name="message" required></textarea>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-success">Enregistrer</button>
+        <button type="button" class="button js-modal-close">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le message</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form id="editForm" method="POST">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" type="text" name="name" id="edit-name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Email</label>
+          <div class="control">
+            <input class="input" type="email" name="email" id="edit-email" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Sujet</label>
+          <div class="control">
+            <input class="input" type="text" name="subject" id="edit-subject" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Message</label>
+          <div class="control">
+            <textarea class="textarea" name="message" id="edit-message" required></textarea>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-warning">Mettre à jour</button>
+        <button type="button" class="button js-modal-close">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title has-text-danger">Supprimer le message</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p>Êtes-vous sûr de vouloir supprimer ce message ?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteForm" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="button is-danger">Oui, supprimer</button>
+        <button type="button" class="button js-modal-close">Annuler</button>
+      </form>
+    </footer>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function openModal(modalId) {
+    const target = document.getElementById(modalId);
+    if (target) {
+      target.classList.add('is-active');
+    }
+  }
+
+  function closeAllModals() {
+    (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+      $modal.classList.remove('is-active');
+    });
+  }
+
+  // Open create modal
+  (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      openModal(modalId);
+    });
+  });
+
+  // Open edit modal & fill data
+  (document.querySelectorAll('.js-modal-trigger-edit') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const msgId = $trigger.dataset.id;
+      const name = $trigger.dataset.name;
+      const email = $trigger.dataset.email;
+      const subject = $trigger.dataset.subject;
+      const message = $trigger.dataset.message;
+
+      const form = document.getElementById('editForm');
+      form.action = `/contact/messages/update/${msgId}/`;
+
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-email').value = email;
+      document.getElementById('edit-subject').value = subject;
+      document.getElementById('edit-message').value = message;
+
+      openModal(modalId);
+    });
+  });
+
+  // Open delete modal & set form action
+  (document.querySelectorAll('.js-modal-trigger-delete') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const msgId = $trigger.dataset.id;
+
+      const form = document.getElementById('deleteForm');
+      form.action = `/contact/messages/delete/${msgId}/`;
+
+      openModal(modalId);
+    });
+  });
+
+  // Close modals
+  (document.querySelectorAll('.js-modal-close') || []).forEach(($close) => {
+    $close.addEventListener('click', () => {
+      closeAllModals();
+    });
+  });
+
+});
+</script>
+{% endblock %}

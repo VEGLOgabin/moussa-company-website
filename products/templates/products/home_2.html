@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Accueil | The Future Nakouahan Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
+/* Hero Section */
+.hero {
+  background-image: url('/media/products/prod_decor.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  position: relative;
+  color: white;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(2px);
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
+  animation: fadeInUp 1s ease-out;
+}
+
+/* Products Section */
+.product-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+}
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-content">
+    <h1 class="title is-1">Bienvenue chez Sojainnovation</h1>
+    <p class="subtitle is-4">Produits durables et innovations pour demain</p>
+    <a href="{% url 'products' %}" class="button is-primary is-medium">Découvrir nos produits</a>
+  </div>
+</section>
+
+<!-- Products -->
+<section class="section">
+  <div class="container">
+    <h2 class="section-title has-text-centered">Nos Produits</h2>
+    <div class="columns is-multiline">
+      {% for product in products %}
+      <div class="column is-one-third fade-in">
+        <div class="card product-card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            </figure>
+          </div>
+          <div class="card-content">
+            <p class="title is-5">{{ product.name }}</p>
+            <p class="subtitle is-6">{{ product.price }} {{ product.currency }}</p>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="has-text-centered">Aucun produit disponible.</p>
+      {% endfor %}
+    </div>
+    {% if products|length > 6 %}
+    <div class="has-text-centered" style="margin-top: 20px;">
+      <a href="{% url 'products' %}" class="button is-link is-light">Voir tous les produits</a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section has-background-light fade-in">
+  <div class="container">
+    <h2 class="section-title has-text-centered">Témoignages</h2>
+    <div id="testimonials-slider">
+      <!-- Add slider logic with JS -->
+      <p class="has-text-centered">Slider des témoignages à venir...</p>
+    </div>
+  </div>
+</section>
+
+<!-- Partners -->
+<section class="section fade-in">
+  <div class="container">
+    <h2 class="section-title has-text-centered">Nos Partenaires</h2>
+    <div id="partners-carousel">
+      <!-- Add carousel logic with JS -->
+      <p class="has-text-centered">Logos des partenaires à venir...</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+// Fade-in on scroll
+document.addEventListener("DOMContentLoaded", function() {
+  const faders = document.querySelectorAll('.fade-in');
+  const appearOnScroll = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.2});
+
+  faders.forEach(fader => appearOnScroll.observe(fader));
+});
+</script>
+{% endblock %}

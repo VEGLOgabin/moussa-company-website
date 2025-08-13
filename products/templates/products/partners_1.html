@@ -1,0 +1,376 @@
+{% extends 'base.html' %}
+
+{% block title %}Espace Partenaires | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+
+    /* Hero Section */
+    .hero.is-info {
+        position: relative;
+        background-image: url('{{ MEDIA_URL }}products/prod_decor1.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        overflow: hidden;
+    }
+
+    /* Add blur overlay */
+    .hero.is-info::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: inherit; /* use same image */
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+        filter: blur(6px) brightness(0.5); /* blur + darken for readability */
+        z-index: 0;
+    }
+
+    /* Ensure text is above the overlay */
+    .hero.is-info .hero-body {
+        position: relative;
+        z-index: 1;
+    }
+
+
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+
+<!-- Hero Section -->
+<section class="hero is-info is-medium">
+  <div class="hero-body has-text-centered">
+    <p class="title is-2">Espace Partenaires & Franchise</p>
+    <p class="subtitle is-5">Rejoignez notre réseau et développons ensemble l’impact de Ecofeed</p>
+    <button class="button is-primary js-modal-trigger" data-target="createModal">Ajouter un partenaire</button>
+  </div>
+</section>
+
+
+
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
+
+
+<!-- Main Section -->
+<section class="section">
+  <div class="container">
+    
+    <!-- Intro -->
+    <div class="content has-text-centered mb-6">
+      <h2 class="title is-4">Pourquoi devenir partenaire ou franchisé ?</h2>
+      <p>Chez <strong>Ecofeed</strong>, nous croyons à la puissance des collaborations pour démocratiser une alimentation saine à base de soja. En tant que partenaire ou franchisé, vous participez activement à cette mission tout en bâtissant une activité durable.</p>
+    </div>
+
+    <!-- Benefits -->
+    <div class="columns is-multiline">
+      <div class="column is-one-third">
+        <div class="box has-text-centered">
+          <span class="icon is-large has-text-info">
+            <i class="fas fa-handshake fa-2x"></i>
+          </span>
+          <h3 class="title is-5">Collaboration gagnant-gagnant</h3>
+          <p>Profitez d’un accompagnement stratégique et commercial pour assurer votre succès local.</p>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box has-text-centered">
+          <span class="icon is-large has-text-success">
+            <i class="fas fa-seedling fa-2x"></i>
+          </span>
+          <h3 class="title is-5">Produits naturels & innovants</h3>
+          <p>Distribuez des produits de qualité, 100% naturels, conçus selon des standards rigoureux.</p>
+        </div>
+      </div>
+
+      <div class="column is-one-third">
+        <div class="box has-text-centered">
+          <span class="icon is-large has-text-warning">
+            <i class="fas fa-chart-line fa-2x"></i>
+          </span>
+          <h3 class="title is-5">Croissance partagée</h3>
+          <p>Bénéficiez d’un modèle de franchise flexible et évolutif adapté à votre marché.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Franchise Info -->
+    <div class="box has-text-centered mt-6">
+      <h3 class="title is-4">Intéressé(e) par la franchise Ecofeed ?</h3>
+      <p class="mb-4">Nous vous formons et vous accompagnons pour lancer votre point de vente, en partageant nos valeurs, notre savoir-faire et nos outils de gestion.</p>
+      <a href="mailto:contact@Ecofeed.com" class="button is-info is-medium">
+        <span class="icon"><i class="fas fa-envelope"></i></span>
+        <span>Contactez-nous</span>
+      </a>
+    </div>
+
+    <!-- Partners Listing -->
+    <div class="columns is-multiline">
+      {% for partner in partners %}
+      <div class="column is-4">
+        <div class="box has-text-centered">
+          {% if partner.logo %}
+          <figure class="image is-128x128 is-inline-block mb-3">
+            <img src="{{ partner.logo.url }}" alt="{{ partner.name }}">
+          </figure>
+          {% else %}
+          <figure class="image is-128x128 is-inline-block mb-3">
+            <img src="https://bulma.io/images/placeholders/128x128.png" alt="No logo">
+          </figure>
+          {% endif %}
+          
+          {% if partner.website %}
+          <p class="title is-5 mb-1">
+            <a href="{{ partner.website }}" target="_blank" rel="noopener noreferrer">{{ partner.name }}</a>
+          </p>
+
+          {% else %}
+
+          <p class="title is-5 mb-1">{{ partner.name }}</p>
+
+          {% endif %}
+
+          <div class="buttons is-centered mt-3">
+            <button
+              class="button is-warning is-small js-modal-trigger-edit"
+              data-target="editModal"
+              data-id="{{ partner.id }}"
+              data-name="{{ partner.name|escapejs }}"
+              data-website="{{ partner.website|default_if_none:''|escapejs }}"
+              data-logo="{% if partner.logo %}{{ partner.logo.url }}{% endif %}"
+            >
+              Modifier
+            </button>
+            <button
+              class="button is-danger is-small js-modal-trigger-delete"
+              data-target="deleteModal"
+              data-id="{{ partner.id }}"
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="has-text-centered">Aucun partenaire pour le moment.</p>
+      {% endfor %}
+    </div>
+
+  </div>
+</section>
+
+</div>
+
+<!-- Create Modal -->
+<div id="createModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un partenaire</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'partner_add' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Site web</label>
+          <div class="control">
+            <input class="input" type="url" name="website" placeholder="https://example.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Logo</label>
+          <div class="file is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="logo">
+              <span class="file-cta">
+                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                <span class="file-label">Choisir un fichier</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-success">Enregistrer</button>
+        <button class="button js-modal-close" type="button">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le partenaire</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form id="editForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" type="text" name="name" id="edit-name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Site web</label>
+          <div class="control">
+            <input class="input" type="url" name="website" id="edit-website" placeholder="https://example.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Logo actuel</label>
+          <figure class="image is-128x128">
+            <img id="edit-logo-preview" src="" alt="Logo partenaire" style="border-radius:8px;">
+          </figure>
+        </div>
+
+        <div class="field">
+          <label class="label">Changer le logo</label>
+          <div class="file is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="logo">
+              <span class="file-cta">
+                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                <span class="file-label">Choisir un fichier</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-warning">Mettre à jour</button>
+        <button class="button js-modal-close" type="button">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title has-text-danger">Supprimer le partenaire</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p>Êtes-vous sûr de vouloir supprimer ce partenaire ?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteForm" method="post">
+        {% csrf_token %}
+        <button type="submit" class="button is-danger">Oui, Supprimer</button>
+        <button class="button js-modal-close" type="button">Annuler</button>
+      </form>
+    </footer>
+  </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function openModal(modalId) {
+    const target = document.getElementById(modalId);
+    if (target) target.classList.add('is-active');
+  }
+
+  function closeAllModals() {
+    (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+      $modal.classList.remove('is-active');
+    });
+  }
+
+  // Open create modal
+  (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      openModal(modalId);
+    });
+  });
+
+  // Open edit modal & fill form
+  (document.querySelectorAll('.js-modal-trigger-edit') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const id = $trigger.dataset.id;
+      const name = $trigger.dataset.name;
+      const website = $trigger.dataset.website;
+      const logo = $trigger.dataset.logo;
+
+      const form = document.getElementById('editForm');
+      form.action = `/partners/update/${id}/`;
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-website').value = website;
+      document.getElementById('edit-logo-preview').src = logo || 'https://bulma.io/images/placeholders/128x128.png';
+
+      openModal(modalId);
+    });
+  });
+
+  // Open delete modal & set form action
+  (document.querySelectorAll('.js-modal-trigger-delete') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const id = $trigger.dataset.id;
+
+      const form = document.getElementById('deleteForm');
+      form.action = `/partners/delete/${id}/`;
+
+      openModal(modalId);
+    });
+  });
+
+  // Close modals on close buttons or background click
+  (document.querySelectorAll('.js-modal-close') || []).forEach(($close) => {
+    $close.addEventListener('click', () => {
+      closeAllModals();
+    });
+  });
+});
+</script>
+{% endblock %}

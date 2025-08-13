@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block title %}Témoignages | Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
+/* Add any testimonial specific styles here */
+
+    /* Hero Section */
+    .hero.is-light {
+        position: relative;
+        background-image: url('{{ MEDIA_URL }}products/prod_decor1.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        overflow: hidden;
+    }
+
+    /* Add blur overlay */
+    .hero.is-light::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: inherit; /* use same image */
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+        filter: blur(6px) brightness(0.5); /* blur + darken for readability */
+        z-index: 0;
+    }
+
+    /* Ensure text is above the overlay */
+    .hero.is-light .hero-body {
+        position: relative;
+        z-index: 1;
+    }
+
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+
+<!-- Hero -->
+<section class="hero is-light is-medium">
+  <div class="hero-body has-text-centered">
+    <p class="title is-2 has-text-white">Témoignages</p>
+    <p class="subtitle is-5 has-text-white">Ce que nos clients disent à propos de nous</p>
+    <button class="button is-primary js-modal-trigger has-text-white" data-target="createModal">Ajouter un témoignage</button>
+  </div>
+</section>
+
+
+
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
+<!-- Testimonials Section -->
+<section class="section">
+  <div class="container">
+    <div class="columns is-multiline">
+
+      {% for testimonial in testimonials %}
+      <div class="column is-4">
+        <div class="box has-text-centered">
+          <figure class="image is-96x96 is-inline-block mb-3">
+            {% if testimonial.photo %}
+            <img class="is-rounded" src="{{ testimonial.photo.url }}" alt="{{ testimonial.name }}">
+            {% else %}
+            <img class="is-rounded" src="https://bulma.io/images/placeholders/96x96.png" alt="No photo">
+            {% endif %}
+          </figure>
+          <p class="title is-6 mb-1">{{ testimonial.name }}</p>
+          <br>
+          <p class="subtitle is-7 mb-3 has-text-grey">Témoignage</p>
+          <p>"{{ testimonial.content }}"</p>
+
+          <div class="buttons is-centered mt-3">
+            <button
+              class="button is-warning is-small js-modal-trigger-edit"
+              data-target="editModal"
+              data-id="{{ testimonial.id }}"
+              data-name="{{ testimonial.name|escapejs }}"
+              data-content="{{ testimonial.content|escapejs }}"
+              data-photo="{% if testimonial.photo %}{{ testimonial.photo.url }}{% endif %}"
+            >
+              Modifier
+            </button>
+            <button
+              class="button is-danger is-small js-modal-trigger-delete"
+              data-target="deleteModal"
+              data-id="{{ testimonial.id }}"
+            >
+              Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <p class="has-text-centered">Aucun témoignage disponible pour le moment.</p>
+      {% endfor %}
+
+    </div>
+  </div>
+</section>
+
+</div>
+
+<!-- Create Modal -->
+<div id="createModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Créer un témoignage</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'testimonial_add' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Témoignage</label>
+          <div class="control">
+            <textarea class="textarea" name="content" required></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Photo de profil</label>
+          <div class="file is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="photo">
+              <span class="file-cta">
+                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                <span class="file-label">Choisir un fichier</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-success">Enregistrer</button>
+        <button class="button js-modal-close" type="button">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le témoignage</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form id="editForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom</label>
+          <div class="control">
+            <input class="input" type="text" name="name" id="edit-name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Témoignage</label>
+          <div class="control">
+            <textarea class="textarea" name="content" id="edit-content" required></textarea>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Photo actuelle</label>
+          <figure class="image is-128x128">
+            <img id="edit-photo-preview" src="" alt="Photo témoignage" style="border-radius:8px;">
+          </figure>
+        </div>
+
+        <div class="field">
+          <label class="label">Changer la photo</label>
+          <div class="file is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="photo">
+              <span class="file-cta">
+                <span class="file-icon"><i class="fas fa-upload"></i></span>
+                <span class="file-label">Choisir un fichier</span>
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="button is-warning">Mettre à jour</button>
+        <button class="button js-modal-close" type="button">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title has-text-danger">Supprimer le témoignage</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p>Êtes-vous sûr de vouloir supprimer ce témoignage ?</p>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteForm" method="post">
+        {% csrf_token %}
+        <button type="submit" class="button is-danger">Oui, Supprimer</button>
+        <button class="button js-modal-close" type="button">Annuler</button>
+      </form>
+    </footer>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  function openModal(modalId) {
+    const target = document.getElementById(modalId);
+    if (target) target.classList.add('is-active');
+  }
+
+  function closeAllModals() {
+    (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+      $modal.classList.remove('is-active');
+    });
+  }
+
+  // Open create modal
+  (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      openModal(modalId);
+    });
+  });
+
+  // Open edit modal & fill form
+  (document.querySelectorAll('.js-modal-trigger-edit') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const id = $trigger.dataset.id;
+      const name = $trigger.dataset.name;
+      const content = $trigger.dataset.content;
+      const photo = $trigger.dataset.photo;
+
+      const form = document.getElementById('editForm');
+      form.action = `/testimonials/update/${id}/`;
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-content').value = content;
+      document.getElementById('edit-photo-preview').src = photo || 'https://bulma.io/images/placeholders/128x128.png';
+
+      openModal(modalId);
+    });
+  });
+
+  // Open delete modal & set form action
+  (document.querySelectorAll('.js-modal-trigger-delete') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const id = $trigger.dataset.id;
+
+      const form = document.getElementById('deleteForm');
+      form.action = `/testimonials/delete/${id}/`;
+
+      openModal(modalId);
+    });
+  });
+
+  // Close modals on close buttons or background click
+  (document.querySelectorAll('.js-modal-close') || []).forEach(($close) => {
+    $close.addEventListener('click', () => {
+      closeAllModals();
+    });
+  });
+});
+</script>
+{% endblock %}

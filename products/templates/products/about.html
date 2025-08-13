@@ -1,54 +1,51 @@
 {% extends 'base.html' %}
 
-{% block title %}À propos | The Future Nakouahan Sojainnovation{% endblock %}
+{% block title %}À propos | Ecofeed{% endblock %}
 
 {% block style %}
 <style>
-      .hero.is-info {
-      background-image: url('https://source.unsplash.com/1600x600/?village,agriculture');
-      background-size: cover;
-      background-position: center;
-      color: white;
+    /* Hero Section */
+    .hero.is-info {
+        position: relative;
+        background-image: url('{{ MEDIA_URL }}products/prod_decor1.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        overflow: hidden;
     }
-    .has-light-bg {
-      background-color: #f5f5f5;
+
+    /* Add blur overlay */
+    .hero.is-info::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: inherit; /* use same image */
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+        filter: blur(6px) brightness(0.5); /* blur + darken for readability */
+        z-index: 0;
     }
+
+    /* Ensure text is above the overlay */
+    .hero.is-info .hero-body {
+        position: relative;
+        z-index: 1;
+    }
+
+
 </style>
 {% endblock %}
 
 {% block content %}
 
 <div>
-  <!-- Navbar -->
-<nav class="navbar is-white" role="navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item has-text-weight-bold" href="#">🌱 Sojainnovation</a>
-    <a role="button" class="navbar-burger" aria-label="menu" data-target="mainNavbar">
-      <span></span><span></span><span></span>
-    </a>
-  </div>
-  <div id="mainNavbar" class="navbar-menu">
-    <div class="navbar-end">
-      <a class="navbar-item" href="{% url 'home' %}">Accueil</a>
-      <a class="navbar-item has-text-success is-active" href="{% url 'about' %}">À propos</a>
-      <a class="navbar-item" href="{% url 'products' %}">Produits</a>
-      <a class="navbar-item" href="#">Commander</a>
-      <a class="navbar-item" href="{% url 'blog' %}">Actualités</a>
-      <a class="navbar-item" href="{% url 'testimonials' %}">Témoignages</a>
-      <a class="navbar-item" href="{% url 'contact' %}">Contact</a>
-      <a class="navbar-item" href="{% url 'partners' %}">Partenaires</a>
 
 
-      {% if user.is_authenticated %}
-        <a class="navbar-item has-text-success" href="{% url 'profile' %}">Mon profil</a>
-        <a class="navbar-item has-text-danger" href="{% url 'logout' %}">Se déconnecter</a>
-      {% else %}
-        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
-        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
-      {% endif %} 
-    </div>
-  </div>
-</nav>
 
 <!-- Hero -->
 <section class="hero is-medium is-info">
@@ -59,6 +56,25 @@
     </div>
   </div>
 </section>
+
+
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
 
 <!-- Mission / Vision -->
 <section class="section has-light-bg">
@@ -93,7 +109,7 @@
     <div class="columns is-vcentered">
       <div class="column is-6">
         <figure class="image is-4by3">
-          <img src="https://source.unsplash.com/800x600/?cassava,farmer" alt="Cassava farming">
+          <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Cassava farming">
         </figure>
       </div>
       <div class="column is-6">

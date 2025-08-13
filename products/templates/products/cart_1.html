@@ -1,0 +1,116 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+{% block content %}
+
+
+
+
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+<section class="section">
+  <div class="container">
+    <h1 class="title">Votre Panier</h1>
+    {% if cart_items %}
+    <table class="table is-fullwidth">
+  <thead>
+    <tr>
+      <th>Produit</th>
+      <th style="width:220px;">Quantité</th>
+      <th>Sous-total</th>
+      <th style="width:160px;">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in cart_items %}
+    <tr>
+      <td>{{ item.product.name }}</td>
+
+      <!-- Quantity (edit + submit) -->
+      <td>
+        <form method="POST" action="{% url 'update_cart_item' item.product.id %}">
+          {% csrf_token %}
+          <div class="field has-addons">
+            <p class="control">
+              <input
+                class="input is-small"
+                type="number"
+                name="quantity"
+                min="1"
+                step="1"
+                value="{{ item.quantity }}"
+                style="width:90px"
+                onchange="this.form.submit()"
+              >
+            </p>
+            <p class="control">
+              <button class="button is-small is-link" type="submit">
+                Mettre à jour
+              </button>
+            </p>
+          </div>
+        </form>
+      </td>
+
+      <td>{{ item.subtotal }} {{ item.product.currency }}</td>
+
+      <!-- Actions (remove) -->
+      <td>
+        <form method="POST" action="{% url 'remove_from_cart' item.product.id %}">
+          {% csrf_token %}
+          <button class="button is-small is-danger" type="submit">
+            <span class="icon"><i class="fas fa-trash"></i></span>
+            <span>Retirer</span>
+          </button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="has-text-weight-semibold">Total: {{ total }} XOF</p>
+<a href="{% url 'checkout' %}" class="button is-success mt-3">Procéder au paiement</a>
+    {% else %}
+    <p>Votre panier est vide.</p>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+

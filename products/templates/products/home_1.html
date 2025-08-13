@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil | The Future Nakouahan Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
+  /* Hero with dark overlay */
+  .hero {
+    position: relative;
+    background-image: url('https://source.unsplash.com/1600x600/?cassava,healthy-food');
+    background-size: cover;
+    background-position: center;
+    color: white;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* dark overlay */
+    z-index: 0;
+  }
+  .hero-body {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Section fade-in animation */
+  .fade-in {
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+  .fade-in.delay-1 { animation-delay: 0.2s; }
+  .fade-in.delay-2 { animation-delay: 0.4s; }
+  .fade-in.delay-3 { animation-delay: 0.6s; }
+  @keyframes fadeInUp {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Values Section */
+  .has-light-brown-bg {
+    background-color: #d2b48c;
+  }
+  .values-icon {
+    background-color: rgba(255 255 255 / 0.2);
+    border-radius: 50%;
+    padding: 1.5rem;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 80px;
+    height: 80px;
+  }
+  .values-icon:hover {
+    background-color: #fff;
+    color: #4caf50 !important;
+    transform: scale(1.1);
+  }
+  .values-text {
+    margin-top: 0.75rem;
+  }
+
+  /* Intro Section */
+  .intro-card {
+    background: #f9f9f9;
+    padding: 2rem;
+    border-radius: 12px;
+    max-width: 900px;
+    margin: 2rem auto;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+  .intro-buttons a {
+    margin: 0 0.5rem;
+  }
+
+  /* Featured Products Slider (placeholder) */
+  .featured-products {
+    max-width: 1100px;
+    margin: 3rem auto;
+  }
+  .featured-products .product-card {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  .featured-products .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+  }
+  .featured-products .product-image img {
+    width: 100%;
+    object-fit: cover;
+    height: 200px;
+  }
+  .featured-products .product-info {
+    padding: 1rem;
+  }
+  .featured-products .product-name {
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  .featured-products .product-price {
+    color: #23a455;
+    font-weight: 700;
+  }
+
+  /* Footer */
+  footer.footer {
+    background-color: #4caf50;
+    color: white;
+    padding: 2rem 1.5rem;
+    margin-top: 4rem;
+  }
+  footer.footer a {
+    color: white;
+    margin-right: 1rem;
+  }
+  footer.footer a:hover {
+    text-decoration: underline;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .intro-card {
+      margin: 1rem;
+      padding: 1.5rem;
+    }
+    .values-icon {
+      width: 60px;
+      height: 60px;
+      padding: 1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div>
+
+  <!-- Hero Section -->
+  <section class="hero is-large">
+    <div class="hero-body">
+      <div class="container has-text-centered fade-in">
+        <h1 class="title is-1 has-text-white has-text-weight-bold">
+          Bienvenue chez Sojainnovation
+        </h1>
+        <h2 class="subtitle is-4 has-text-white">
+          Des produits locaux, sains et sans gluten à base de manioc
+        </h2>
+        <a class="button is-success is-medium mt-4" href="{% url 'products' %}">Découvrir nos produits</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Valeurs Section -->
+  <section class="section has-light-brown-bg fade-in delay-1">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered has-text-white">Nos Valeurs</h2>
+      <div class="columns is-multiline is-centered">
+        <div class="column is-3 has-text-centered">
+          <span class="icon values-icon has-text-white"><i class="fas fa-heart fa-2x"></i></span>
+          <p class="has-text-white values-text">Santé</p>
+        </div>
+        <div class="column is-3 has-text-centered">
+          <span class="icon values-icon has-text-white"><i class="fas fa-leaf fa-2x"></i></span>
+          <p class="has-text-white values-text">Tradition</p>
+        </div>
+        <div class="column is-3 has-text-centered">
+          <span class="icon values-icon has-text-white"><i class="fas fa-lightbulb fa-2x"></i></span>
+          <p class="has-text-white values-text">Innovation</p>
+        </div>
+        <div class="column is-3 has-text-centered">
+          <span class="icon values-icon has-text-white"><i class="fas fa-handshake fa-2x"></i></span>
+          <p class="has-text-white values-text">Proximité</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Intro Section -->
+  <section class="section fade-in delay-2">
+    <div class="container intro-card has-text-centered">
+      <h2 class="title is-3">Qui sommes-nous ?</h2>
+      <p class="subtitle is-5">
+        The Future Nakouahan Sojainnovation est une entreprise agroalimentaire innovante spécialisée dans
+        la transformation du manioc en produits sans gluten. Nous croyons en une alimentation saine,
+        accessible et enracinée dans la tradition locale.
+      </p>
+      <div class="buttons intro-buttons is-centered mt-4">
+        <a href="{% url 'products' %}" class="button is-link is-medium">Commander maintenant</a>
+        <a href="{% url 'about' %}" class="button is-light is-medium">En savoir plus</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Slider (Placeholder) -->
+  <section class="section featured-products fade-in delay-3">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered mb-5">Produits phares</h2>
+      <div class="columns is-multiline is-variable is-4">
+        {% comment %}
+        Replace below static product cards with dynamic content
+        {% endcomment %}
+        <div class="column is-4">
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://source.unsplash.com/400x300/?cassava,food" alt="Produit 1">
+            </div>
+            <div class="product-info">
+              <p class="product-name">Produit 1</p>
+              <p class="product-price">1200 FCFA</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://source.unsplash.com/400x300/?gluten-free" alt="Produit 2">
+            </div>
+            <div class="product-info">
+              <p class="product-name">Produit 2</p>
+              <p class="product-price">1500 FCFA</p>
+            </div>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="product-card">
+            <div class="product-image">
+              <img src="https://source.unsplash.com/400x300/?healthy-food" alt="Produit 3">
+            </div>
+            <div class="product-info">
+              <p class="product-name">Produit 3</p>
+              <p class="product-price">1000 FCFA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container has-text-centered">
+    <p>© 2025 The Future Nakouahan Sojainnovation. Tous droits réservés.</p>
+    <div class="mt-3">
+      <a href="#" aria-label="Facebook"><i class="fab fa-facebook fa-lg"></i></a>
+      <a href="#" aria-label="Twitter"><i class="fab fa-twitter fa-lg"></i></a>
+      <a href="#" aria-label="Instagram"><i class="fab fa-instagram fa-lg"></i></a>
+    </div>
+  </div>
+</footer>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // You can add some smooth scroll or animations here later
+</script>
+{% endblock %}

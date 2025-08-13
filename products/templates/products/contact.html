@@ -1,10 +1,46 @@
 <
 {% extends 'base.html' %}
 
-{% block title %}Contact | Sojainnovation{% endblock %}
+{% block title %}Contact | Ecofeed{% endblock %}
 
 {% block style %}
 <style>
+
+    /* Hero Section */
+    .hero.is-light {
+        position: relative;
+        background-image: url('{{ MEDIA_URL }}products/prod_decor1.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        color: white;
+        overflow: hidden;
+    }
+
+    /* Add blur overlay */
+    .hero.is-light::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: inherit; /* use same image */
+        background-size: inherit;
+        background-position: inherit;
+        background-repeat: inherit;
+        filter: blur(6px) brightness(0.5); /* blur + darken for readability */
+        z-index: 0;
+    }
+
+    /* Ensure text is above the overlay */
+    .hero.is-light .hero-body {
+        position: relative;
+        z-index: 1;
+    }
+
+
+
 </style>
 {% endblock %}
 
@@ -13,46 +49,37 @@
 
 <div>
 
-  <!-- Navbar -->
-<nav class="navbar is-white" role="navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item has-text-weight-bold" href="#">🌱 Sojainnovation</a>
-    <a role="button" class="navbar-burger" aria-label="menu" data-target="mainNavbar">
-      <span></span><span></span><span></span>
-    </a>
-  </div>
-  <div id="mainNavbar" class="navbar-menu">
-    <div class="navbar-end">
-      <a class="navbar-item" href="{% url 'home' %}">Accueil</a>
-      <a class="navbar-item" href="{% url 'about' %}">À propos</a>
-      <a class="navbar-item" href="{% url 'products' %}">Produits</a>
-      <a class="navbar-item" href="#">Commander</a>
-      <a class="navbar-item" href="{% url 'blog' %}">Actualités</a>
-      <a class="navbar-item" href="{% url 'testimonials' %}">Témoignages</a>
-      <a class="navbar-item has-text-success is-active" href="{% url 'contact' %}">Contact</a>
-      <a class="navbar-item" href="{% url 'partners' %}">Partenaires</a>
 
 
-
-
-      {% if user.is_authenticated %}
-        <a class="navbar-item has-text-success" href="{% url 'profile' %}">Mon profil</a>
-        <a class="navbar-item has-text-danger" href="{% url 'logout' %}">Se déconnecter</a>
-      {% else %}
-        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
-        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
-      {% endif %} 
-    </div>
-  </div>
-</nav>
 
 <!-- Hero Section -->
 <section class="hero is-light is-medium">
   <div class="hero-body has-text-centered">
-    <p class="title is-2">Contact</p>
-    <p class="subtitle is-5">Envie d’échanger avec nous ? Écrivez-nous ou passez nous voir !</p>
+    <p class="title is-2 has-text-white">Contact</p>
+    <p class="subtitle is-5 has-text-white">Envie d’échanger avec nous ? Écrivez-nous ou passez nous voir !</p>
   </div>
 </section>
+
+
+
+
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
 
 <!-- Contact Form + Map -->
 <section class="section">
@@ -62,13 +89,15 @@
       <!-- Contact Form -->
       <div class="column is-half">
         <h3 class="title is-4">Envoyer un message</h3>
-        <form action="#" method="POST">
+        <form method="POST"  action="{% url 'contact_message_add' %}">
+          {% csrf_token %}
           <div class="field">
-            <label class="label">Nom</label>
+            <label class="label">Nom & Prénoms</label>
             <div class="control">
               <input class="input" type="text" name="name" placeholder="Votre nom" required>
             </div>
           </div>
+
 
           <div class="field">
             <label class="label">Email</label>
@@ -76,6 +105,17 @@
               <input class="input" type="email" name="email" placeholder="Votre email" required>
             </div>
           </div>
+
+
+
+          <div class="field">
+            <label class="label">Sujet</label>
+            <div class="control">
+              <input class="input" type="text" name="subject" placeholder="Votre nom" required>
+            </div>
+          </div>
+
+
 
           <div class="field">
             <label class="label">Message</label>
@@ -101,21 +141,33 @@
         <div class="box">
           <iframe 
             src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.823182263603!2d2.4404033151740045!3d6.367099427256668!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103c9f23c8fca4f7%3A0xf7454c33e95ea48c!2sCotonou%2C%20Benin!5e0!3m2!1sfr!2sbj!4v1659612174871!5m2!1sfr!2sbj" 
-            width="100%" height="300" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy">
+            width="100%" height="430" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy">
           </iframe>
         </div>
       </div>
 
     </div>
 
-    <!-- WhatsApp Button -->
+   <!-- WhatsApp Button -->
     <div class="has-text-centered mt-6">
       <a href="https://wa.me/22991234567" target="_blank" class="button is-link is-medium is-rounded">
         <span class="icon"><i class="fab fa-whatsapp"></i></span>
         <span>Nous écrire sur WhatsApp</span>
       </a>
       <p class="is-size-7 mt-2">📞 Disponible du lundi au samedi, de 8h à 18h</p>
+    </div> 
+
+
+  {% if user.is_authenticated %}
+      <!-- View messages Button as admin -->
+    <div class="has-text-centered mt-6">
+      <a href="{% url 'contact_messages' %}" target="_blank" class="button is-link is-medium is-rounded">
+        <span class="icon"><i class="fab"></i></span>
+        <span>Consulter les messages</span>
+      </a>
     </div>
+
+    {% endif %}
 
   </div>
 </section>

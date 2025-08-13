@@ -1,45 +1,23 @@
 {% extends 'base.html' %}
 
-{% block title %}Historique des paiements{% endblock %}
+{% block title %}Historique des paiements | Ecofeed{% endblock %}
 
 {% block content %}
 
 
-
-<!-- Navbar -->
-  <!-- Navbar -->
-<nav class="navbar is-white" role="navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item has-text-weight-bold" href="#">🌱 Sojainnovation</a>
-    <a role="button" class="navbar-burger" aria-label="menu" data-target="mainNavbar">
-      <span></span><span></span><span></span>
-    </a>
-  </div>
-  <div id="mainNavbar" class="navbar-menu">
-    <div class="navbar-end">
-      <a class="navbar-item" href="{% url 'home' %}">Accueil</a>
-      <a class="navbar-item" href="{% url 'about' %}">À propos</a>
-      <a class="navbar-item " href="{% url 'products' %}">Produits</a>
-      <a class="navbar-item" href="#">Commander</a>
-      <a class="navbar-item" href="{% url 'blog' %}">Actualités</a>
-      <a class="navbar-item" href="{% url 'testimonials' %}">Témoignages</a>
-      <a class="navbar-item" href="{% url 'contact' %}">Contact</a>
-      <a class="navbar-item" href="{% url 'partners' %}">Partenaires</a>
-
-
-
-
-      {% if user.is_authenticated %}
-        <a class="navbar-item has-text-success" href="{% url 'profile' %}">Mon profil</a>
-        <a class="navbar-item has-text-danger" href="{% url 'logout' %}">Se déconnecter</a>
-      {% else %}
-        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
-        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
-      {% endif %} 
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
     </div>
-  </div>
-</nav>
-
+  {% endfor %}
+</div>
+{% endif %}
 
 
 <section class="section">
