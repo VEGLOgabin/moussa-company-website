@@ -4,6 +4,372 @@
 
 {% block style %}
 <style>
+  /* Modern styling for signup page */
+  .signup-hero {
+    background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+    min-height: calc(100vh - 52px);
+    display: flex;
+    align-items: center;
+    padding: 2rem 0;
+    margin-top: 52px; /* Account for fixed navbar */
+  }
+
+  .signup-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  .signup-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, #4caf50 0%, #80e27e 100%);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    color: white;
+  }
+
+  .card-header h1 {
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  .card-header p {
+    opacity: 0.9;
+    margin-top: 0.5rem;
+    font-weight: 300;
+  }
+
+  .card-body {
+    padding: 2.5rem 2rem;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: #263238;
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 0.9rem 1rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
+  }
+
+  .form-control:focus {
+    outline: none;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    background-color: white;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .form-row .form-group {
+    flex: 1;
+  }
+
+  .file-upload {
+    position: relative;
+    margin-top: 0.5rem;
+  }
+
+  .file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1rem;
+    background-color: #fafafa;
+    border: 1px dashed #e0e0e0;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-label:hover {
+    background-color: #f0f0f0;
+    border-color: #4caf50;
+  }
+
+  .file-upload-text {
+    color: #90a4ae;
+  }
+
+  .file-upload-button {
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-button:hover {
+    background-color: #087f23;
+  }
+
+  .file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .file-name {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #90a4ae;
+    font-style: italic;
+  }
+
+  .submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #4caf50 0%, #087f23 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+  }
+
+  .login-link {
+    text-align: center;
+    margin-top: 2rem;
+    color: #90a4ae;
+  }
+
+  .login-link a {
+    color: #4caf50;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .login-link a:hover {
+    color: #087f23;
+  }
+
+  /* Notification styling */
+  .notification-container {
+    max-width: 480px;
+    margin: 2rem auto 0;
+    padding: 0 1rem;
+  }
+
+  .notification {
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid;
+  }
+
+  .notification.success {
+    background-color: #e8f5e9;
+    border-left-color: #4caf50;
+    color: #2e7d32;
+  }
+
+  .notification.error {
+    background-color: #ffebee;
+    border-left-color: #f44336;
+    color: #c62828;
+  }
+
+  .notification.info {
+    background-color: #e3f2fd;
+    border-left-color: #2196f3;
+    color: #1565c0;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 576px) {
+    .form-row {
+      flex-direction: column;
+      gap: 0;
+    }
+    
+    .card-body {
+      padding: 2rem 1.5rem;
+    }
+    
+    .card-header {
+      padding: 2rem 1.5rem;
+    }
+    
+    .signup-hero {
+      padding: 1rem 0;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Messages -->
+{% if messages %}
+<div class="notification-container">
+  {% for message in messages %}
+    <div class="notification {% if message.tags == 'success' %}success{% elif message.tags == 'error' %}error{% else %}info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<section class="signup-hero">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-6">
+        <div class="signup-card">
+          <div class="card-header">
+            <h1>Créer un compte</h1>
+            <p>Rejoignez notre communauté dès aujourd'hui</p>
+          </div>
+          
+          <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+              {% csrf_token %}
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Prénom</label>
+                  <input class="form-control" type="text" name="first_name" placeholder="Votre prénom" required>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Nom</label>
+                  <input class="form-control" type="text" name="last_name" placeholder="Votre nom" required>
+                </div>
+              </div>
+              
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Sexe</label>
+                  <select class="form-control" name="sex">
+                    <option value="Homme">Homme</option>
+                    <option value="Femme">Femme</option>
+                  </select>
+                </div>
+                
+                <div class="form-group">
+                  <label class="form-label">Date de naissance</label>
+                  <input class="form-control" type="date" name="birthdate">
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Téléphone</label>
+                <input class="form-control" type="tel" name="phone_number" placeholder="+229..." required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Email</label>
+                <input class="form-control" type="email" name="email" placeholder="exemple@sojainnovation.bj" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Mot de passe</label>
+                <input class="form-control" type="password" name="password" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">Photo de profil</label>
+                <div class="file-upload">
+                  <label class="file-upload-label">
+                    <span class="file-upload-text">Choisir un fichier</span>
+                    <span class="file-upload-button">Parcourir</span>
+                    <input class="file-input" type="file" name="photo">
+                  </label>
+                  <div class="file-name">Aucun fichier choisi</div>
+                </div>
+              </div>
+              
+              <button type="submit" class="submit-btn">Créer mon compte</button>
+            </form>
+            
+            <div class="login-link">
+              Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Show selected filename for file input
+  document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.querySelector('.file-input');
+    if (fileInput) {
+      fileInput.addEventListener('change', function () {
+        const fileName = document.querySelector('.file-name');
+        if (fileInput.files.length > 0) {
+          fileName.textContent = fileInput.files[0].name;
+          fileName.style.color = '#4caf50';
+        } else {
+          fileName.textContent = "Aucun fichier choisi";
+          fileName.style.color = '#90a4ae';
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}Créer un compte | Sojainnovation{% endblock %}
+
+{% block style %}
+<style>
   .form-box {
     border-radius: 15px;
     background-color: #fdfcfb;
@@ -158,4 +524,4 @@
     }
   });
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

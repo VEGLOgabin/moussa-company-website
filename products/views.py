@@ -19,16 +19,43 @@ user_actions_logger = logging.getLogger('user_actions')
 
 
 
-# Home page
+# # Home page
+# def home(request):
+#     context = {
+#         'user': request.user,
+#         'products': Product.objects.all()[:6],
+#         'testimonials': Testimonial.objects.all()[:6],
+#         'blogs': BlogPost.objects.order_by('-published_at')[:6],
+#         'partners': Partner.objects.all()
+#     }
+#     return render(request, "products/home.html", context)
 def home(request):
+    # Get featured products (you can add a 'featured' field to Product model later)
+    featured_products = Product.objects.all()[:8]
+    
+    # Get latest products for new arrivals
+    new_arrivals = Product.objects.order_by('-created_at')[:6]
+    
+    # Get best sellers (you can add ordering logic later)
+    best_sellers = Product.objects.all()[:6]
+    
+    # Get latest blog posts
+    latest_posts = BlogPost.objects.order_by('-published_at')[:3]
+    
     context = {
         'user': request.user,
-        'products': Product.objects.all()[:6],
-        'testimonials': Testimonial.objects.all()[:6],
-        'blogs': BlogPost.objects.order_by('-published_at')[:6],
-        'partners': Partner.objects.all()
+        'featured_products': featured_products,
+        'new_arrivals': new_arrivals,
+        'best_sellers': best_sellers,
+        'testimonials': Testimonial.objects.all()[:4],
+        'blogs': latest_posts,
+        'partners': Partner.objects.all()[:8]
     }
-    return render(request, "products/home_4.html", context)
+    return render(request, "products/home.html", context)
+
+
+
+
 
 
 # # Product listing
@@ -53,11 +80,106 @@ def products(request):
         'is_admin': True,
         'cart_product_ids': cart_product_ids
     }
-    return render(request, "products/produits_4.html", context)
+    return render(request, "products/produits.html", context)
 
 
 
 
+# from django.http import JsonResponse
+# import json
+
+# @require_POST
+# def add_to_cart_ajax(request, product_id):
+#     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#         cart = request.session.get('cart', {})
+#         product_id_str = str(product_id)
+        
+#         if product_id_str in cart:
+#             cart[product_id_str] += 1
+#         else:
+#             cart[product_id_str] = 1
+            
+#         request.session['cart'] = cart
+#         request.session.modified = True
+        
+#         return JsonResponse({
+#             'success': True,
+#             'cart_count': len(cart),
+#             'message': 'Produit ajouté au panier avec succès!'
+#         })
+#     return JsonResponse({'success': False}, status=400)
+
+# @require_POST
+# def remove_from_cart_ajax(request, product_id):
+#     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+#         cart = request.session.get('cart', {})
+#         product_id_str = str(product_id)
+        
+#         if product_id_str in cart:
+#             del cart[product_id_str]
+#             request.session['cart'] = cart
+#             request.session.modified = True
+            
+#             return JsonResponse({
+#                 'success': True,
+#                 'cart_count': len(cart),
+#                 'message': 'Produit retiré du panier'
+#             })
+    
+#     return JsonResponse({'success': False}, status=400)
+from django.http import JsonResponse
+import json
+
+@require_POST
+def add_to_cart_ajax(request, product_id):
+    
+    user_actions_logger.info(f"Add to cart called for product {product_id}")
+    user_actions_logger.info(f"Headers: {request.headers}")
+    # Remove the XMLHttpRequest check or make it optional
+    try:
+        cart = request.session.get('cart', {})
+        product_id_str = str(product_id)
+        
+        if product_id_str in cart:
+            cart[product_id_str] += 1
+        else:
+            cart[product_id_str] = 1
+            
+        request.session['cart'] = cart
+        request.session.modified = True
+        
+        return JsonResponse({
+            'success': True,
+            'cart_count': len(cart),
+            'message': 'Produit ajouté au panier avec succès!'
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
+
+@require_POST
+def remove_from_cart_ajax(request, product_id):
+    # Remove the XMLHttpRequest check or make it optional
+    try:
+        cart = request.session.get('cart', {})
+        product_id_str = str(product_id)
+        
+        if product_id_str in cart:
+            del cart[product_id_str]
+            request.session['cart'] = cart
+            request.session.modified = True
+            
+            return JsonResponse({
+                'success': True,
+                'cart_count': len(cart),
+                'message': 'Produit retiré du panier'
+            })
+        else:
+            return JsonResponse({'success': False, 'message': 'Produit non trouvé dans le panier'}, status=400)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=400)
+    
+    
+    
 
 
 @login_required

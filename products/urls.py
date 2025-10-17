@@ -8,7 +8,8 @@ urlpatterns = [
     path('products/add/',views.add_product,name="add_product"),
     path('products/update/<int:product_id>/', views.update_product, name='update_product'),
     path('products/delete/<int:product_id>/', views.delete_product, name='delete_product'),
-    
+    path('cart/add/<int:product_id>/', views.add_to_cart_ajax, name='add_to_cart_ajax'),
+    path('cart/remove/<int:product_id>/', views.remove_from_cart_ajax, name='remove_from_cart_ajax'),
     
     
     path('blog/',views.blog,name="blog"),
@@ -56,8 +57,8 @@ urlpatterns = [
     path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/', views.cart_view, name='cart'),
     # path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
-    path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
-    path('cart/update/<int:product_id>/', views.update_cart_item, name='update_cart_item'),
+    # path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    # path('cart/update/<int:product_id>/', views.update_cart_item, name='update_cart_item'),
 
     
     path('checkout/', views.checkout, name='checkout'),

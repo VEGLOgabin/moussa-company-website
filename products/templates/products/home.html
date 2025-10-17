@@ -1,90 +1,586 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Accueil | The Future Nakouahan Sojainnovation{% endblock %}
+{% block title %}Ecofeed - Produits Naturels & Biologiques{% endblock %}
 
 {% block style %}
 <style>
+  /* Hero Section */
+  .hero-section {
+    background: linear-gradient(135deg, rgba(35, 164, 85, 0.9) 0%, rgba(30, 140, 74, 0.9) 100%),
+                url('{{ MEDIA_URL }}products/prod_decor1.png') center/cover;
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+    margin-top: -70px;
+    padding-top: 170px;
+  }
 
-  .hero {
-      background-image: url('https://source.unsplash.com/1600x600/?cassava,healthy-food');
-      background-size: cover;
-      background-position: center;
-      color: white;
-    }
-    .has-light-brown-bg {
-      background-color: #d2b48c;
-    }
-    .has-green-bg {
-      background-color: #4caf50;
-      color: white;
-    }
+  .hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
 
+  .hero-subtitle {
+    font-size: 1.3rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .hero-cta {
+    background: #ff6b35;
+    color: white;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    border: none;
+    transition: all 0.3s ease;
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 107, 53, 0.3);
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 4rem 0;
+    background: #f8f9fa;
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: 2rem 1rem;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .feature-icon {
+    width: 80px;
+    height: 80px;
+    background: #e8f5e9;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: #23a455;
+    font-size: 2rem;
+  }
+
+  /* Products Section */
+  .products-section {
+    padding: 5rem 0;
+  }
+
+  .section-title {
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: #2c3e50;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  .product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+  }
+
+  .product-image {
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+
+  .product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(35, 164, 85, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .product-card:hover .product-overlay {
+    opacity: 1;
+  }
+
+  .add-to-cart-btn {
+    background: white;
+    color: #23a455;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 25px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+
+  .add-to-cart-btn:hover {
+    background: #ff6b35;
+    color: white;
+  }
+
+  .product-info {
+    padding: 1.5rem;
+  }
+
+  .product-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+  }
+
+  .product-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #23a455;
+  }
+
+  /* Testimonials */
+  .testimonials-section {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: white;
+    padding: 5rem 0;
+  }
+
+  .testimonial-card {
+    background: rgba(255,255,255,0.1);
+    padding: 2rem;
+    border-radius: 15px;
+    margin: 1rem;
+    backdrop-filter: blur(10px);
+  }
+
+  .testimonial-text {
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+  }
+
+  .author-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+  }
+
+  /* Newsletter */
+  .newsletter-section {
+    background: linear-gradient(135deg, #23a455 0%, #1e8c4a 100%);
+    color: white;
+    padding: 4rem 0;
+    text-align: center;
+  }
+
+  .newsletter-title {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .newsletter-form {
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  .newsletter-input {
+    border-radius: 50px 0 0 50px;
+    border: none;
+    padding: 1rem 1.5rem;
+  }
+
+  .newsletter-btn {
+    border-radius: 0 50px 50px 0;
+    background: #ff6b35;
+    border: none;
+    padding: 1rem 2rem;
+    font-weight: 600;
+  }
+
+  /* Blog Section */
+  .blog-section {
+    padding: 5rem 0;
+    background: #f8f9fa;
+  }
+
+  .blog-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+  }
+
+  .blog-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .blog-image {
+    height: 200px;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .blog-content {
+    padding: 1.5rem;
+  }
+
+  .blog-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+
+  .blog-excerpt {
+    color: #6c757d;
+    margin-bottom: 1rem;
+  }
+
+  .read-more {
+    color: #23a455;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Partners */
+  .partners-section {
+    padding: 3rem 0;
+    text-align: center;
+  }
+
+  .partner-logo {
+    height: 80px;
+    margin: 1rem;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    filter: grayscale(100%);
+  }
+
+  .partner-logo:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: scale(1.1);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.5rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
-
-<div>
-
 <!-- Hero Section -->
-<section class="hero is-large">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-1 has-text-white has-text-weight-bold">
-        Bienvenue chez Sojainnovation
-      </h1>
-      <h2 class="subtitle is-4 has-text-white">
-        Des produits locaux, sains et sans gluten à base de manioc
-      </h2>
-      <a class="button is-success is-medium mt-4" href="#">Découvrir nos produits</a>
-    </div>
-  </div>
-</section>
-
-<!-- Valeurs Section -->
-<section class="section has-light-brown-bg">
+<section class="hero-section">
   <div class="container">
-    <h2 class="title is-3 has-text-centered has-text-white">Nos Valeurs</h2>
-    <div class="columns is-multiline is-centered">
-      <div class="column is-3 has-text-centered">
-        <span class="icon is-large has-text-white"><i class="fas fa-heart fa-2x"></i></span>
-        <p class="has-text-white mt-2">Santé</p>
-      </div>
-      <div class="column is-3 has-text-centered">
-        <span class="icon is-large has-text-white"><i class="fas fa-leaf fa-2x"></i></span>
-        <p class="has-text-white mt-2">Tradition</p>
-      </div>
-      <div class="column is-3 has-text-centered">
-        <span class="icon is-large has-text-white"><i class="fas fa-lightbulb fa-2x"></i></span>
-        <p class="has-text-white mt-2">Innovation</p>
-      </div>
-      <div class="column is-3 has-text-centered">
-        <span class="icon is-large has-text-white"><i class="fas fa-handshake fa-2x"></i></span>
-        <p class="has-text-white mt-2">Proximité</p>
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <h1 class="hero-title">Produits Naturels pour une Vie Saine</h1>
+        <p class="hero-subtitle">
+          Découvrez notre sélection de produits biologiques, locaux et respectueux de l'environnement
+        </p>
+        <a href="{% url 'products' %}" class="button hero-cta">
+          Découvrir nos produits
+        </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Intro Section -->
-<section class="section">
-  <div class="container has-text-centered">
-    <h2 class="title is-3">Qui sommes-nous ?</h2>
-    <p class="subtitle is-5">
-      The Future Nakouahan Sojainnovation est une entreprise agroalimentaire innovante spécialisée dans
-      la transformation du manioc en produits sans gluten. Nous croyons en une alimentation saine,
-      accessible et enracinée dans la tradition locale.
+<!-- Features Section -->
+<section class="features-section">
+  <div class="container">
+    <div class="columns is-multiline">
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <h3 class="title is-5">100% Naturel</h3>
+          <p class="subtitle is-6">Des produits biologiques et sans produits chimiques</p>
+        </div>
+      </div>
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h3 class="title is-5">Livraison Rapide</h3>
+          <p class="subtitle is-6">Expédition sous 24h pour toute commande</p>
+        </div>
+      </div>
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="title is-5">Paiement Sécurisé</h3>
+          <p class="subtitle is-6">Transactions cryptées et protégées</p>
+        </div>
+      </div>
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <h3 class="title is-5">Qualité Garantie</h3>
+          <p class="subtitle is-6">Satisfaction garantie ou remboursé</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<section class="products-section">
+  <div class="container">
+    <h2 class="section-title">Produits Populaires</h2>
+    <div class="columns is-multiline">
+      {% for product in featured_products %}
+      <div class="column is-3">
+        <div class="product-card">
+          <div class="product-image" style="background-image: url('{{ product.image.url }}')">
+            <div class="product-overlay">
+              <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="button add-to-cart-btn">
+                  <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="has-text-centered mt-5">
+      <a href="{% url 'products' %}" class="button is-primary is-medium">
+        Voir tous les produits
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- New Arrivals -->
+<section class="products-section" style="background: #f8f9fa;">
+  <div class="container">
+    <h2 class="section-title">Nouveautés</h2>
+    <div class="columns is-multiline">
+      {% for product in new_arrivals %}
+      <div class="column is-2">
+        <div class="product-card">
+          <div class="product-image" style="background-image: url('{{ product.image.url }}')">
+            <div class="product-overlay">
+              <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="button add-to-cart-btn">
+                  <i class="fas fa-cart-plus mr-2"></i>Ajouter
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name is-size-6">{{ product.name|truncatechars:30 }}</h3>
+            <p class="product-price is-size-5">{{ product.price }} {{ product.currency }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials-section">
+  <div class="container">
+    <h2 class="section-title has-text-white">Ce que disent nos clients</h2>
+    <div class="columns is-multiline">
+      {% for testimonial in testimonials %}
+      <div class="column is-6">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"{{ testimonial.content }}"</p>
+          <div class="testimonial-author">
+            {% if testimonial.photo %}
+            <img src="{{ testimonial.photo.url }}" alt="{{ testimonial.name }}" class="author-avatar">
+            {% else %}
+            <div class="author-avatar has-background-primary has-text-white is-flex is-align-items-center is-justify-content-center">
+              <i class="fas fa-user"></i>
+            </div>
+            {% endif %}
+            <div>
+              <strong>{{ testimonial.name }}</strong>
+              <br>
+              <small>{{ testimonial.date }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter-section">
+  <div class="container">
+    <h2 class="newsletter-title">Restez Informé</h2>
+    <p class="subtitle is-5 has-text-white mb-4">
+      Recevez nos dernières offres et actualités
     </p>
-    <div class="buttons is-centered mt-4">
-      <a href="#" class="button is-link is-medium">Commander maintenant</a>
-      <a href="#" class="button is-light is-medium">En savoir plus</a>
+    <form class="newsletter-form">
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <input class="input newsletter-input" type="email" placeholder="Votre adresse email">
+        </div>
+        <div class="control">
+          <button class="button newsletter-btn" type="submit">
+            S'abonner
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Blog Section -->
+<section class="blog-section">
+  <div class="container">
+    <h2 class="section-title">Notre Blog</h2>
+    <div class="columns is-multiline">
+      {% for post in blogs %}
+      <div class="column is-4">
+        <div class="blog-card">
+          {% if post.cover_image %}
+          <div class="blog-image" style="background-image: url('{{ post.cover_image.url }}')"></div>
+          {% else %}
+          <div class="blog-image has-background-primary"></div>
+          {% endif %}
+          <div class="blog-content">
+            <h3 class="blog-title">{{ post.title }}</h3>
+            <p class="blog-excerpt">{{ post.content|truncatewords:20 }}</p>
+            <a href="{% url 'blog_detail' post.slug %}" class="read-more">
+              Lire la suite →
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="has-text-centered mt-4">
+      <a href="{% url 'blog' %}" class="button is-primary">
+        Voir tous les articles
+      </a>
     </div>
   </div>
 </section>
 
-</div>
-
+<!-- Partners -->
+<section class="partners-section">
+  <div class="container">
+    <h2 class="section-title">Nos Partenaires</h2>
+    <div class="columns is-multiline is-centered">
+      {% for partner in partners %}
+      <div class="column is-2">
+        {% if partner.logo %}
+        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="partner-logo">
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
 {% endblock %}
 
 {% block scripts %}
-{% endblock scripts %}
+<script>
+  // Add smooth scrolling for anchor links
+  document.addEventListener('DOMContentLoaded', function() {
+    const links = document.querySelectorAll('a[href^="#"]');
+    
+    for (const link of links) {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    }
+    
+    // Add animation on scroll
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, observerOptions);
+    
+    // Observe elements for animation
+    const animatedElements = document.querySelectorAll('.product-card, .feature-card, .testimonial-card');
+    animatedElements.forEach(el => {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition = 'all 0.6s ease';
+      observer.observe(el);
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,397 @@
+<!-- Modal Form for Creating Product -->
+<div class="modal" id="productModal">
+  <div class="modal-background" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un produit</p>
+      <button class="delete" aria-label="close" onclick="closeModal()"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'add_product' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" placeholder="Nom du produit" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" placeholder="Description détaillée du produit..." rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Prix ({{ product.currency|default:"XOF" }})</label>
+              <div class="control">
+                <input class="input" type="number" name="price" placeholder="0" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" value="1" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image du produit</label>
+          <div class="file has-name is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" accept="image/*" required>
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Choisir une image…</span>
+              </span>
+              <span class="file-name">Aucun fichier sélectionné</span>
+            </label>
+          </div>
+          <p class="help">Formats acceptés: JPG, PNG, WEBP. Taille max: 5MB</p>
+        </div>
+
+        <div class="image-preview mt-4 is-hidden" id="imagePreview">
+          <p class="has-text-centered mb-2">Aperçu de l'image</p>
+          <img id="previewImage" src="" alt="Aperçu" class="preview-image">
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">
+          <span class="icon">
+            <i class="fas fa-plus-circle"></i>
+          </span>
+          <span>Ajouter le produit</span>
+        </button>
+        <button class="button" type="button" onclick="closeModal()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Form for Updating Product -->
+<div class="modal" id="productModalUpdate">
+  <div class="modal-background" onclick="closeModalUpdate()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le produit</p>
+      <button class="delete" aria-label="close" onclick="closeModalUpdate()"></button>
+    </header>
+    <form id="updateProductForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <input type="hidden" name="product_id">
+
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Prix ({{ product.currency|default:"XOF" }})</label>
+              <div class="control">
+                <input class="input" type="number" name="price" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" value="1" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image actuelle</label>
+          <div class="image-preview">
+            <img id="updateProductImagePreview" src="" alt="Image actuelle du produit" class="preview-image">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Changer l'image</label>
+          <div class="file has-name is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" accept="image/*" id="updateImageInput">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Changer l'image…</span>
+              </span>
+              <span class="file-name">Garder l'image actuelle</span>
+            </label>
+          </div>
+          <p class="help">Laissez vide pour conserver l'image actuelle</p>
+        </div>
+
+        <div class="image-preview mt-4 is-hidden" id="updateImagePreview">
+          <p class="has-text-centered mb-2">Nouvel aperçu</p>
+          <img id="newPreviewImage" src="" alt="Nouvel aperçu" class="preview-image">
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">
+          <span class="icon">
+            <i class="fas fa-save"></i>
+          </span>
+          <span>Enregistrer les modifications</span>
+        </button>
+        <button class="button" type="button" onclick="closeModalUpdate()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Modal for Deleting Product -->
+<div class="modal" id="deleteProductModal">
+  <div class="modal-background" onclick="closeDeleteModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head has-background-danger">
+      <p class="modal-card-title has-text-white">
+        <span class="icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+        <span>Confirmer la suppression</span>
+      </p>
+      <button class="delete" aria-label="close" onclick="closeDeleteModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="content">
+        <div class="has-text-centered mb-4">
+          <span class="icon is-large has-text-danger">
+            <i class="fas fa-trash-alt fa-3x"></i>
+          </span>
+        </div>
+        <h4 class="title is-5 has-text-centered">Êtes-vous sûr de vouloir supprimer ce produit ?</h4>
+        <p class="has-text-centered">
+          Cette action est irréversible. Toutes les données associées à ce produit seront définitivement perdues.
+        </p>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteProductForm" method="POST">
+        {% csrf_token %}
+        <button class="button is-danger" type="submit">
+          <span class="icon">
+            <i class="fas fa-trash"></i>
+          </span>
+          <span>Supprimer définitivement</span>
+        </button>
+        <button class="button" type="button" onclick="closeDeleteModal()">
+          <span class="icon">
+            <i class="fas fa-times"></i>
+          </span>
+          <span>Annuler</span>
+        </button>
+      </form>
+    </footer>
+  </div>
+</div>
+
+<style>
+  .preview-image {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+    border: 2px solid #e0e0e0;
+  }
+
+  .file-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .modal-card {
+    max-width: 600px;
+    width: 90%;
+  }
+
+  .modal-card-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  @media (max-width: 768px) {
+    .modal-card {
+      width: 95%;
+      margin: 0 auto;
+    }
+  }
+</style>
+
+<script>
+  // File input handling for create modal
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create product modal file input
+    const fileInput = document.querySelector('#productModal .file-input');
+    if (fileInput) {
+      fileInput.onchange = function () {
+        const fileName = document.querySelector('#productModal .file-name');
+        if (fileInput.files.length > 0) {
+          fileName.textContent = fileInput.files[0].name;
+          
+          // Show image preview
+          const preview = document.getElementById('imagePreview');
+          const previewImage = document.getElementById('previewImage');
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('is-hidden');
+          }
+          
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          fileName.textContent = "Aucun fichier sélectionné";
+          document.getElementById('imagePreview').classList.add('is-hidden');
+        }
+      };
+    }
+
+    // Update product modal file input
+    const updateFileInput = document.getElementById('updateImageInput');
+    if (updateFileInput) {
+      updateFileInput.onchange = function () {
+        const fileName = document.querySelector('#productModalUpdate .file-name');
+        if (updateFileInput.files.length > 0) {
+          fileName.textContent = updateFileInput.files[0].name;
+          
+          // Show new image preview
+          const preview = document.getElementById('updateImagePreview');
+          const previewImage = document.getElementById('newPreviewImage');
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('is-hidden');
+          }
+          
+          reader.readAsDataURL(updateFileInput.files[0]);
+        } else {
+          fileName.textContent = "Garder l'image actuelle";
+          document.getElementById('updateImagePreview').classList.add('is-hidden');
+        }
+      };
+    }
+
+    // Reset modals when closed
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('modal:close', function() {
+        const fileInputs = modal.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+          input.value = '';
+        });
+        
+        const fileNames = modal.querySelectorAll('.file-name');
+        fileNames.forEach(name => {
+          name.textContent = input.type === 'file' ? 
+            (modal.id === 'productModalUpdate' ? "Garder l'image actuelle" : "Aucun fichier sélectionné") : 
+            name.textContent;
+        });
+        
+        const previews = modal.querySelectorAll('.image-preview');
+        previews.forEach(preview => {
+          if (!preview.id.includes('updateProductImagePreview')) {
+            preview.classList.add('is-hidden');
+          }
+        });
+      });
+    });
+  });
+
+  // Enhanced modal functions
+  function openModal() { 
+    const modal = document.getElementById("productModal");
+    modal.classList.add("is-active");
+    // Reset form
+    modal.querySelector('form').reset();
+    document.getElementById('imagePreview').classList.add('is-hidden');
+  }
+  
+  function closeModal() { 
+    const modal = document.getElementById("productModal");
+    modal.classList.remove("is-active");
+    modal.dispatchEvent(new Event('modal:close'));
+  }
+
+  function openModalUpdate(button) {
+    const modal = document.getElementById("productModalUpdate");
+    const form = document.getElementById("updateProductForm");
+    const productId = button.getAttribute("data-id");
+    
+    form.action = `/products/update/${productId}/`;
+    form.querySelector("input[name='product_id']").value = productId;
+    form.querySelector("input[name='name']").value = button.getAttribute("data-name");
+    form.querySelector("textarea[name='description']").value = button.getAttribute("data-description");
+    form.querySelector("input[name='price']").value = button.getAttribute("data-price");
+    
+    if (button.hasAttribute("data-quantity")) {
+      form.querySelector("input[name='quantity']").value = button.getAttribute("data-quantity");
+    }
+
+    const imgPreview = document.getElementById("updateProductImagePreview");
+    imgPreview.src = button.getAttribute("data-image");
+
+    // Reset file input and hide new preview
+    const fileInput = document.getElementById('updateImageInput');
+    fileInput.value = '';
+    document.querySelector('#productModalUpdate .file-name').textContent = "Garder l'image actuelle";
+    document.getElementById('updateImagePreview').classList.add('is-hidden');
+
+    modal.classList.add("is-active");
+  }
+
+  function closeModalUpdate() {
+    const modal = document.getElementById("productModalUpdate");
+    modal.classList.remove("is-active");
+    modal.dispatchEvent(new Event('modal:close'));
+  }
+
+  function openDeleteModal(productId) {
+    const modal = document.getElementById("deleteProductModal");
+    const form = document.getElementById("deleteProductForm");
+    form.action = `/products/delete/${productId}/`;
+    modal.classList.add("is-active");
+  }
+
+  function closeDeleteModal() {
+    const modal = document.getElementById("deleteProductModal");
+    modal.classList.remove("is-active");
+  }
+
+  // Close modals with ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+      closeModalUpdate();
+      closeDeleteModal();
+    }
+  });
+</script>

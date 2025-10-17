@@ -1,104 +1,2527 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Produits | The Future Nakouahan Sojainnovation{% endblock %}
+{% block title %}Boutique | Ecofeed{% endblock %}
 
 {% block style %}
 <style>
+  /* ===== VARIABLES ===== */
+  :root {
+    --primary: #23a455;
+    --primary-dark: #1e8c4a;
+    --primary-light: #e8f5e9;
+    --accent: #ff6b35;
+    --dark: #2c3e50;
+    --light: #f8f9fa;
+    --gray: #6c757d;
+    --border: #e9ecef;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
 
-   .hero.is-primary {
-      background-image: url('https://source.unsplash.com/1600x600/?cassava,food');
-      background-size: cover;
-      background-position: center;
-      color: white;
+  /* ===== HERO SECTION ===== */
+  .products-hero {
+    background: linear-gradient(135deg, rgba(35, 164, 85, 0.9) 0%, rgba(30, 140, 74, 0.9) 100%),
+                url('{% static "products/prod_decor.png" %}') center/cover;
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+    margin-top: -70px;
+    padding-top: 150px;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* ===== FILTER SECTION ===== */
+  .filter-section {
+    background: white;
+    padding: 2rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+  }
+
+  .search-box {
+    position: relative;
+  }
+
+  .search-input {
+    border-radius: 50px;
+    padding-left: 3rem;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(35, 164, 85, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    z-index: 5;
+  }
+
+  /* ===== PRODUCT GRID ===== */
+  .products-grid {
+    padding: 2rem 0;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .product-image {
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image img {
+    transform: scale(1.05);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--accent);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .product-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .product-card:hover .product-actions {
+    opacity: 1;
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .action-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .product-info {
+    padding: 1.5rem;
+  }
+
+  .product-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+    line-height: 1.4;
+  }
+
+  .product-description {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .product-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1rem;
+  }
+
+  .product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  .product-rating {
+    color: #ffc107;
+  }
+
+  /* ===== CART BUTTONS ===== */
+  .cart-section {
+    margin-top: 1rem;
+  }
+
+  .cart-btn {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .add-to-cart {
+    background: var(--primary);
+    color: white;
+  }
+
+  .add-to-cart:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .remove-from-cart {
+    background: #dc3545;
+    color: white;
+  }
+
+  .remove-from-cart:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+  }
+
+  .in-cart-indicator {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ===== FLOATING ACTION BUTTONS ===== */
+  .floating-actions {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .floating-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-size: 1.2rem;
+    position: relative;
+  }
+
+  .floating-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  .floating-btn.primary {
+    background: var(--primary);
+  }
+
+  .floating-btn.info {
+    background: #17a2b8;
+  }
+
+  .floating-btn-text {
+    position: absolute;
+    right: 70px;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .floating-btn:hover .floating-btn-text {
+    opacity: 1;
+    right: 80px;
+  }
+
+  /* ===== MODAL STYLES ===== */
+  .modal-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    max-width: 600px;
+    width: 90%;
+  }
+
+  .modal-card-head {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+  }
+
+  .modal-card-title {
+    color: white;
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+
+  .modal-card-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+
+  .modal-card-foot {
+    background: var(--light);
+    border-top: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+  }
+
+  .image-preview {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px dashed var(--border);
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .image-preview img {
+    max-height: 200px;
+    border-radius: 8px;
+    max-width: 100%;
+  }
+
+  .preview-image {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+    border: 2px solid #e0e0e0;
+  }
+
+  .file-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* ===== TOAST NOTIFICATIONS ===== */
+  .toast {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border-left: 4px solid var(--primary);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    max-width: 300px;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  .toast.success {
+    border-left-color: var(--primary);
+  }
+
+  .toast.error {
+    border-left-color: #dc3545;
+  }
+
+  /* ===== EMPTY STATE ===== */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--gray);
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* ===== LOADING STATES ===== */
+  .loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .button.is-loading {
+    position: relative;
+    color: transparent !important;
+  }
+
+  .button.is-loading::after {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* ===== RESPONSIVE DESIGN ===== */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.2rem;
     }
 
+    .hero-subtitle {
+      font-size: 1.1rem;
+    }
+
+    .product-card {
+      margin-bottom: 1.5rem;
+    }
+
+    .floating-actions {
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .floating-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 1rem;
+    }
+
+    .modal-card {
+      width: 95%;
+      margin: 0 auto;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ===== TOAST NOTIFICATION ===== -->
+<div class="toast" id="toast">
+  <div class="toast-content">
+    <strong id="toast-title">Success</strong>
+    <p id="toast-message">Operation completed successfully</p>
+  </div>
+</div>
+
+<!-- ===== HERO SECTION ===== -->
+<section class="products-hero">
+  <div class="container">
+    <h1 class="hero-title">Notre Boutique</h1>
+    <p class="hero-subtitle">
+      Découvrez notre sélection exclusive de produits naturels et biologiques pour votre bien-être
+    </p>
+  </div>
+</section>
+
+<!-- ===== FILTER SECTION ===== -->
+<section class="filter-section">
+  <div class="container">
+    <div class="columns is-vcentered">
+      <div class="column is-8">
+        <div class="search-box">
+          <span class="search-icon">
+            <i class="fas fa-search"></i>
+          </span>
+          <input class="input search-input" type="text" id="searchInput" placeholder="Rechercher un produit...">
+        </div>
+      </div>
+      <div class="column is-4">
+        <div class="field">
+          <div class="select is-fullwidth">
+            <select id="sortSelect">
+              <option value="">Trier par</option>
+              <option value="name">Nom (A-Z)</option>
+              <option value="price_asc">Prix (Croissant)</option>
+              <option value="price_desc">Prix (Décroissant)</option>
+              <option value="newest">Plus récent</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PRODUCTS GRID ===== -->
+<section class="products-grid">
+  <div class="container">
+    <div class="columns is-multiline" id="productGrid">
+      {% for product in products %}
+      <div class="column is-4 product-item" 
+           data-name="{{ product.name|lower }}" 
+           data-description="{{ product.description|lower }}"
+           data-price="{{ product.price }}"
+           data-date="{{ product.created_at|date:'Y-m-d' }}">
+        
+        <div class="product-card">
+          <!-- Product Image -->
+          <div class="product-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% if forloop.counter <= 3 %}
+            <div class="product-badge">Populaire</div>
+            {% endif %}
+            
+            <!-- Quick Actions -->
+            <div class="product-actions">
+              <button class="action-btn" title="Voir les détails">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="Ajouter aux favoris">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Product Info -->
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">{{ product.description }}</p>
+            
+            <div class="product-meta">
+              <span class="product-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </span>
+              <span>En stock</span>
+            </div>
+
+            <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+
+            <!-- Cart Section -->
+            <div class="cart-section">
+              {% if product.id|stringformat:"s" in cart_product_ids %}
+                <div class="in-cart-indicator">
+                  <i class="fas fa-check-circle mr-2"></i>Dans le panier
+                </div>
+                <button class="cart-btn remove-from-cart" data-product-id="{{ product.id }}">
+                  <i class="fas fa-trash mr-2"></i>Retirer du panier
+                </button>
+              {% else %}
+                <button class="cart-btn add-to-cart" data-product-id="{{ product.id }}">
+                  <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                </button>
+              {% endif %}
+            </div>
+
+            <!-- Admin Actions -->
+            {% if user.is_authenticated and is_admin %}
+            <div class="buttons are-small is-justify-content-center mt-3">
+              <button class="button is-warning is-light edit-product"
+                      data-id="{{ product.id }}"
+                      data-name="{{ product.name }}"
+                      data-description="{{ product.description }}"
+                      data-price="{{ product.price }}"
+                      data-image="{{ product.image.url }}">
+                <i class="fas fa-edit mr-2"></i>Modifier
+              </button>
+              <button class="button is-danger is-light delete-product" data-id="{{ product.id }}">
+                <i class="fas fa-trash mr-2"></i>Supprimer
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="column is-12">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <h3 class="title is-4">Aucun produit trouvé</h3>
+          <p class="subtitle is-6">Aucun produit ne correspond à votre recherche.</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ===== FLOATING ACTION BUTTONS ===== -->
+{% if user.is_authenticated and is_admin %}
+<div class="floating-actions">
+  <button class="floating-btn primary" onclick="openModal()" title="Ajouter un produit">
+    <i class="fas fa-plus"></i>
+    <span class="floating-btn-text">Ajouter un produit</span>
+  </button>
+  <a href="{% url 'payment_history' %}" class="floating-btn info" title="Historique des paiements">
+    <i class="fas fa-receipt"></i>
+    <span class="floating-btn-text">Historique des paiements</span>
+  </a>
+</div>
+{% endif %}
+
+<!-- ===== MODALS ===== -->
+
+<!-- Create Product Modal -->
+<div class="modal" id="productModal">
+  <div class="modal-background" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un produit</p>
+      <button class="delete" aria-label="close" onclick="closeModal()"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'add_product' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" placeholder="Nom du produit" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" placeholder="Description détaillée du produit..." rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Prix ({{ product.currency|default:"XOF" }})</label>
+              <div class="control">
+                <input class="input" type="number" name="price" placeholder="0" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" value="1" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image du produit</label>
+          <div class="file has-name is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" accept="image/*" required>
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Choisir une image…</span>
+              </span>
+              <span class="file-name">Aucun fichier sélectionné</span>
+            </label>
+          </div>
+          <p class="help">Formats acceptés: JPG, PNG, WEBP. Taille max: 5MB</p>
+        </div>
+
+        <div class="image-preview mt-4 is-hidden" id="imagePreview">
+          <p class="has-text-centered mb-2">Aperçu de l'image</p>
+          <img id="previewImage" src="" alt="Aperçu" class="preview-image">
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">
+          <span class="icon">
+            <i class="fas fa-plus-circle"></i>
+          </span>
+          <span>Ajouter le produit</span>
+        </button>
+        <button class="button" type="button" onclick="closeModal()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Update Product Modal -->
+<div class="modal" id="productModalUpdate">
+  <div class="modal-background" onclick="closeModalUpdate()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le produit</p>
+      <button class="delete" aria-label="close" onclick="closeModalUpdate()"></button>
+    </header>
+    <form id="updateProductForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <input type="hidden" name="product_id">
+
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Prix ({{ product.currency|default:"XOF" }})</label>
+              <div class="control">
+                <input class="input" type="number" name="price" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" value="1" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image actuelle</label>
+          <div class="image-preview">
+            <img id="updateProductImagePreview" src="" alt="Image actuelle du produit" class="preview-image">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Changer l'image</label>
+          <div class="file has-name is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" accept="image/*" id="updateImageInput">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Changer l'image…</span>
+              </span>
+              <span class="file-name">Garder l'image actuelle</span>
+            </label>
+          </div>
+          <p class="help">Laissez vide pour conserver l'image actuelle</p>
+        </div>
+
+        <div class="image-preview mt-4 is-hidden" id="updateImagePreview">
+          <p class="has-text-centered mb-2">Nouvel aperçu</p>
+          <img id="newPreviewImage" src="" alt="Nouvel aperçu" class="preview-image">
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">
+          <span class="icon">
+            <i class="fas fa-save"></i>
+          </span>
+          <span>Enregistrer les modifications</span>
+        </button>
+        <button class="button" type="button" onclick="closeModalUpdate()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Product Modal -->
+<div class="modal" id="deleteProductModal">
+  <div class="modal-background" onclick="closeDeleteModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head has-background-danger">
+      <p class="modal-card-title has-text-white">
+        <span class="icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+        <span>Confirmer la suppression</span>
+      </p>
+      <button class="delete" aria-label="close" onclick="closeDeleteModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="content">
+        <div class="has-text-centered mb-4">
+          <span class="icon is-large has-text-danger">
+            <i class="fas fa-trash-alt fa-3x"></i>
+          </span>
+        </div>
+        <h4 class="title is-5 has-text-centered">Êtes-vous sûr de vouloir supprimer ce produit ?</h4>
+        <p class="has-text-centered">
+          Cette action est irréversible. Toutes les données associées à ce produit seront définitivement perdues.
+        </p>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteProductForm" method="POST">
+        {% csrf_token %}
+        <button class="button is-danger" type="submit">
+          <span class="icon">
+            <i class="fas fa-trash"></i>
+          </span>
+          <span>Supprimer définitivement</span>
+        </button>
+        <button class="button" type="button" onclick="closeDeleteModal()">
+          <span class="icon">
+            <i class="fas fa-times"></i>
+          </span>
+          <span>Annuler</span>
+        </button>
+      </form>
+    </footer>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ===== TOAST NOTIFICATION SYSTEM =====
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMessage = document.getElementById('toast-message');
+    
+    toast.className = `toast ${type}`;
+    toastTitle.textContent = type === 'success' ? 'Succès' : 'Erreur';
+    toastMessage.textContent = message;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+
+  // ===== CART COUNT UPDATE =====
+  function updateCartCount(count) {
+    const cartCountElements = document.querySelectorAll('.cart-count');
+    cartCountElements.forEach(element => {
+      element.textContent = `(${count})`;
+    });
+  }
+
+  // ===== CSRF TOKEN HELPER =====
+  function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+  }
+
+  // ===== CART AJAX FUNCTIONS =====
+    function addToCartHandler(event) {
+        event.preventDefault();
+        const productId = this.dataset.productId;
+        const button = this;
+        
+        button.classList.add('is-loading', 'loading');
+        
+        fetch(`/cart/add/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest', // Add this header
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update cart section
+                const cartSection = button.closest('.cart-section');
+                cartSection.innerHTML = `
+                    <div class="in-cart-indicator">
+                        <i class="fas fa-check-circle mr-2"></i>Dans le panier
+                    </div>
+                    <button class="cart-btn remove-from-cart" data-product-id="${productId}">
+                        <i class="fas fa-trash mr-2"></i>Retirer du panier
+                    </button>
+                `;
+                
+                // Re-attach event listener
+                cartSection.querySelector('.remove-from-cart').addEventListener('click', removeFromCartHandler);
+                
+                showToast(data.message || 'Produit ajouté au panier avec succès!', 'success');
+                updateCartCount(data.cart_count);
+            } else {
+                showToast(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Erreur lors de l\'ajout au panier', 'error');
+        })
+        .finally(() => {
+            button.classList.remove('is-loading', 'loading');
+        });
+    }
+
+    function removeFromCartHandler(event) {
+        event.preventDefault();
+        const productId = this.dataset.productId;
+        const button = this;
+        
+        button.classList.add('is-loading', 'loading');
+        
+        fetch(`/cart/remove/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest', // Add this header
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update cart section
+                const cartSection = button.closest('.cart-section');
+                cartSection.innerHTML = `
+                    <button class="cart-btn add-to-cart" data-product-id="${productId}">
+                        <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                    </button>
+                `;
+                
+                // Re-attach event listener
+                cartSection.querySelector('.add-to-cart').addEventListener('click', addToCartHandler);
+                
+                showToast(data.message || 'Produit retiré du panier', 'success');
+                updateCartCount(data.cart_count);
+            } else {
+                showToast(data.message || 'Erreur lors du retrait du panier', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Erreur lors du retrait du panier', 'error');
+        })
+        .finally(() => {
+            button.classList.remove('is-loading', 'loading');
+        });
+    }
+  // ===== PRODUCT FILTERING AND SORTING =====
+  function initializeFiltering() {
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const productItems = document.querySelectorAll('.product-item');
+
+    function filterAndSortProducts() {
+      const searchText = searchInput.value.toLowerCase();
+      const sortValue = sortSelect.value;
+
+      let filteredProducts = Array.from(productItems).filter(product => {
+        const name = product.dataset.name;
+        const description = product.dataset.description;
+        return name.includes(searchText) || description.includes(searchText);
+      });
+
+      // Sort products
+      if (sortValue) {
+        filteredProducts.sort((a, b) => {
+          switch (sortValue) {
+            case 'name':
+              return a.dataset.name.localeCompare(b.dataset.name);
+            case 'price_asc':
+              return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+            case 'price_desc':
+              return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+            case 'newest':
+              return new Date(b.dataset.date) - new Date(a.dataset.date);
+            default:
+              return 0;
+          }
+        });
+      }
+
+      // Update DOM
+      const productGrid = document.getElementById('productGrid');
+      productGrid.innerHTML = '';
+      filteredProducts.forEach(product => {
+        productGrid.appendChild(product);
+      });
+
+      // Re-attach event listeners to new elements
+      attachCartEventListeners();
+      attachAdminEventListeners();
+
+      // Show empty state if no products
+      if (filteredProducts.length === 0) {
+        productGrid.innerHTML = `
+          <div class="column is-12">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <h3 class="title is-4">Aucun produit trouvé</h3>
+              <p class="subtitle is-6">Essayez de modifier vos critères de recherche.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    if (searchInput) searchInput.addEventListener('input', filterAndSortProducts);
+    if (sortSelect) sortSelect.addEventListener('change', filterAndSortProducts);
+  }
+
+  // ===== EVENT LISTENER ATTACHMENT =====
+  function attachCartEventListeners() {
+    // Add to cart buttons
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', addToCartHandler);
+    });
+
+    // Remove from cart buttons
+    document.querySelectorAll('.remove-from-cart').forEach(button => {
+      button.addEventListener('click', removeFromCartHandler);
+    });
+  }
+
+  function attachAdminEventListeners() {
+    // Edit product buttons
+    document.querySelectorAll('.edit-product').forEach(button => {
+      button.addEventListener('click', function() {
+        openModalUpdate(this);
+      });
+    });
+
+    // Delete product buttons
+    document.querySelectorAll('.delete-product').forEach(button => {
+      button.addEventListener('click', function() {
+        openDeleteModal(this.dataset.id);
+      });
+    });
+  }
+
+  // ===== MODAL FUNCTIONS =====
+  function openModal() { 
+    document.getElementById("productModal").classList.add("is-active"); 
+  }
+  
+  function closeModal() { 
+    document.getElementById("productModal").classList.remove("is-active"); 
+  }
+
+  function openModalUpdate(button) {
+    const modal = document.getElementById("productModalUpdate");
+    const form = document.getElementById("updateProductForm");
+    const productId = button.getAttribute("data-id");
+    
+    form.action = `/products/update/${productId}/`;
+    form.querySelector("input[name='product_id']").value = productId;
+    form.querySelector("input[name='name']").value = button.getAttribute("data-name");
+    form.querySelector("textarea[name='description']").value = button.getAttribute("data-description");
+    form.querySelector("input[name='price']").value = button.getAttribute("data-price");
+    
+    if (button.hasAttribute("data-quantity")) {
+      form.querySelector("input[name='quantity']").value = button.getAttribute("data-quantity");
+    }
+
+    const imgPreview = document.getElementById("updateProductImagePreview");
+    imgPreview.src = button.getAttribute("data-image");
+
+    // Reset file input and hide new preview
+    const fileInput = document.getElementById('updateImageInput');
+    fileInput.value = '';
+    document.querySelector('#productModalUpdate .file-name').textContent = "Garder l'image actuelle";
+    document.getElementById('updateImagePreview').classList.add('is-hidden');
+
+    modal.classList.add("is-active");
+  }
+
+  function closeModalUpdate() {
+    document.getElementById("productModalUpdate").classList.remove("is-active");
+  }
+
+  function openDeleteModal(productId) {
+    const modal = document.getElementById("deleteProductModal");
+    const form = document.getElementById("deleteProductForm");
+    form.action = `/products/delete/${productId}/`;
+    modal.classList.add("is-active");
+  }
+
+  function closeDeleteModal() {
+    document.getElementById("deleteProductModal").classList.remove("is-active");
+  }
+
+  // ===== FILE INPUT HANDLING =====
+  function initializeFileInputs() {
+    // Create product modal file input
+    const fileInput = document.querySelector('#productModal .file-input');
+    if (fileInput) {
+      fileInput.onchange = function () {
+        const fileName = document.querySelector('#productModal .file-name');
+        if (fileInput.files.length > 0) {
+          fileName.textContent = fileInput.files[0].name;
+          
+          // Show image preview
+          const preview = document.getElementById('imagePreview');
+          const previewImage = document.getElementById('previewImage');
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('is-hidden');
+          }
+          
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          fileName.textContent = "Aucun fichier sélectionné";
+          document.getElementById('imagePreview').classList.add('is-hidden');
+        }
+      };
+    }
+
+    // Update product modal file input
+    const updateFileInput = document.getElementById('updateImageInput');
+    if (updateFileInput) {
+      updateFileInput.onchange = function () {
+        const fileName = document.querySelector('#productModalUpdate .file-name');
+        if (updateFileInput.files.length > 0) {
+          fileName.textContent = updateFileInput.files[0].name;
+          
+          // Show new image preview
+          const preview = document.getElementById('updateImagePreview');
+          const previewImage = document.getElementById('newPreviewImage');
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('is-hidden');
+          }
+          
+          reader.readAsDataURL(updateFileInput.files[0]);
+        } else {
+          fileName.textContent = "Garder l'image actuelle";
+          document.getElementById('updateImagePreview').classList.add('is-hidden');
+        }
+      };
+    }
+  }
+
+  // ===== INITIALIZATION =====
+  document.addEventListener('DOMContentLoaded', function() {
+    // Initialize cart functionality
+    attachCartEventListeners();
+    
+    // Initialize admin functionality
+    attachAdminEventListeners();
+    
+    // Initialize filtering and sorting
+    initializeFiltering();
+    
+    // Initialize file inputs
+    initializeFileInputs();
+
+    // Close modals with ESC key
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeModal();
+        closeModalUpdate();
+        closeDeleteModal();
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Boutique | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Product Page Styling */
+  :root {
+    --primary: #23a455;
+    --primary-dark: #1e8c4a;
+    --primary-light: #e8f5e9;
+    --accent: #ff6b35;
+    --dark: #2c3e50;
+    --light: #f8f9fa;
+    --gray: #6c757d;
+    --border: #e9ecef;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Hero Section */
+  .products-hero {
+    background: linear-gradient(135deg, rgba(35, 164, 85, 0.9) 0%, rgba(30, 140, 74, 0.9) 100%),
+                url('{% static "images/products-bg.jpg" %}') center/cover;
+    color: white;
+    padding: 80px 0;
+    text-align: center;
+    margin-top: -70px;
+    padding-top: 150px;
+  }
+
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+
+  .hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Filter Section */
+  .filter-section {
+    background: white;
+    padding: 2rem 0;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 2rem;
+  }
+
+  .search-box {
+    position: relative;
+  }
+
+  .search-input {
+    border-radius: 50px;
+    padding-left: 3rem;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(35, 164, 85, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray);
+    z-index: 5;
+  }
+
+  /* Product Grid */
+  .products-grid {
+    padding: 2rem 0;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: all 0.3s ease;
+    margin-bottom: 2rem;
+    position: relative;
+    border: 1px solid var(--border);
+  }
+
+  .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-hover);
+  }
+
+  .product-image {
+    height: 250px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image img {
+    transform: scale(1.05);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: var(--accent);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    z-index: 2;
+  }
+
+  .product-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transition: all 0.3s ease;
+  }
+
+  .product-card:hover .product-actions {
+    opacity: 1;
+  }
+
+  .action-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: white;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .action-btn:hover {
+    background: var(--primary);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  .product-info {
+    padding: 1.5rem;
+  }
+
+  .product-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+    line-height: 1.4;
+  }
+
+  .product-description {
+    color: var(--gray);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .product-price {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1rem;
+  }
+
+  .product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  .product-rating {
+    color: #ffc107;
+  }
+
+  .cart-btn {
+    width: 100%;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .add-to-cart {
+    background: var(--primary);
+    color: white;
+  }
+
+  .add-to-cart:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+  }
+
+  .remove-from-cart {
+    background: #dc3545;
+    color: white;
+  }
+
+  .remove-from-cart:hover {
+    background: #c82333;
+    transform: translateY(-2px);
+  }
+
+  .in-cart-indicator {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 0.5rem;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  /* Floating Action Buttons */
+  .floating-actions {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .floating-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    font-size: 1.2rem;
+  }
+
+  .floating-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+  }
+
+  .floating-btn.primary {
+    background: var(--primary);
+  }
+
+  .floating-btn.info {
+    background: #17a2b8;
+  }
+
+  .floating-btn-text {
+    position: absolute;
+    right: 70px;
+    background: white;
+    padding: 8px 16px;
+    border-radius: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    white-space: nowrap;
+    opacity: 0;
+    transition: all 0.3s ease;
+    pointer-events: none;
+  }
+
+  .floating-btn:hover .floating-btn-text {
+    opacity: 1;
+    right: 80px;
+  }
+
+  /* Modern Modal Styling */
+  .modal-card {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+
+  .modal-card-head {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1.5rem;
+  }
+
+  .modal-card-title {
+    color: white;
+    font-weight: 600;
+  }
+
+  .modal-card-foot {
+    background: var(--light);
+    border-top: 1px solid var(--border);
+    padding: 1.5rem;
+  }
+
+  .image-preview {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px dashed var(--border);
+    padding: 1rem;
+    text-align: center;
+  }
+
+  .image-preview img {
+    max-height: 200px;
+    border-radius: 8px;
+  }
+
+  /* Loading States */
+  .loading {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+
+  .button.is-loading {
+    position: relative;
+    color: transparent !important;
+  }
+
+  .button.is-loading::after {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Toast Notifications */
+  .toast {
+    position: fixed;
+    top: 100px;
+    right: 30px;
+    background: white;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border-left: 4px solid var(--primary);
+    z-index: 10000;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    max-width: 300px;
+  }
+
+  .toast.show {
+    transform: translateX(0);
+  }
+
+  .toast.success {
+    border-left-color: var(--primary);
+  }
+
+  .toast.error {
+    border-left-color: #dc3545;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--gray);
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    color: var(--border);
+    margin-bottom: 1rem;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero-title {
+      font-size: 2.2rem;
+    }
+
+    .product-card {
+      margin-bottom: 1.5rem;
+    }
+
+    .floating-actions {
+      bottom: 20px;
+      right: 20px;
+    }
+
+    .floating-btn {
+      width: 50px;
+      height: 50px;
+      font-size: 1rem;
+    }
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 
-
-<div>
+<!-- Toast Notification -->
+<div class="toast" id="toast">
+  <div class="toast-content">
+    <strong id="toast-title">Success</strong>
+    <p id="toast-message">Operation completed successfully</p>
+  </div>
+</div>
 
 <!-- Hero Section -->
-<section class="hero is-medium is-primary">
-  <div class="hero-body has-text-centered">
-    <p class="title is-1 has-text-white">Nos Produits</p>
-    <p class="subtitle is-4 has-text-white">Sains. Locaux. Sans gluten. Naturellement bons.</p>
+<section class="products-hero">
+  <div class="container">
+    <h1 class="hero-title">Notre Boutique</h1>
+    <p class="hero-subtitle">
+      Découvrez notre sélection exclusive de produits naturels et biologiques pour votre bien-être
+    </p>
   </div>
 </section>
 
-<!-- Products List -->
-<section class="section">
+<!-- Filter Section -->
+<section class="filter-section">
   <div class="container">
-    <div class="columns is-multiline is-centered">
-
-      <!-- Product 1 -->
+    <div class="columns is-vcentered">
+      <div class="column is-8">
+        <div class="search-box">
+          <span class="search-icon">
+            <i class="fas fa-search"></i>
+          </span>
+          <input class="input search-input" type="text" id="searchInput" placeholder="Rechercher un produit...">
+        </div>
+      </div>
       <div class="column is-4">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-4by3">
-              <img src="https://source.unsplash.com/600x400/?cassava,bread" alt="Pain à base de manioc">
-            </figure>
-          </div>
-          <div class="card-content">
-            <p class="title is-5">Pain à base de manioc</p>
-            <p class="content">
-              Délicieux pain sans gluten fabriqué à partir de manioc localement transformé.
-              Riche en fibres et parfait pour tous les régimes.
-            </p>
-            <a href="#" class="button is-primary is-small mt-2">Commander</a>
+        <div class="field">
+          <div class="select is-fullwidth">
+            <select id="sortSelect">
+              <option value="">Trier par</option>
+              <option value="name">Nom (A-Z)</option>
+              <option value="price_asc">Prix (Croissant)</option>
+              <option value="price_desc">Prix (Décroissant)</option>
+              <option value="newest">Plus récent</option>
+            </select>
           </div>
         </div>
       </div>
-
-      <!-- Product 2 -->
-      <div class="column is-4">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-4by3">
-              <img src="https://source.unsplash.com/600x400/?snacks,cassava" alt="Snacks santé au manioc">
-            </figure>
-          </div>
-          <div class="card-content">
-            <p class="title is-5">Snacks santé</p>
-            <p class="content">
-              Snacks croquants et naturels à base de manioc, idéals pour une pause nutritive.
-            </p>
-            <a href="#" class="button is-primary is-small mt-2">Commander</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Product 3 -->
-      <div class="column is-4">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-4by3">
-              <img src="https://source.unsplash.com/600x400/?cassava,flour" alt="Farine de manioc">
-            </figure>
-          </div>
-          <div class="card-content">
-            <p class="title is-5">Farine de manioc</p>
-            <p class="content">
-              Farine fine et pure à base de manioc, parfaite pour cuisiner sainement et local.
-            </p>
-            <a href="#" class="button is-primary is-small mt-2">Commander</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add more products here as needed -->
-
     </div>
   </div>
 </section>
 
+<!-- Products Grid -->
+<section class="products-grid">
+  <div class="container">
+    <div class="columns is-multiline" id="productGrid">
+      {% for product in products %}
+      <div class="column is-4 product-item" 
+           data-name="{{ product.name|lower }}" 
+           data-description="{{ product.description|lower }}"
+           data-price="{{ product.price }}"
+           data-date="{{ product.created_at|date:'Y-m-d' }}">
+        
+        <div class="product-card">
+          <!-- Product Image -->
+          <div class="product-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% if forloop.counter <= 3 %}
+            <div class="product-badge">Populaire</div>
+            {% endif %}
+            
+            <!-- Quick Actions -->
+            <div class="product-actions">
+              <button class="action-btn" title="Voir les détails">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn" title="Ajouter aux favoris">
+                <i class="far fa-heart"></i>
+              </button>
+            </div>
+          </div>
 
+          <!-- Product Info -->
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">{{ product.description }}</p>
+            
+            <div class="product-meta">
+              <span class="product-rating">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star-half-alt"></i>
+              </span>
+              <span>En stock</span>
+            </div>
+
+            <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+
+            <!-- Cart Actions -->
+            {% if product.id|stringformat:"s" in cart_product_ids %}
+              <div class="in-cart-indicator">
+                <i class="fas fa-check-circle mr-2"></i>Dans le panier
+              </div>
+              <button class="cart-btn remove-from-cart" data-product-id="{{ product.id }}">
+                <i class="fas fa-trash mr-2"></i>Retirer du panier
+              </button>
+            {% else %}
+              <button class="cart-btn add-to-cart" data-product-id="{{ product.id }}">
+                <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+              </button>
+            {% endif %}
+
+            <!-- Admin Actions -->
+            {% if user.is_authenticated and is_admin %}
+            <div class="buttons are-small is-justify-content-center mt-3">
+              <button class="button is-warning is-light edit-product"
+                      data-id="{{ product.id }}"
+                      data-name="{{ product.name }}"
+                      data-description="{{ product.description }}"
+                      data-price="{{ product.price }}"
+                      data-image="{{ product.image.url }}">
+                <i class="fas fa-edit mr-2"></i>Modifier
+              </button>
+              <button class="button is-danger is-light delete-product" data-id="{{ product.id }}">
+                <i class="fas fa-trash mr-2"></i>Supprimer
+              </button>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="column is-12">
+        <div class="empty-state">
+          <div class="empty-state-icon">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <h3 class="title is-4">Aucun produit trouvé</h3>
+          <p class="subtitle is-6">Aucun produit ne correspond à votre recherche.</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Floating Action Buttons -->
+{% if user.is_authenticated and is_admin %}
+<div class="floating-actions">
+  <button class="floating-btn primary" onclick="openModal()" title="Ajouter un produit">
+    <i class="fas fa-plus"></i>
+    <span class="floating-btn-text">Ajouter un produit</span>
+  </button>
+  <a href="{% url 'payment_history' %}" class="floating-btn info" title Historique des paiements">
+    <i class="fas fa-receipt"></i>
+    <span class="floating-btn-text">Historique des paiements</span>
+  </a>
 </div>
+{% endif %}
+
+<!-- Modals (same as before but with updated styling) -->
+
+
+
+
+
+
+
+
+<!-- Modal Form for Creating Product -->
+<div class="modal" id="productModal">
+  <div class="modal-background" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un produit</p>
+      <button class="delete" aria-label="close" onclick="closeModal()"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'add_product' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" placeholder="Nom du produit" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" placeholder="Description détaillée du produit..." rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Prix ({{ product.currency|default:"XOF" }})</label>
+              <div class="control">
+                <input class="input" type="number" name="price" placeholder="0" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" value="1" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image du produit</label>
+          <div class="file has-name is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" accept="image/*" required>
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Choisir une image…</span>
+              </span>
+              <span class="file-name">Aucun fichier sélectionné</span>
+            </label>
+          </div>
+          <p class="help">Formats acceptés: JPG, PNG, WEBP. Taille max: 5MB</p>
+        </div>
+
+        <div class="image-preview mt-4 is-hidden" id="imagePreview">
+          <p class="has-text-centered mb-2">Aperçu de l'image</p>
+          <img id="previewImage" src="" alt="Aperçu" class="preview-image">
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">
+          <span class="icon">
+            <i class="fas fa-plus-circle"></i>
+          </span>
+          <span>Ajouter le produit</span>
+        </button>
+        <button class="button" type="button" onclick="closeModal()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Form for Updating Product -->
+<div class="modal" id="productModalUpdate">
+  <div class="modal-background" onclick="closeModalUpdate()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le produit</p>
+      <button class="delete" aria-label="close" onclick="closeModalUpdate()"></button>
+    </header>
+    <form id="updateProductForm" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <input type="hidden" name="product_id">
+
+        <div class="field">
+          <label class="label">Nom du produit</label>
+          <div class="control">
+            <input class="input" type="text" name="name" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Description</label>
+          <div class="control">
+            <textarea class="textarea" name="description" rows="4" required></textarea>
+          </div>
+        </div>
+
+        <div class="columns">
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Prix ({{ product.currency|default:"XOF" }})</label>
+              <div class="control">
+                <input class="input" type="number" name="price" min="0" required>
+              </div>
+            </div>
+          </div>
+          <div class="column is-6">
+            <div class="field">
+              <label class="label">Quantité</label>
+              <div class="control">
+                <input class="input" type="number" name="quantity" value="1" min="1">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Image actuelle</label>
+          <div class="image-preview">
+            <img id="updateProductImagePreview" src="" alt="Image actuelle du produit" class="preview-image">
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label">Changer l'image</label>
+          <div class="file has-name is-boxed is-fullwidth">
+            <label class="file-label">
+              <input class="file-input" type="file" name="image" accept="image/*" id="updateImageInput">
+              <span class="file-cta">
+                <span class="file-icon">
+                  <i class="fas fa-upload"></i>
+                </span>
+                <span class="file-label">Changer l'image…</span>
+              </span>
+              <span class="file-name">Garder l'image actuelle</span>
+            </label>
+          </div>
+          <p class="help">Laissez vide pour conserver l'image actuelle</p>
+        </div>
+
+        <div class="image-preview mt-4 is-hidden" id="updateImagePreview">
+          <p class="has-text-centered mb-2">Nouvel aperçu</p>
+          <img id="newPreviewImage" src="" alt="Nouvel aperçu" class="preview-image">
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button class="button is-success" type="submit">
+          <span class="icon">
+            <i class="fas fa-save"></i>
+          </span>
+          <span>Enregistrer les modifications</span>
+        </button>
+        <button class="button" type="button" onclick="closeModalUpdate()">Annuler</button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Modal for Deleting Product -->
+<div class="modal" id="deleteProductModal">
+  <div class="modal-background" onclick="closeDeleteModal()"></div>
+  <div class="modal-card">
+    <header class="modal-card-head has-background-danger">
+      <p class="modal-card-title has-text-white">
+        <span class="icon">
+          <i class="fas fa-exclamation-triangle"></i>
+        </span>
+        <span>Confirmer la suppression</span>
+      </p>
+      <button class="delete" aria-label="close" onclick="closeDeleteModal()"></button>
+    </header>
+    <section class="modal-card-body">
+      <div class="content">
+        <div class="has-text-centered mb-4">
+          <span class="icon is-large has-text-danger">
+            <i class="fas fa-trash-alt fa-3x"></i>
+          </span>
+        </div>
+        <h4 class="title is-5 has-text-centered">Êtes-vous sûr de vouloir supprimer ce produit ?</h4>
+        <p class="has-text-centered">
+          Cette action est irréversible. Toutes les données associées à ce produit seront définitivement perdues.
+        </p>
+      </div>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteProductForm" method="POST">
+        {% csrf_token %}
+        <button class="button is-danger" type="submit">
+          <span class="icon">
+            <i class="fas fa-trash"></i>
+          </span>
+          <span>Supprimer définitivement</span>
+        </button>
+        <button class="button" type="button" onclick="closeDeleteModal()">
+          <span class="icon">
+            <i class="fas fa-times"></i>
+          </span>
+          <span>Annuler</span>
+        </button>
+      </form>
+    </footer>
+  </div>
+</div>
+
+<style>
+  .preview-image {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    margin: 0 auto;
+    display: block;
+    border: 2px solid #e0e0e0;
+  }
+
+  .file-name {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .modal-card {
+    max-width: 600px;
+    width: 90%;
+  }
+
+  .modal-card-body {
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+  }
+
+  @media (max-width: 768px) {
+    .modal-card {
+      width: 95%;
+      margin: 0 auto;
+    }
+  }
+</style>
+
+<script>
+  // File input handling for create modal
+  document.addEventListener('DOMContentLoaded', function() {
+    // Create product modal file input
+    const fileInput = document.querySelector('#productModal .file-input');
+    if (fileInput) {
+      fileInput.onchange = function () {
+        const fileName = document.querySelector('#productModal .file-name');
+        if (fileInput.files.length > 0) {
+          fileName.textContent = fileInput.files[0].name;
+          
+          // Show image preview
+          const preview = document.getElementById('imagePreview');
+          const previewImage = document.getElementById('previewImage');
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('is-hidden');
+          }
+          
+          reader.readAsDataURL(fileInput.files[0]);
+        } else {
+          fileName.textContent = "Aucun fichier sélectionné";
+          document.getElementById('imagePreview').classList.add('is-hidden');
+        }
+      };
+    }
+
+    // Update product modal file input
+    const updateFileInput = document.getElementById('updateImageInput');
+    if (updateFileInput) {
+      updateFileInput.onchange = function () {
+        const fileName = document.querySelector('#productModalUpdate .file-name');
+        if (updateFileInput.files.length > 0) {
+          fileName.textContent = updateFileInput.files[0].name;
+          
+          // Show new image preview
+          const preview = document.getElementById('updateImagePreview');
+          const previewImage = document.getElementById('newPreviewImage');
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            preview.classList.remove('is-hidden');
+          }
+          
+          reader.readAsDataURL(updateFileInput.files[0]);
+        } else {
+          fileName.textContent = "Garder l'image actuelle";
+          document.getElementById('updateImagePreview').classList.add('is-hidden');
+        }
+      };
+    }
+
+    // Reset modals when closed
+    document.querySelectorAll('.modal').forEach(modal => {
+      modal.addEventListener('modal:close', function() {
+        const fileInputs = modal.querySelectorAll('input[type="file"]');
+        fileInputs.forEach(input => {
+          input.value = '';
+        });
+        
+        const fileNames = modal.querySelectorAll('.file-name');
+        fileNames.forEach(name => {
+          name.textContent = input.type === 'file' ? 
+            (modal.id === 'productModalUpdate' ? "Garder l'image actuelle" : "Aucun fichier sélectionné") : 
+            name.textContent;
+        });
+        
+        const previews = modal.querySelectorAll('.image-preview');
+        previews.forEach(preview => {
+          if (!preview.id.includes('updateProductImagePreview')) {
+            preview.classList.add('is-hidden');
+          }
+        });
+      });
+    });
+  });
+
+  // Enhanced modal functions
+  function openModal() { 
+    const modal = document.getElementById("productModal");
+    modal.classList.add("is-active");
+    // Reset form
+    modal.querySelector('form').reset();
+    document.getElementById('imagePreview').classList.add('is-hidden');
+  }
+  
+  function closeModal() { 
+    const modal = document.getElementById("productModal");
+    modal.classList.remove("is-active");
+    modal.dispatchEvent(new Event('modal:close'));
+  }
+
+  function openModalUpdate(button) {
+    const modal = document.getElementById("productModalUpdate");
+    const form = document.getElementById("updateProductForm");
+    const productId = button.getAttribute("data-id");
+    
+    form.action = `/products/update/${productId}/`;
+    form.querySelector("input[name='product_id']").value = productId;
+    form.querySelector("input[name='name']").value = button.getAttribute("data-name");
+    form.querySelector("textarea[name='description']").value = button.getAttribute("data-description");
+    form.querySelector("input[name='price']").value = button.getAttribute("data-price");
+    
+    if (button.hasAttribute("data-quantity")) {
+      form.querySelector("input[name='quantity']").value = button.getAttribute("data-quantity");
+    }
+
+    const imgPreview = document.getElementById("updateProductImagePreview");
+    imgPreview.src = button.getAttribute("data-image");
+
+    // Reset file input and hide new preview
+    const fileInput = document.getElementById('updateImageInput');
+    fileInput.value = '';
+    document.querySelector('#productModalUpdate .file-name').textContent = "Garder l'image actuelle";
+    document.getElementById('updateImagePreview').classList.add('is-hidden');
+
+    modal.classList.add("is-active");
+  }
+
+  function closeModalUpdate() {
+    const modal = document.getElementById("productModalUpdate");
+    modal.classList.remove("is-active");
+    modal.dispatchEvent(new Event('modal:close'));
+  }
+
+  function openDeleteModal(productId) {
+    const modal = document.getElementById("deleteProductModal");
+    const form = document.getElementById("deleteProductForm");
+    form.action = `/products/delete/${productId}/`;
+    modal.classList.add("is-active");
+  }
+
+  function closeDeleteModal() {
+    const modal = document.getElementById("deleteProductModal");
+    modal.classList.remove("is-active");
+  }
+
+  // Close modals with ESC key
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+      closeModal();
+      closeModalUpdate();
+      closeDeleteModal();
+    }
+  });
+</script>
+
+
+
+
+
+
+
 
 
 {% endblock %}
 
 {% block scripts %}
-{% endblock scripts %}
+<script>
+  // CSRF Token for AJAX requests
+  const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+  // Toast Notification System
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMessage = document.getElementById('toast-message');
+    
+    toast.className = `toast ${type}`;
+    toastTitle.textContent = type === 'success' ? 'Succès' : 'Erreur';
+    toastMessage.textContent = message;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+
+  // Add to Cart with AJAX
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add to Cart
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        const button = this;
+        
+        button.classList.add('is-loading', 'loading');
+        
+        fetch(`/cart/add/${productId}/`, {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // Update button to remove from cart
+            const productCard = button.closest('.product-card');
+            const cartBtnContainer = productCard.querySelector('.cart-btn').parentNode;
+            
+            cartBtnContainer.innerHTML = `
+              <div class="in-cart-indicator">
+                <i class="fas fa-check-circle mr-2"></i>Dans le panier
+              </div>
+              <button class="cart-btn remove-from-cart" data-product-id="${productId}">
+                <i class="fas fa-trash mr-2"></i>Retirer du panier
+              </button>
+            `;
+            
+            // Re-attach event listener to new remove button
+            cartBtnContainer.querySelector('.remove-from-cart').addEventListener('click', removeFromCartHandler);
+            
+            showToast('Produit ajouté au panier avec succès!', 'success');
+            
+            // Update cart count in navbar
+            updateCartCount(data.cart_count);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          showToast('Erreur lors de l\'ajout au panier', 'error');
+        })
+        .finally(() => {
+          button.classList.remove('is-loading', 'loading');
+        });
+      });
+    });
+
+    // Remove from Cart with AJAX
+    function removeFromCartHandler() {
+      const productId = this.dataset.productId;
+      const button = this;
+      
+      button.classList.add('is-loading', 'loading');
+      
+      fetch(`/cart/remove/${productId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Update button to add to cart
+          const productCard = button.closest('.product-card');
+          const cartBtnContainer = productCard.querySelector('.cart-btn').parentNode;
+          
+          cartBtnContainer.innerHTML = `
+            <button class="cart-btn add-to-cart" data-product-id="${productId}">
+              <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+            </button>
+          `;
+          
+          // Re-attach event listener to new add button
+          cartBtnContainer.querySelector('.add-to-cart').addEventListener('click', addToCartHandler);
+          
+          showToast('Produit retiré du panier', 'success');
+          
+          // Update cart count in navbar
+          updateCartCount(data.cart_count);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Erreur lors du retrait du panier', 'error');
+      })
+      .finally(() => {
+        button.classList.remove('is-loading', 'loading');
+      });
+    }
+
+    // Attach remove handlers
+    document.querySelectorAll('.remove-from-cart').forEach(button => {
+      button.addEventListener('click', removeFromCartHandler);
+    });
+
+    // Add to Cart handler function
+    function addToCartHandler() {
+      const productId = this.dataset.productId;
+      const button = this;
+      
+      button.classList.add('is-loading', 'loading');
+      
+      fetch(`/cart/add/${productId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': csrfToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const productCard = button.closest('.product-card');
+          const cartBtnContainer = productCard.querySelector('.cart-btn').parentNode;
+          
+          cartBtnContainer.innerHTML = `
+            <div class="in-cart-indicator">
+              <i class="fas fa-check-circle mr-2"></i>Dans le panier
+            </div>
+            <button class="cart-btn remove-from-cart" data-product-id="${productId}">
+              <i class="fas fa-trash mr-2"></i>Retirer du panier
+            </button>
+          `;
+          
+          cartBtnContainer.querySelector('.remove-from-cart').addEventListener('click', removeFromCartHandler);
+          showToast('Produit ajouté au panier avec succès!', 'success');
+          updateCartCount(data.cart_count);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showToast('Erreur lors de l\'ajout au panier', 'error');
+      })
+      .finally(() => {
+        button.classList.remove('is-loading', 'loading');
+      });
+    }
+
+    // Update cart count in navbar
+    function updateCartCount(count) {
+      const cartCountElements = document.querySelectorAll('.cart-count');
+      cartCountElements.forEach(element => {
+        element.textContent = `(${count})`;
+      });
+    }
+
+    // Product filtering and sorting
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
+    const productItems = document.querySelectorAll('.product-item');
+
+    function filterAndSortProducts() {
+      const searchText = searchInput.value.toLowerCase();
+      const sortValue = sortSelect.value;
+
+      let filteredProducts = Array.from(productItems).filter(product => {
+        const name = product.dataset.name;
+        const description = product.dataset.description;
+        return name.includes(searchText) || description.includes(searchText);
+      });
+
+      // Sort products
+      if (sortValue) {
+        filteredProducts.sort((a, b) => {
+          switch (sortValue) {
+            case 'name':
+              return a.dataset.name.localeCompare(b.dataset.name);
+            case 'price_asc':
+              return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+            case 'price_desc':
+              return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+            case 'newest':
+              return new Date(b.dataset.date) - new Date(a.dataset.date);
+            default:
+              return 0;
+          }
+        });
+      }
+
+      // Update DOM
+      const productGrid = document.getElementById('productGrid');
+      productGrid.innerHTML = '';
+      filteredProducts.forEach(product => {
+        productGrid.appendChild(product);
+      });
+
+      // Show empty state if no products
+      if (filteredProducts.length === 0) {
+        productGrid.innerHTML = `
+          <div class="column is-12">
+            <div class="empty-state">
+              <div class="empty-state-icon">
+                <i class="fas fa-search"></i>
+              </div>
+              <h3 class="title is-4">Aucun produit trouvé</h3>
+              <p class="subtitle is-6">Essayez de modifier vos critères de recherche.</p>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    searchInput.addEventListener('input', filterAndSortProducts);
+    sortSelect.addEventListener('change', filterAndSortProducts);
+
+    // Admin modal handlers
+    document.querySelectorAll('.edit-product').forEach(button => {
+      button.addEventListener('click', function() {
+        openModalUpdate(this);
+      });
+    });
+
+    document.querySelectorAll('.delete-product').forEach(button => {
+      button.addEventListener('click', function() {
+        openDeleteModal(this.dataset.id);
+      });
+    });
+  });
+
+  // Modal functions (keep your existing modal functions)
+  function openModal() { 
+    document.getElementById("productModal").classList.add("is-active"); 
+  }
+  
+  function closeModal() { 
+    document.getElementById("productModal").classList.remove("is-active"); 
+  }
+
+  function openModalUpdate(button) {
+    const modal = document.getElementById("productModalUpdate");
+    const form = document.getElementById("updateProductForm");
+    const productId = button.getAttribute("data-id");
+    
+    form.action = `/products/update/${productId}/`;
+    form.querySelector("input[name='product_id']").value = productId;
+    form.querySelector("input[name='name']").value = button.getAttribute("data-name");
+    form.querySelector("textarea[name='description']").value = button.getAttribute("data-description");
+    form.querySelector("input[name='price']").value = button.getAttribute("data-price");
+
+    const imgPreview = document.getElementById("updateProductImagePreview");
+    imgPreview.src = button.getAttribute("data-image");
+
+    modal.classList.add("is-active");
+  }
+
+  function closeModalUpdate() {
+    document.getElementById("productModalUpdate").classList.remove("is-active");
+  }
+
+  function openDeleteModal(productId) {
+    const modal = document.getElementById("deleteProductModal");
+    const form = document.getElementById("deleteProductForm");
+    form.action = `/products/delete/${productId}/`;
+    modal.classList.add("is-active");
+  }
+
+  function closeDeleteModal() {
+    document.getElementById("deleteProductModal").classList.remove("is-active");
+  }
+</script>
+{% endblock %} {% endcomment %}
