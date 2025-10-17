@@ -12,23 +12,16 @@ import logging
 from .payment_utils import get_client
 from django.utils import timezone
 import os
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.db.models import Q
 
-
+import json
 
 user_actions_logger = logging.getLogger('user_actions')
 
 
 
-# # Home page
-# def home(request):
-#     context = {
-#         'user': request.user,
-#         'products': Product.objects.all()[:6],
-#         'testimonials': Testimonial.objects.all()[:6],
-#         'blogs': BlogPost.objects.order_by('-published_at')[:6],
-#         'partners': Partner.objects.all()
-#     }
-#     return render(request, "products/home.html", context)
+
 def home(request):
     # Get featured products (you can add a 'featured' field to Product model later)
     featured_products = Product.objects.all()[:8]
@@ -58,77 +51,124 @@ def home(request):
 
 
 
-# # Product listing
+# # # Product listing
 # def products(request):
-    
 #     cart = request.session.get('cart', {})
-#     cart_product_ids = cart.keys()
-
+#     cart_product_ids = list(cart.keys())  # keys are strings
 #     context = {
 #         'products': Product.objects.all(),
-#         'is_admin': request.user.is_authenticated and request.user.user_type == 'admin',
+#         # 'is_admin': request.user.is_authenticated and request.user.user_type == 'admin',
+#         'is_admin': True,
 #         'cart_product_ids': cart_product_ids
 #     }
-#     return render(request, "products/produits_3.html", context)
+#     return render(request, "products/produits.html", context)
+
+
+
+# def products(request):
+#     cart = request.session.get('cart', {})
+#     cart_product_ids = list(cart.keys())
+    
+#     # Get filter parameters
+#     search_query = request.GET.get('search', '')
+#     sort_by = request.GET.get('sort', '')
+    
+#     # Start with all products
+#     products_list = Product.objects.all()
+    
+#     # Apply search filter
+#     if search_query:
+#         products_list = products_list.filter(
+#             Q(name__icontains=search_query) | 
+#             Q(description__icontains=search_query)
+#         )
+    
+#     # Apply sorting
+#     if sort_by == 'name':
+#         products_list = products_list.order_by('name')
+#     elif sort_by == 'price_asc':
+#         products_list = products_list.order_by('price')
+#     elif sort_by == 'price_desc':
+#         products_list = products_list.order_by('-price')
+#     elif sort_by == 'newest':
+#         products_list = products_list.order_by('-created_at')
+#     else:
+#         products_list = products_list.order_by('-created_at')
+    
+#     # Pagination
+#     paginator = Paginator(products_list, 9)
+#     page = request.GET.get('page')
+    
+#     try:
+#         products_page = paginator.page(page)
+#     except PageNotAnInteger:
+#         products_page = paginator.page(1)
+#     except EmptyPage:
+#         products_page = paginator.page(paginator.num_pages)
+    
+#     context = {
+#         'products': products_page,
+#         'is_admin': True,
+#         'cart_product_ids': cart_product_ids,
+#         'paginator': paginator,
+#         'search_query': search_query,
+#         'sort_by': sort_by,
+#     }
+#     return render(request, "products/produits.html", context)
 
 def products(request):
     cart = request.session.get('cart', {})
-    cart_product_ids = list(cart.keys())  # keys are strings
+    cart_product_ids = list(cart.keys())
+    
+    # Get filter parameters
+    search_query = request.GET.get('search', '')
+    sort_by = request.GET.get('sort', '')
+    
+    # Start with all products
+    products_list = Product.objects.all()
+    
+    # Apply search filter
+    if search_query:
+        products_list = products_list.filter(
+            Q(name__icontains=search_query) | 
+            Q(description__icontains=search_query)
+        )
+    
+    # Apply sorting
+    if sort_by == 'name':
+        products_list = products_list.order_by('name')
+    elif sort_by == 'price_asc':
+        products_list = products_list.order_by('price')
+    elif sort_by == 'price_desc':
+        products_list = products_list.order_by('-price')
+    elif sort_by == 'newest':
+        products_list = products_list.order_by('-created_at')
+    else:
+        products_list = products_list.order_by('-created_at')
+    
+    # Pagination
+    paginator = Paginator(products_list, 9)
+    page = request.GET.get('page')
+    
+    try:
+        products_page = paginator.page(page)
+    except PageNotAnInteger:
+        products_page = paginator.page(1)
+    except EmptyPage:
+        products_page = paginator.page(paginator.num_pages)
+    
     context = {
-        'products': Product.objects.all(),
-        # 'is_admin': request.user.is_authenticated and request.user.user_type == 'admin',
+        'products': products_page,
         'is_admin': True,
-        'cart_product_ids': cart_product_ids
+        'cart_product_ids': cart_product_ids,
+        'search_query': search_query,  # Pass search back to template
+        'sort_by': sort_by,            # Pass sort back to template
     }
     return render(request, "products/produits.html", context)
 
 
 
 
-# from django.http import JsonResponse
-# import json
-
-# @require_POST
-# def add_to_cart_ajax(request, product_id):
-#     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#         cart = request.session.get('cart', {})
-#         product_id_str = str(product_id)
-        
-#         if product_id_str in cart:
-#             cart[product_id_str] += 1
-#         else:
-#             cart[product_id_str] = 1
-            
-#         request.session['cart'] = cart
-#         request.session.modified = True
-        
-#         return JsonResponse({
-#             'success': True,
-#             'cart_count': len(cart),
-#             'message': 'Produit ajouté au panier avec succès!'
-#         })
-#     return JsonResponse({'success': False}, status=400)
-
-# @require_POST
-# def remove_from_cart_ajax(request, product_id):
-#     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-#         cart = request.session.get('cart', {})
-#         product_id_str = str(product_id)
-        
-#         if product_id_str in cart:
-#             del cart[product_id_str]
-#             request.session['cart'] = cart
-#             request.session.modified = True
-            
-#             return JsonResponse({
-#                 'success': True,
-#                 'cart_count': len(cart),
-#                 'message': 'Produit retiré du panier'
-#             })
-    
-#     return JsonResponse({'success': False}, status=400)
-from django.http import JsonResponse
-import json
 
 @require_POST
 def add_to_cart_ajax(request, product_id):
@@ -214,18 +254,7 @@ def add_product(request):
 
 
 
-# @login_required
-# def update_product(request, product_id):
-#     product = get_object_or_404(Product, id=product_id)
-#     # if request.method == 'POST' and request.user.user_type == 'admin':
-#     if request.method == 'POST':
-#         product.name = request.POST.get('name')
-#         product.description = request.POST.get('description')
-#         product.price = request.POST.get('price')
-#         if request.FILES.get('image'):
-#             product.image = request.FILES.get('image')
-#         product.save()
-#     return redirect('products')
+
 
 
 @login_required
@@ -249,13 +278,6 @@ def update_product(request, product_id):
 
 
 
-# @login_required
-# def delete_product(request, product_id):
-#     # if request.user.user_type == 'admin':
-#     if request.user.is_authenticated:
-#         product = get_object_or_404(Product, id=product_id)
-#         product.delete()
-#     return redirect('products')
 
 
 
@@ -272,82 +294,6 @@ def delete_product(request, product_id):
 
 
 
-
-
-# @login_required
-# def checkout(request):
-#     cart = request.session.get('cart', {})
-#     if not cart:
-#         messages.error(request, "Votre panier est vide.")
-#         return redirect('products')
-
-#     products = Product.objects.filter(id__in=cart.keys())
-#     cart_items = []
-#     total = 0
-
-#     for product in products:
-#         quantity = cart[str(product.id)]
-#         subtotal = product.price * quantity
-#         cart_items.append({
-#             'product': product,
-#             'quantity': quantity,
-#             'subtotal': subtotal
-#         })
-#         total += subtotal
-
-#     payment_error = None  # Will be passed to template
-
-#     if request.method == 'POST':
-#         order = Order.objects.create(
-#             ordered_by=request.user,
-#             total_price=total,
-#             currency="XOF",
-#             status='pending'
-#         )
-
-#         for item in cart_items:
-#             OrderProduct.objects.create(
-#                 order=order,
-#                 product=item['product'],
-#                 quantity=item['quantity']
-#             )
-
-#         client = get_client()
-#         transaction_id = f"ORDER-{order.pk}-{int(timezone.now().timestamp())}"
-#         order.transaction_id = transaction_id
-#         order.save()
-
-#         data = {
-#             "transaction_id": transaction_id,
-#             "amount": int(order.total_price),
-#             "currency": order.currency,
-#             "description": f"Commande #{order.pk}",
-#             "return_url": request.build_absolute_uri(reverse('payment_return')),
-#             "notify_url": request.build_absolute_uri(reverse('payment_notify')),
-#             "customer_name": request.user.first_name,
-#             "customer_surname": request.user.last_name,
-#             "customer_email": request.user.email,
-#         }
-
-#         resp = client.PaymentInitialization(data)
-        
-#         print(resp)
-
-#         if not resp or resp.get("code") != "201":
-#             error_message = resp.get("message", "Erreur inconnue")
-#             error_description = resp.get("description", "")
-#             payment_error = f"{error_message} - {error_description}"
-#             messages.error(request, payment_error)
-#         else:
-#             payment_url = resp["data"]["payment_url"]
-#             request.session['cart'] = {}
-#             return redirect(payment_url)
-
-#     return render(request, 'products/checkout.html', {
-#         'cart_items': cart_items,
-#         'total': total,
-#         'payment_error': payment_error,  # Pass error to template
-#     })
 
 
 
@@ -565,15 +511,6 @@ def delete_blog_post(request, post_id):
 
 
 
-
-
-# # Testimonials
-# def testimonials(request):
-#     return render(request, "products/temoignages.html", {"testimonials": Testimonial.objects.all()})
-
-# # Partners
-# def partners(request):
-#     return render(request, "products/partenaires.html", {"partners": Partner.objects.all()})
 
 
 
@@ -903,17 +840,6 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from products.models import Product
 
-def add_to_cart(request, product_id):
-    if request.method == 'POST':
-        cart = request.session.get('cart', {})
-        product_id_str = str(product_id)
-        if product_id_str in cart:
-            cart[product_id_str] += 1
-        else:
-            cart[product_id_str] = 1
-        request.session['cart'] = cart
-        messages.success(request, "Produit ajouté au panier.")
-    return redirect('products')
 
 
 
@@ -1020,6 +946,17 @@ def payment_return(request):
 
 
 
+def add_to_cart(request, product_id):
+    if request.method == 'POST':
+        cart = request.session.get('cart', {})
+        product_id_str = str(product_id)
+        if product_id_str in cart:
+            cart[product_id_str] += 1
+        else:
+            cart[product_id_str] = 1
+        request.session['cart'] = cart
+        messages.success(request, "Produit ajouté au panier.")
+    return redirect('products')
 
 
 
