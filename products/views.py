@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.http import require_POST
-from .models import Product, Order, Testimonial, Partner, ContactMessage, BlogPost, PaymentHistory, OrderProduct
+from .models import Product, Order, Testimonial, Partner, ContactMessage, BlogPost, PaymentHistory, OrderProduct, ProductRating
 from accounts.models import User
 import logging
 from .payment_utils import get_client
@@ -16,6 +16,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
 import json
+
+
 
 user_actions_logger = logging.getLogger('user_actions')
 
@@ -52,70 +54,6 @@ def home(request):
 
 
 # # # Product listing
-# def products(request):
-#     cart = request.session.get('cart', {})
-#     cart_product_ids = list(cart.keys())  # keys are strings
-#     context = {
-#         'products': Product.objects.all(),
-#         # 'is_admin': request.user.is_authenticated and request.user.user_type == 'admin',
-#         'is_admin': True,
-#         'cart_product_ids': cart_product_ids
-#     }
-#     return render(request, "products/produits.html", context)
-
-
-
-# def products(request):
-#     cart = request.session.get('cart', {})
-#     cart_product_ids = list(cart.keys())
-    
-#     # Get filter parameters
-#     search_query = request.GET.get('search', '')
-#     sort_by = request.GET.get('sort', '')
-    
-#     # Start with all products
-#     products_list = Product.objects.all()
-    
-#     # Apply search filter
-#     if search_query:
-#         products_list = products_list.filter(
-#             Q(name__icontains=search_query) | 
-#             Q(description__icontains=search_query)
-#         )
-    
-#     # Apply sorting
-#     if sort_by == 'name':
-#         products_list = products_list.order_by('name')
-#     elif sort_by == 'price_asc':
-#         products_list = products_list.order_by('price')
-#     elif sort_by == 'price_desc':
-#         products_list = products_list.order_by('-price')
-#     elif sort_by == 'newest':
-#         products_list = products_list.order_by('-created_at')
-#     else:
-#         products_list = products_list.order_by('-created_at')
-    
-#     # Pagination
-#     paginator = Paginator(products_list, 9)
-#     page = request.GET.get('page')
-    
-#     try:
-#         products_page = paginator.page(page)
-#     except PageNotAnInteger:
-#         products_page = paginator.page(1)
-#     except EmptyPage:
-#         products_page = paginator.page(paginator.num_pages)
-    
-#     context = {
-#         'products': products_page,
-#         'is_admin': True,
-#         'cart_product_ids': cart_product_ids,
-#         'paginator': paginator,
-#         'search_query': search_query,
-#         'sort_by': sort_by,
-#     }
-#     return render(request, "products/produits.html", context)
-
 def products(request):
     cart = request.session.get('cart', {})
     cart_product_ids = list(cart.keys())
@@ -233,7 +171,7 @@ def add_product(request):
         description = request.POST.get('description')
         price = request.POST.get('price')
         quantity = request.POST.get('quantity', 1)
-        currency = request.POST.get('currency', 'XOF')
+        currency = request.POST.get('currency', 'FCFA')
         image = request.FILES.get('image')
 
         try:
@@ -291,6 +229,102 @@ def delete_product(request, product_id):
 
     product.delete()
     return redirect('products')
+
+
+
+
+
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    
+    # Get related products (same category or same seller, adjust as needed)
+    related_products = Product.objects.filter(
+        added_by=product.added_by
+    ).exclude(id=product.id)[:4]
+    
+    # Get ratings for this product
+    ratings = product.ratings.all().select_related('user')
+    
+    # Check if user has already rated this product
+    user_rating = None
+    user_rating_obj = None
+    if request.user.is_authenticated:
+        try:
+            user_rating_obj = product.ratings.get(user=request.user)
+            user_rating = user_rating_obj.rating
+        except ProductRating.DoesNotExist:
+            pass
+    
+    context = {
+        'product': product,
+        'related_products': related_products,
+        'ratings': ratings,
+        'user_rating': user_rating,
+        'user_rating_obj': user_rating_obj,
+        'cart_product_ids': list(request.session.get('cart', {}).keys()),
+    }
+    
+    return render(request, 'products/product_detail.html', context)
+
+@login_required
+def rate_product(request, product_id):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        product = get_object_or_404(Product, id=product_id)
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment', '').strip()
+        
+        if not rating:
+            return JsonResponse({'success': False, 'error': 'Rating is required'})
+        
+        try:
+            rating = int(rating)
+            if rating < 1 or rating > 5:
+                raise ValueError
+        except (ValueError, TypeError):
+            return JsonResponse({'success': False, 'error': 'Invalid rating value'})
+        
+        # Update or create rating
+        rating_obj, created = ProductRating.objects.update_or_create(
+            product=product,
+            user=request.user,
+            defaults={
+                'rating': rating,
+                'comment': comment if comment else None
+            }
+        )
+        
+        # Return updated product rating data
+        return JsonResponse({
+            'success': True,
+            'average_rating': product.average_rating(),
+            'rating_count': product.rating_count(),
+            'user_rating': rating,
+            'created': created,
+            'message': 'Rating submitted successfully!' if created else 'Rating updated successfully!'
+        })
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+@login_required
+def delete_rating(request, product_id):
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        product = get_object_or_404(Product, id=product_id)
+        
+        try:
+            rating = product.ratings.get(user=request.user)
+            rating.delete()
+            
+            return JsonResponse({
+                'success': True,
+                'average_rating': product.average_rating(),
+                'rating_count': product.rating_count(),
+                'message': 'Rating deleted successfully!'
+            })
+        except ProductRating.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Rating not found'})
+    
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 
 

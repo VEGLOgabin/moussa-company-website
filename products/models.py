@@ -1,7 +1,12 @@
 from django.db import models
 from django.utils import timezone
-
 from accounts.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
+
+
+
+
+
 
 class Product(models.Model):
     name = models.CharField(max_length=255)
@@ -13,6 +18,52 @@ class Product(models.Model):
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
     
+    
+    def average_rating(self):
+        """Calculate average rating for the product"""
+        ratings = self.ratings.all()
+        if ratings:
+            return round(sum(r.rating for r in ratings) / len(ratings), 1)
+        return 0
+    
+    def rating_count(self):
+        """Get total number of ratings"""
+        return self.ratings.count()
+    
+    def user_rating(self, user):
+        """Get user's rating for this product"""
+        try:
+            return self.ratings.get(user=user).rating
+        except ProductRating.DoesNotExist:
+            return 0
+        
+    def __str__(self):
+        return self.name
+
+        
+        
+        
+    
+class ProductRating(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_ratings')
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Rating from 1 to 5 stars"
+    )
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['product', 'user']  # One rating per user per product
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name} - {self.rating} stars"
+
+
+
 
 
 class Order(models.Model):

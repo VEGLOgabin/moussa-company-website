@@ -12,6 +12,14 @@ urlpatterns = [
     path('cart/remove/<int:product_id>/', views.remove_from_cart_ajax, name='remove_from_cart_ajax'),
     
     
+    
+    path('product/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('product/<int:product_id>/rate/', views.rate_product, name='rate_product'),
+    path('product/<int:product_id>/rate/delete/', views.delete_rating, name='delete_rating'),
+    
+    
+    
+    
     path('blog/',views.blog,name="blog"),
     path("blog/post/", views.create_blog_post, name = "post_news"),
     path('blog/<slug:post_slug>/', views.blog_detail, name='blog_detail'),

@@ -1,0 +1,1198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* ===== PRODUCT DETAIL STYLES ===== */
+  .product-detail-hero {
+    background: linear-gradient(135deg, rgba(35, 164, 85, 0.05) 0%, rgba(30, 140, 74, 0.05) 100%);
+    padding: 3rem 0;
+    margin-top: -70px;
+    padding-top: 120px;
+  }
+
+  .product-gallery {
+    position: relative;
+  }
+
+  .main-image {
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    margin-bottom: 1rem;
+  }
+
+  .main-image img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+  }
+
+  .product-info-section {
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .product-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    line-height: 1.3;
+  }
+
+  .product-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+  }
+
+  .product-meta {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .meta-label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 0.3rem;
+  }
+
+  .meta-value {
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .stock-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+  }
+
+  .stock-status.in-stock {
+    background: rgba(35, 164, 85, 0.1);
+    color: var(--primary);
+  }
+
+  .stock-status.low-stock {
+    background: rgba(255, 193, 7, 0.1);
+    color: #b58b00;
+  }
+
+  .stock-status.out-of-stock {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+  }
+
+  /* ===== RATING STYLES ===== */
+  .rating-section {
+    margin: 2rem 0;
+    padding: 2rem;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+
+  .rating-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .rating-stats {
+    text-align: center;
+    padding: 1.5rem;
+    background: var(--primary-light);
+    border-radius: 12px;
+    margin-right: 2rem;
+  }
+
+  .average-rating {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1;
+  }
+
+  .star-rating {
+    color: #ffc107;
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+  }
+
+  .rating-count {
+    color: var(--gray);
+    font-size: 0.9rem;
+  }
+
+  .rating-bars {
+    flex: 1;
+  }
+
+  .rating-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .rating-bar-label {
+    width: 80px;
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+
+  .rating-bar-progress {
+    flex: 1;
+    height: 8px;
+    background: var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 1rem;
+  }
+
+  .rating-bar-fill {
+    height: 100%;
+    background: #ffc107;
+    border-radius: 10px;
+  }
+
+  .rating-bar-count {
+    width: 30px;
+    font-size: 0.9rem;
+    color: var(--gray);
+    text-align: right;
+  }
+
+  /* Star Rating Input */
+  .star-rating-input {
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+  }
+
+  .star-input {
+    display: none;
+  }
+
+  .star-label {
+    font-size: 2rem;
+    color: #ddd;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+
+  .star-label:hover,
+  .star-input:checked ~ .star-label {
+    color: #ffc107;
+  }
+
+  .rating-form {
+    background: var(--light);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+  }
+
+  .user-rating-indicator {
+    background: var(--primary-light);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* Reviews List */
+  .reviews-list {
+    margin-top: 2rem;
+  }
+
+  .review-item {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .review-item:last-child {
+    border-bottom: none;
+  }
+
+  .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+  }
+
+  .review-user {
+    font-weight: 600;
+    color: var(--dark);
+  }
+
+  .review-rating {
+    color: #ffc107;
+  }
+
+  .review-date {
+    font-size: 0.8rem;
+    color: var(--gray);
+  }
+
+  .review-comment {
+    color: var(--dark);
+    line-height: 1.6;
+  }
+
+  .no-reviews {
+    text-align: center;
+    padding: 3rem;
+    color: var(--gray);
+  }
+
+  /* Related Products */
+  .related-products {
+    margin: 3rem 0;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .product-title {
+      font-size: 1.8rem;
+    }
+
+    .product-price {
+      font-size: 1.6rem;
+    }
+
+    .product-meta {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .rating-header {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .rating-stats {
+      margin-right: 0;
+      margin-bottom: 1.5rem;
+    }
+
+    .main-image img {
+      height: 300px;
+    }
+  }
+
+
+
+
+
+
+  /* ===== ENHANCED CART SECTION STYLES ===== */
+  .cart-section {
+    margin: 1.5rem 0;
+  }
+
+  .cart-state {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  /* Success State */
+  .success-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(35, 164, 85, 0.08) 0%, rgba(35, 164, 85, 0.02) 100%);
+    border: 1px solid rgba(35, 164, 85, 0.2);
+    border-radius: 12px;
+    animation: slideInUp 0.5s ease;
+  }
+
+  .success-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+  }
+
+  .success-content {
+    flex: 1;
+  }
+
+  .success-title {
+    display: block;
+    font-weight: 600;
+    color: var(--primary);
+    font-size: 1rem;
+  }
+
+  .success-subtitle {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-top: 0.2rem;
+  }
+
+  /* Cart Actions */
+  .cart-actions {
+    display: flex;
+    gap: 0.75rem;
+  }
+
+  /* Base Cart Button */
+  .cart-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cart-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .cart-btn:hover::before {
+    left: 100%;
+  }
+
+  /* Primary Button */
+  .btn-primary {
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(35, 164, 85, 0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(35, 164, 85, 0.4);
+  }
+
+  .btn-primary .btn-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+  }
+
+  .btn-primary .btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+
+  .btn-primary .btn-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .btn-primary .btn-main-text {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .btn-primary .btn-sub-text {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 400;
+  }
+
+  .btn-primary .btn-arrow {
+    margin-left: auto;
+    opacity: 0.8;
+    transition: transform 0.3s ease;
+  }
+
+  .btn-primary:hover .btn-arrow {
+    transform: translateX(3px);
+  }
+
+  /* Secondary Button */
+  .btn-secondary {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    flex: 1;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(220, 53, 69, 0.15);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+  }
+
+  /* Disabled Button */
+  .btn-disabled {
+    background: var(--border);
+    color: var(--gray);
+    cursor: not-allowed;
+    opacity: 0.7;
+    width: 100%;
+  }
+
+  .btn-disabled:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* Out of Stock State */
+  .out-of-stock-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(108, 117, 125, 0.08) 0%, rgba(108, 117, 125, 0.02) 100%);
+    border: 1px solid rgba(108, 117, 125, 0.2);
+    border-radius: 12px;
+  }
+
+  .out-of-stock-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--gray);
+    border-radius: 50%;
+    color: white;
+    font-size: 1.2rem;
+  }
+
+  .out-of-stock-content {
+    flex: 1;
+  }
+
+  .out-of-stock-title {
+    display: block;
+    font-weight: 600;
+    color: var(--gray);
+    font-size: 1rem;
+  }
+
+  .out-of-stock-subtitle {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--gray);
+    margin-top: 0.2rem;
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+
+  .quick-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: white;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+  }
+
+  .quick-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .wishlist-btn:hover {
+    color: #dc3545;
+    border-color: #dc3545;
+  }
+
+  /* Loading States */
+  .cart-btn.is-loading {
+    position: relative;
+    color: transparent !important;
+  }
+
+  .cart-btn.is-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .cart-actions {
+      flex-direction: column;
+    }
+    
+    .cart-btn {
+      padding: 0.875rem 1rem;
+    }
+    
+    .btn-primary .btn-content {
+      gap: 0.5rem;
+    }
+    
+    .btn-primary .btn-text {
+      flex: 1;
+    }
+    
+    .success-indicator,
+    .out-of-stock-indicator {
+      padding: 0.875rem;
+    }
+    
+    .success-icon,
+    .out-of-stock-icon {
+      width: 36px;
+      height: 36px;
+      font-size: 1.1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- ===== TOAST NOTIFICATION ===== -->
+<div class="toast" id="toast">
+  <div class="toast-content">
+    <strong id="toast-title">Success</strong>
+    <p id="toast-message">Operation completed successfully</p>
+  </div>
+</div>
+
+<!-- ===== PRODUCT HERO SECTION ===== -->
+<section class="product-detail-hero">
+  <div class="container">
+    <div class="columns is-vcentered">
+      <!-- Product Images -->
+      <div class="column is-6">
+        <div class="product-gallery">
+          <div class="main-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" id="mainProductImage">
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="column is-6">
+        <div class="product-info-section">
+          <h1 class="product-title">{{ product.name }}</h1>
+          
+          <!-- Rating Display -->
+          <div class="rating-display mb-3">
+            <div class="star-rating">
+              {% with avg_rating=product.average_rating %}
+                {% for i in "12345" %}
+                  {% if forloop.counter <= avg_rating %}
+                    <i class="fas fa-star"></i>
+                  {% elif forloop.counter|add:"-0.5" <= avg_rating %}
+                    <i class="fas fa-star-half-alt"></i>
+                  {% else %}
+                    <i class="far fa-star"></i>
+                  {% endif %}
+                {% endfor %}
+              {% endwith %}
+              <span class="ml-2 has-text-grey">({{ product.rating_count }} avis)</span>
+            </div>
+          </div>
+
+          <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+
+          <!-- Stock Status -->
+          <div class="stock-status {% if product.quantity > 10 %}in-stock{% elif product.quantity > 0 %}low-stock{% else %}out-of-stock{% endif %}">
+            {% if product.quantity > 10 %}
+              <i class="fas fa-check-circle"></i>
+              En stock
+            {% elif product.quantity > 0 %}
+              <i class="fas fa-exclamation-triangle"></i>
+              Plus que {{ product.quantity }} disponible{{ product.quantity|pluralize:"s" }}
+            {% else %}
+              <i class="fas fa-times-circle"></i>
+              Rupture de stock
+            {% endif %}
+          </div>
+
+          <!-- Product Meta -->
+          <div class="product-meta">
+            {% comment %} <div class="meta-item">
+              <span class="meta-label">Vendeur</span>
+              <span class="meta-value">{{ product.added_by.username }}</span>
+            </div> {% endcomment %}
+            <div class="meta-item">
+              <span class="meta-label">Catégorie</span>
+              <span class="meta-value">Produit naturel</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Ajouté le</span>
+              <span class="meta-value">{{ product.created_at|date:"d/m/Y" }}</span>
+            </div>
+          </div>
+
+          {% comment %} <!-- Cart Section -->
+          <div class="cart-section">
+            {% if product.id|stringformat:"s" in cart_product_ids %}
+              <div class="in-cart-indicator">
+                <i class="fas fa-check-circle mr-2"></i>Dans le panier
+              </div>
+              <button class="cart-btn remove-from-cart" data-product-id="{{ product.id }}">
+                <i class="fas fa-trash mr-2"></i>Retirer du panier
+              </button>
+            {% else %}
+              <button class="cart-btn add-to-cart {% if product.quantity == 0 %}disabled{% endif %}" 
+                      data-product-id="{{ product.id }}" 
+                      {% if product.quantity == 0 %}disabled{% endif %}>
+                {% if product.quantity == 0 %}
+                  <i class="fas fa-ban mr-2"></i>Rupture de stock
+                {% else %}
+                  <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                {% endif %}
+              </button>
+            {% endif %}
+          </div> {% endcomment %}
+
+
+          <!-- Cart Section -->
+          <div class="cart-section">
+            {% if product.id|stringformat:"s" in cart_product_ids %}
+              <div class="cart-state">
+                <!-- Success State -->
+                <div class="success-indicator">
+                  <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div class="success-content">
+                    <span class="success-title">Ajouté au panier</span>
+                    <span class="success-subtitle">Produit disponible dans votre panier</span>
+                  </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="cart-actions">
+                  <button class="cart-btn btn-secondary remove-from-cart" data-product-id="{{ product.id }}">
+                    <i class="fas fa-trash-alt mr-2"></i>
+                    <span>Retirer</span>
+                  </button>
+                  <a href="{% url 'cart' %}" class="cart-btn btn-primary">
+                    <i class="fas fa-shopping-cart mr-2"></i>
+                    <span>Voir le panier</span>
+                  </a>
+                </div>
+              </div>
+            {% else %}
+              <div class="cart-state">
+                {% if product.quantity == 0 %}
+                  <!-- Out of Stock State -->
+                  <div class="out-of-stock-indicator">
+                    <div class="out-of-stock-icon">
+                      <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="out-of-stock-content">
+                      <span class="out-of-stock-title">Rupture de stock</span>
+                      <span class="out-of-stock-subtitle">Bientôt de retour</span>
+                    </div>
+                  </div>
+                  <button class="cart-btn btn-disabled" disabled>
+                    <i class="fas fa-bell mr-2"></i>
+                    <span>Me prévenir</span>
+                  </button>
+                {% else %}
+                  <!-- Available State -->
+                  <button class="cart-btn btn-primary add-to-cart" data-product-id="{{ product.id }}">
+                    <div class="btn-content">
+                      <div class="btn-icon">
+                        <i class="fas fa-cart-plus"></i>
+                      </div>
+                      <div class="btn-text">
+                        <span class="btn-main-text">Ajouter au panier</span>
+                        <span class="btn-sub-text">Livraison rapide</span>
+                      </div>
+                    </div>
+                    <div class="btn-arrow">
+                      <i class="fas fa-chevron-right"></i>
+                    </div>
+                  </button>
+                  
+                  <!-- Quick Actions -->
+                  <div class="quick-actions">
+                    <button class="quick-btn wishlist-btn" title="Ajouter à la liste de souhaits">
+                      <i class="far fa-heart"></i>
+                    </button>
+                    <button class="quick-btn compare-btn" title="Comparer">
+                      <i class="fas fa-exchange-alt"></i>
+                    </button>
+                  </div>
+                {% endif %}
+              </div>
+            {% endif %}
+          </div>
+
+
+
+
+          <!-- Product Description -->
+          <div class="product-description mt-4">
+            <h4 class="title is-5 mb-3">Description</h4>
+            <p class="has-text-grey-dark" style="line-height: 1.8;">{{ product.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RATING & REVIEWS SECTION ===== -->
+<section class="rating-section">
+  <div class="container">
+    <div class="rating-header">
+      <!-- Rating Stats -->
+      <div class="rating-stats">
+        <div class="average-rating">{{ product.average_rating|default:"0.0" }}</div>
+        <div class="star-rating">
+          {% with avg_rating=product.average_rating %}
+            {% for i in "12345" %}
+              {% if forloop.counter <= avg_rating %}
+                <i class="fas fa-star"></i>
+              {% elif forloop.counter|add:"-0.5" <= avg_rating %}
+                <i class="fas fa-star-half-alt"></i>
+              {% else %}
+                <i class="far fa-star"></i>
+              {% endif %}
+            {% endfor %}
+          {% endwith %}
+        </div>
+        <div class="rating-count">{{ product.rating_count }} avis</div>
+      </div>
+
+      <!-- Rating Distribution -->
+      <div class="rating-bars">
+        {% for i in "54321" %}
+          {% with star_num=i|add:"0" %}
+            {% with star_count=product.ratings.filter|length %}
+              {% widthratio star_num 1 20 as percentage %}
+              <div class="rating-bar">
+                <span class="rating-bar-label">{{ star_num }} étoiles</span>
+                <div class="rating-bar-progress">
+                  <div class="rating-bar-fill" style="width: {{ percentage }}%"></div>
+                </div>
+                <span class="rating-bar-count">{{ star_count }}</span>
+              </div>
+            {% endwith %}
+          {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Rating Form -->
+    {% if user.is_authenticated %}
+      <div class="rating-form">
+        {% if user_rating %}
+          <div class="user-rating-indicator">
+            <span>Votre note: 
+              <span class="star-rating">
+                {% for i in "12345" %}
+                  {% if forloop.counter <= user_rating %}
+                    <i class="fas fa-star has-text-warning"></i>
+                  {% else %}
+                    <i class="far fa-star has-text-warning"></i>
+                  {% endif %}
+                {% endfor %}
+              </span>
+            </span>
+            <button class="button is-small is-danger is-light" onclick="deleteRating({{ product.id }})">
+              <i class="fas fa-trash mr-1"></i> Supprimer
+            </button>
+          </div>
+        {% endif %}
+
+        <h5 class="title is-5 mb-3">{% if user_rating %}Modifier votre avis{% else %}Donner votre avis{% endif %}</h5>
+        
+        <form id="ratingForm">
+          {% csrf_token %}
+          <div class="field">
+            <label class="label">Votre note</label>
+            <div class="star-rating-input">
+              {% for i in "54321" %}
+                <input type="radio" id="star{{ i }}" name="rating" value="{{ i }}" class="star-input" 
+                       {% if user_rating == i|add:"0" %}checked{% endif %}>
+                <label for="star{{ i }}" class="star-label">
+                  <i class="fas fa-star"></i>
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label">Votre commentaire (optionnel)</label>
+            <div class="control">
+              <textarea class="textarea" name="comment" placeholder="Partagez votre expérience avec ce produit..." rows="3">{% if user_rating_obj %}{{ user_rating_obj.comment }}{% endif %}</textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <button type="submit" class="button is-primary">
+              <i class="fas fa-paper-plane mr-2"></i>
+              {% if user_rating %}Mettre à jour{% else %}Soumettre l'avis{% endif %}
+            </button>
+          </div>
+        </form>
+      </div>
+    {% else %}
+      <div class="has-text-centered">
+        <p class="mb-3">Connectez-vous pour noter ce produit</p>
+        <a href="{% url 'login' %}?next={{ request.path }}" class="button is-primary">
+          <i class="fas fa-sign-in-alt mr-2"></i>Se connecter
+        </a>
+      </div>
+    {% endif %}
+
+    <!-- Reviews List -->
+    <div class="reviews-list">
+      <h5 class="title is-5 mb-4">Avis des clients ({{ ratings.count }})</h5>
+      
+      {% if ratings %}
+        {% for rating in ratings %}
+          <div class="review-item">
+            <div class="review-header">
+              <div>
+                <div class="review-user">{{ rating.user.username }}</div>
+                <div class="review-rating">
+                  {% for i in "12345" %}
+                    {% if forloop.counter <= rating.rating %}
+                      <i class="fas fa-star"></i>
+                    {% else %}
+                      <i class="far fa-star"></i>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+              <div class="review-date">{{ rating.created_at|date:"d/m/Y" }}</div>
+            </div>
+            {% if rating.comment %}
+              <div class="review-comment">{{ rating.comment }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="no-reviews">
+          <i class="fas fa-comment-slash fa-3x mb-3 has-text-grey-light"></i>
+          <p>Aucun avis pour le moment</p>
+          <p class="has-text-grey">Soyez le premier à noter ce produit !</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ===== RATING SYSTEM =====
+  function submitRating(productId) {
+    const form = document.getElementById('ratingForm');
+    const formData = new FormData(form);
+    
+    fetch(`/product/${productId}/rate/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showToast(data.message, 'success');
+        // Reload the page to show updated ratings
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        showToast(data.error || 'Erreur lors de la notation', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showToast('Erreur lors de la notation', 'error');
+    });
+  }
+
+    // ===== CART COUNT UPDATE =====
+  function updateCartCount(count) {
+    const cartCountElements = document.querySelectorAll('.cart-count');
+    cartCountElements.forEach(element => {
+      element.textContent = `(${count})`;
+    });
+  }
+
+  function deleteRating(productId) {
+    if (!confirm('Êtes-vous sûr de vouloir supprimer votre note ?')) {
+      return;
+    }
+    
+    fetch(`/product/${productId}/rate/delete/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCSRFToken(),
+        'X-Requested-With': 'XMLHttpRequest',
+      }
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        showToast(data.message, 'success');
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        showToast(data.error || 'Erreur lors de la suppression', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      showToast('Erreur lors de la suppression', 'error');
+    });
+  }
+
+  // ===== INITIALIZATION =====
+  document.addEventListener('DOMContentLoaded', function() {
+    // Rating form submission
+    const ratingForm = document.getElementById('ratingForm');
+    if (ratingForm) {
+      ratingForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const productId = {{ product.id }};
+        submitRating(productId);
+      });
+    }
+
+    // Cart functionality
+    attachCartEventListeners();
+  });
+
+  // Reuse your existing functions
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastTitle = document.getElementById('toast-title');
+    const toastMessage = document.getElementById('toast-message');
+    
+    toast.className = `toast ${type}`;
+    toastTitle.textContent = type === 'success' ? 'Succès' : 'Erreur';
+    toastMessage.textContent = message;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 3000);
+  }
+
+  function getCSRFToken() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    return csrfToken ? csrfToken.value : '';
+  }
+
+  function attachCartEventListeners() {
+    // Your existing cart event listeners
+    document.querySelectorAll('.add-to-cart').forEach(button => {
+      button.addEventListener('click', addToCartHandler);
+    });
+
+    document.querySelectorAll('.remove-from-cart').forEach(button => {
+      button.addEventListener('click', removeFromCartHandler);
+    });
+  }
+
+
+
+  // ===== CART AJAX FUNCTIONS =====
+    function addToCartHandler(event) {
+        event.preventDefault();
+        const productId = this.dataset.productId;
+        const button = this;
+        
+        button.classList.add('is-loading', 'loading');
+        
+        fetch(`/cart/add/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest', // Add this header
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update cart section
+                const cartSection = button.closest('.cart-section');
+                cartSection.innerHTML = `
+                    <div class="in-cart-indicator">
+                        <i class="fas fa-check-circle mr-2"></i>Dans le panier
+                    </div>
+                    <button class="cart-btn remove-from-cart" data-product-id="${productId}">
+                        <i class="fas fa-trash mr-2"></i>Retirer du panier
+                    </button>
+                `;
+                
+                // Re-attach event listener
+                cartSection.querySelector('.remove-from-cart').addEventListener('click', removeFromCartHandler);
+                
+                showToast(data.message || 'Produit ajouté au panier avec succès!', 'success');
+                updateCartCount(data.cart_count);
+            } else {
+                showToast(data.message || 'Erreur lors de l\'ajout au panier', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Erreur lors de l\'ajout au panier', 'error');
+        })
+        .finally(() => {
+            button.classList.remove('is-loading', 'loading');
+        });
+    }
+
+    function removeFromCartHandler(event) {
+        event.preventDefault();
+        const productId = this.dataset.productId;
+        const button = this;
+        
+        button.classList.add('is-loading', 'loading');
+        
+        fetch(`/cart/remove/${productId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCSRFToken(),
+                'X-Requested-With': 'XMLHttpRequest', // Add this header
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Update cart section
+                const cartSection = button.closest('.cart-section');
+                cartSection.innerHTML = `
+                    <button class="cart-btn add-to-cart" data-product-id="${productId}">
+                        <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                    </button>
+                `;
+                
+                // Re-attach event listener
+                cartSection.querySelector('.add-to-cart').addEventListener('click', addToCartHandler);
+                
+                showToast(data.message || 'Produit retiré du panier', 'success');
+                updateCartCount(data.cart_count);
+            } else {
+                showToast(data.message || 'Erreur lors du retrait du panier', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Erreur lors du retrait du panier', 'error');
+        })
+        .finally(() => {
+            button.classList.remove('is-loading', 'loading');
+        });
+    }
+  
+</script>
+{% endblock %}
