@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Paiement Échoué | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+    .failure-hero {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+        margin-top: -70px;
+        padding-top: 150px;
+    }
+
+    .failure-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 600px;
+        border: 2px solid #dc3545;
+    }
+
+    .failure-icon {
+        font-size: 4rem;
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .failure-card {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="failure-hero">
+    <div class="container">
+        <h1 class="title is-1 has-text-white">Paiement Échoué</h1>
+        <p class="subtitle has-text-white">Une erreur s'est produite lors du traitement de votre paiement</p>
+    </div>
+</section>
+
+<!-- Failure Card -->
+<section class="section">
+    <div class="container">
+        <div class="failure-card">
+            <div class="has-text-centered">
+                <div class="failure-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <h2 class="title is-3">Paiement Non Abouti</h2>
+                <p class="subtitle is-5">Votre transaction n'a pas pu être validée</p>
+            </div>
+
+            <div class="content has-text-centered">
+                <p>Les raisons possibles sont :</p>
+                <ul>
+                    <li>Fonds insuffisants sur votre compte</li>
+                    <li>Problème de réseau temporaire</li>
+                    <li>Transaction annulée</li>
+                    <li>Dépassement du délai de validation</li>
+                </ul>
+                
+                <p class="has-text-weight-semibold mt-4">
+                    Votre commande a été sauvegardée. Vous pouvez réessayer le paiement.
+                </p>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <a href="{% url 'checkout' %}" class="button is-danger is-large">
+                    <i class="fas fa-redo mr-2"></i>
+                    Réessayer le paiement
+                </a>
+                <a href="{% url 'products' %}" class="button is-light is-large">
+                    <i class="fas fa-shopping-bag mr-2"></i>
+                    Retour aux produits
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

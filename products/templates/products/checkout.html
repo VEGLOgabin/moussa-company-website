@@ -1,96 +1,858 @@
 {% extends 'base.html' %}
+{% block title %}Finaliser la commande | Réseau Élevage{% endblock %}
 
-{% block title %}Finaliser la commande | Sojainnovation{% endblock %}
+{% block style %}
+<style>
+
+
+    .notification-modern {
+    border-radius: 15px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    font-weight: 500;
+    border-left: 4px solid;
+    animation: slideIn 0.5s ease-out;
+    max-width: 1200px;
+  }
+  
+  .notification-success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: #28a745;
+  }
+  
+  .notification-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: #dc3545;
+  }
+  
+  .notification-info {
+    background: #cce7ff;
+    color: #004085;
+    border-left-color: #007bff;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  
+  .checkout-hero {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    padding: 3rem 0 2rem;
+    border-radius: 0 0 30px 30px;
+    margin-bottom: 2rem;
+  }
+  
+  .checkout-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+  
+  .checkout-hero .subtitle {
+    opacity: 0.9;
+    font-size: 1.1rem;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .checkout-container {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+  
+  .checkout-steps {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 3rem;
+    gap: 2rem;
+  }
+  
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .step-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #e9ecef;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .step.active .step-number {
+    background: #9c27b0;
+    color: white;
+  }
+  
+  .step.completed .step-number {
+    background: #4caf50;
+    color: white;
+  }
+  
+  .step-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  .step.active .step-label {
+    color: #9c27b0;
+    font-weight: 600;
+  }
+  
+  .order-summary {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(156, 39, 176, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .summary-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f1f3f4;
+  }
+  
+  .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .order-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+  }
+  
+  .item-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid #e9ecef;
+  }
+  
+  .item-details {
+    flex: 1;
+  }
+  
+  .item-name {
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.25rem;
+  }
+  
+  .item-meta {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .item-quantity {
+    background: #e9ecef;
+    padding: 0.3rem 0.8rem;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+  
+  .item-price {
+    font-weight: 700;
+    color: #9c27b0;
+  }
+  
+  .order-totals {
+    border-top: 2px solid #f1f3f4;
+    padding-top: 1.5rem;
+  }
+  
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+  }
+  
+  .total-label {
+    color: #6c757d;
+  }
+  
+  .total-value {
+    font-weight: 600;
+    color: #343a40;
+  }
+  
+  .grand-total {
+    border-top: 2px solid #e9ecef;
+    margin-top: 1rem;
+    padding-top: 1rem;
+  }
+  
+  .grand-total .total-label {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #343a40;
+  }
+  
+  .grand-total .total-value {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #9c27b0;
+  }
+  
+  .payment-section {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(156, 39, 176, 0.1);
+    padding: 2rem;
+  }
+  
+  .payment-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+    text-align: center;
+  }
+  
+  .payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .payment-method {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .payment-method:hover {
+    border-color: #9c27b0;
+  }
+  
+  .payment-method.selected {
+    border-color: #9c27b0;
+    background: #f3e5f5;
+  }
+  
+  .method-icon {
+    width: 40px;
+    height: 40px;
+    background: #f3e5f5;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9c27b0;
+    font-size: 1.2rem;
+  }
+  
+  .method-info {
+    flex: 1;
+  }
+  
+  .method-name {
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.25rem;
+  }
+  
+  .method-description {
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+  
+  .method-radio {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 50%;
+    position: relative;
+  }
+  
+  .payment-method.selected .method-radio::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 10px;
+    background: #9c27b0;
+    border-radius: 50%;
+  }
+  
+  .pay-button {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1.25rem 2rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+  }
+  
+  .pay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(156, 39, 176, 0.3);
+  }
+  
+  .pay-button:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  .security-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  .security-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .security-badge i {
+    color: #4caf50;
+  }
+  
+  .customer-info {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(156, 39, 176, 0.1);
+    padding: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .info-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+  
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .info-label {
+    font-weight: 600;
+    color: #343a40;
+    font-size: 0.9rem;
+  }
+  
+  .info-value {
+    color: #6c757d;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+  }
+  
+  .empty-cart {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6c757d;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+  
+  .empty-cart .icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 1rem;
+  }
+  
+  .empty-cart h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #495057;
+  }
+  
+  .continue-shopping {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .continue-shopping:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+    color: white;
+  }
+  
+  @media (max-width: 1024px) {
+    .checkout-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .checkout-hero {
+      padding: 2rem 0 1rem;
+    }
+    
+    .checkout-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .checkout-steps {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .step {
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
+<!-- Hero Section -->
+<section class="checkout-hero">
+  <div class="container">
+    <h1>Finaliser ma commande</h1>
+    <p class="subtitle">Vérifiez vos informations et procédez au paiement en toute sécurité</p>
+  </div>
+</section>
 
+
+<!-- Messages -->
 {% if messages %}
-<div class="container mt-4">
+<div class="container">
   {% for message in messages %}
-    <div class="notification 
-      {% if message.tags == 'success' %}is-success
-      {% elif message.tags == 'error' %}is-danger
-      {% else %}is-info{% endif %}">
-      {{ message }}
+    <div class="notification-modern 
+      {% if message.tags == 'success' %}notification-success
+      {% elif message.tags == 'error' %}notification-error
+      {% else %}notification-info{% endif %}">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <i class="fas 
+          {% if message.tags == 'success' %}fa-check-circle
+          {% elif message.tags == 'error' %}fa-exclamation-circle
+          {% else %}fa-info-circle{% endif %}"></i>
+        <span>{{ message }}</span>
+      </div>
     </div>
   {% endfor %}
 </div>
 {% endif %}
 
+<div class="container">
+  <!-- Checkout Steps -->
+  <div class="checkout-steps">
+    <div class="step completed">
+      <div class="step-number">1</div>
+      <span class="step-label">Panier</span>
+    </div>
+    <div class="step active">
+      <div class="step-number">2</div>
+      <span class="step-label">Paiement</span>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <span class="step-label">Confirmation</span>
+    </div>
+  </div>
 
+  {% if cart_items %}
+  <div class="checkout-container">
+    <!-- Left Column - Order Details -->
+    <div>
+      <!-- Customer Information -->
+      <div class="customer-info">
+        <h3 class="info-title">Informations client</h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Nom complet</span>
+            <div class="info-value">{{ user.get_full_name }}</div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <div class="info-value">{{ user.email }}</div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Téléphone</span>
+            <div class="info-value">{{ user.phone_number|default:"Non renseigné" }}</div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Numéro de commande</span>
+            <div class="info-value">#{{ order.pk }}</div>
+          </div>
+        </div>
+      </div>
 
-
-
-<section class="section">
-  <div class="container">
-    <h1 class="title has-text-centered">🛒 Finaliser ma commande</h1>
-
-
-
-
-    {% if cart_items %}
-    <div class="box">
-      <h2 class="subtitle">Résumé de votre panier :</h2>
-
-      <table class="table is-fullwidth is-striped">
-        <thead>
-          <tr>
-            <th>Produit</th>
-            <th>Quantité</th>
-            <th>Prix unitaire</th>
-            <th>Sous-total</th>
-          </tr>
-        </thead>
-        <tbody>
+      <!-- Order Summary -->
+      <div class="order-summary">
+        <h3 class="summary-title">Résumé de votre commande</h3>
+        
+        <div class="order-items">
           {% for item in cart_items %}
-          <tr>
-            <td>
-              <strong>{{ item.product.name }}</strong><br>
-              <small>{{ item.product.description|truncatechars:60 }}</small>
-            </td>
-            <td>{{ item.quantity }}</td>
-            <td>{{ item.product.price }} {{ item.product.currency }}</td>
-            <td>{{ item.subtotal }} {{ item.product.currency }}</td>
-          </tr>
+          <div class="order-item">
+            {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+            {% else %}
+              <div class="item-image" style="background: #f8f9fa; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                <i class="fas fa-image"></i>
+              </div>
+            {% endif %}
+            <div class="item-details">
+              <div class="item-name">{{ item.product.name }}</div>
+              <div class="item-meta">{{ item.product.type|title }} • {{ item.product.added_by.get_full_name }}</div>
+            </div>
+            <div class="item-quantity">×{{ item.quantity }}</div>
+            <div class="item-price">{{ item.subtotal }} {{ item.product.currency }}</div>
+          </div>
           {% endfor %}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th colspan="3" class="has-text-right">Total :</th>
-            <th>{{ total }} XOF</th>
-          </tr>
-        </tfoot>
-      </table>
+        </div>
+        
+        <div class="order-totals">
+          <div class="total-row">
+            <span class="total-label">Sous-total</span>
+            <span class="total-value">{{ total }} FCFA</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Frais de service</span>
+            <span class="total-value">Gratuits</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Livraison</span>
+            <span class="total-value">À définir</span>
+          </div>
+          <div class="total-row grand-total">
+            <span class="total-label">Total à payer</span>
+            <span class="total-value">{{ total }} FCFA</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <form method="POST">
-      {% csrf_token %}
-      <div class="has-text-centered">
-        <button class="button is-success is-large">
-          <span class="icon"><i class="fas fa-check-circle"></i></span>
-          <span>Payer maintenant</span>
-        </button>
+    <!-- Right Column - Payment -->
+    <div class="payment-section">
+      <h3 class="payment-title">Méthode de paiement</h3>
+      
+      <div class="payment-methods">
+        <div class="payment-method selected" data-method="kkiapay">
+          <div class="method-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">Paiement Mobile</div>
+            <div class="method-description">KkiaPay - Paiement sécurisé</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+        
+        <div class="payment-method" data-method="card" style="opacity: 0.5; cursor: not-allowed;">
+          <div class="method-icon">
+            <i class="fas fa-credit-card"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">Carte Bancaire</div>
+            <div class="method-description">Bientôt disponible</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+        
+        <div class="payment-method" data-method="transfer" style="opacity: 0.5; cursor: not-allowed;">
+          <div class="method-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">Virement Bancaire</div>
+            <div class="method-description">Bientôt disponible</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
       </div>
-    </form>
-    
-
-
-
-    {% else %}
-    <article class="message is-warning">
-      <div class="message-body has-text-centered">
-        Votre panier est vide. <a href="{% url 'products' %}">Voir nos produits</a>
+      
+      <button class="pay-button" id="pay-button">
+        <i class="fas fa-lock"></i>
+        Payer {{ total }} FCFA
+      </button>
+      
+      <div class="security-badges">
+        <div class="security-badge">
+          <i class="fas fa-shield-alt"></i>
+          <span>Paiement sécurisé</span>
+        </div>
+        <div class="security-badge">
+          <i class="fas fa-lock"></i>
+          <span>SSL crypté</span>
+        </div>
+        <div class="security-badge">
+          <i class="fas fa-check-circle"></i>
+          <span>Garantie</span>
+        </div>
       </div>
-    </article>
-    {% endif %}
+    </div>
   </div>
-</section>
+  {% else %}
+  <!-- Empty Cart -->
+  <div class="empty-cart">
+    <div class="icon">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+    <h3>Votre panier est vide</h3>
+    <p>Ajoutez des articles à votre panier avant de procéder au paiement.</p>
+    <a href="{% url 'marketplace' %}" class="continue-shopping">
+      <i class="fas fa-store"></i>
+      Retour au marketplace
+    </a>
+  </div>
+  {% endif %}
+</div>
 
-
-
-
-
+<!-- KkiaPay Script -->
+<script src="https://cdn.kkiapay.me/k.js"></script>
 {% endblock %}
+
+
+
+
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const payButton = document.getElementById('pay-button');
+  const paymentMethods = document.querySelectorAll('.payment-method');
+  
+  // Payment method selection
+  paymentMethods.forEach(method => {
+    if (!method.style.opacity) { // Only enable clickable methods
+      method.addEventListener('click', function() {
+        // Remove selected class from all methods
+        paymentMethods.forEach(m => m.classList.remove('selected'));
+        // Add selected class to clicked method
+        this.classList.add('selected');
+      });
+    }
+  });
+
+  // KkiaPay configuration
+  const amount = {{ total }};
+  const transactionId = "{{ order.transaction_id }}";
+  const publicKey = "{{ public_key }}";
+  const phone = "{{ user.phone_number|default:'22900000000' }}";
+  const callbackUrl = "{% url 'kkiapay_callback' %}";
+
+  function openKkiapay() {
+    // Use the new callback URL that handles both success and failure
+    openKkiapayWidget({
+        amount: amount,
+        position: "center",
+        callback: callbackUrl,  // This is the key change!
+        data: "Commande #{{ order.pk }}",
+        theme: "#9c27b0",
+        sandbox: true, // Set to false in production
+        key: publicKey,
+        phone: phone,
+        name: "{{ user.first_name|default:'Client' }}",
+        email: "{{ user.email|default:'client@example.com' }}",
+        transactionId: transactionId
+    });
+  }
+
+  // Pay button handler
+  if (payButton) {
+    payButton.addEventListener('click', function() {
+      // Show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation du paiement...';
+      this.disabled = true;
+      
+      // Simulate processing delay
+      setTimeout(() => {
+        openKkiapay();
+        
+        // Reset button after a delay (in case payment widget doesn't open)
+        setTimeout(() => {
+          this.innerHTML = originalText;
+          this.disabled = false;
+        }, 5000);
+      }, 1000);
+    });
+  }
+
+  // Add animation to elements
+  const animateElements = document.querySelectorAll('.order-item, .payment-method, .info-item');
+  animateElements.forEach((element, index) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      element.style.transition = 'all 0.5s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+});
+</script>
+{% endblock %}
+
+
+
+{% comment %} {% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const payButton = document.getElementById('pay-button');
+  const paymentMethods = document.querySelectorAll('.payment-method');
+  
+  // Payment method selection
+  paymentMethods.forEach(method => {
+    if (!method.style.opacity) { // Only enable clickable methods
+      method.addEventListener('click', function() {
+        // Remove selected class from all methods
+        paymentMethods.forEach(m => m.classList.remove('selected'));
+        // Add selected class to clicked method
+        this.classList.add('selected');
+      });
+    }
+  });
+
+  // KkiaPay configuration
+  const amount = {{ total }};
+  const transactionId = "ORDER-{{ order.pk }}-{{ timestamp }}";
+  const publicKey = "{{ public_key }}";
+  const phone = "{{ user.phone_number|default:'22900000000' }}";
+
+  function openKkiapay() {
+    openKkiapayWidget({
+        amount: amount,
+        position: "center",
+        callback: "{% url 'payment_success' %}",
+        data: "Commande #{{ order.pk }}",
+        theme: "#9c27b0",
+        sandbox: true, // Set to false in production
+        key: publicKey,
+        phone: phone,
+        name: "{{ user.first_name|default:'Client' }}",
+        email: "{{ user.email|default:'client@example.com' }}",
+        transactionId: transactionId
+    });
+  }
+
+  // Pay button handler
+  if (payButton) {
+    payButton.addEventListener('click', function() {
+      // Show loading state
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation du paiement...';
+      this.disabled = true;
+      
+      // Simulate processing delay
+      setTimeout(() => {
+        openKkiapay();
+        
+        // Reset button after a delay (in case payment widget doesn't open)
+        setTimeout(() => {
+          this.innerHTML = '<i class="fas fa-lock"></i> Payer {{ total }} FCFA';
+          this.disabled = false;
+        }, 3000);
+      }, 1000);
+    });
+  }
+
+  // Add animation to elements
+  const animateElements = document.querySelectorAll('.order-item, .payment-method, .info-item');
+  animateElements.forEach((element, index) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      element.style.transition = 'all 0.5s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+});
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -68,10 +68,19 @@ urlpatterns = [
     path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
     path('cart/update/<int:product_id>/', views.update_cart_item, name='update_cart_item'),
 
-    
     path('checkout/', views.checkout, name='checkout'),
-    path('payment/notify/', views.payment_notify, name='payment_notify'),
+    # path('payment-success/', views.payment_success, name='payment_success'),
+    # path('payment/notify/', views.payment_notify, name='payment_notify'),
+    # path('payment/return/', views.payment_return, name='payment_return'),
     path('payment/return/', views.payment_return, name='payment_return'),
     path('payment-history/', views.payment_history, name='payment_history'),
+    
+
+
+    # Payment callbacks
+    path('payment/callback/', views.kkiapay_callback, name='kkiapay_callback'),
+    path('order/confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
+    path('payment/failed/', views.payment_failed, name='payment_failed'),
+    
 
 ]

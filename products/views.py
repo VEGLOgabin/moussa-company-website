@@ -16,7 +16,8 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 
 import json
-
+from django.views.decorators.csrf import csrf_exempt
+from django.conf import settings
 
 
 user_actions_logger = logging.getLogger('user_actions')
@@ -170,7 +171,7 @@ def add_product(request):
         name = request.POST.get('name')
         description = request.POST.get('description')
         price = request.POST.get('price')
-        quantity = request.POST.get('quantity', 1)
+        available = request.POST.get('available', 0)
         currency = request.POST.get('currency', 'FCFA')
         image = request.FILES.get('image')
 
@@ -179,7 +180,7 @@ def add_product(request):
                 name=name,
                 description=description,
                 price=price,
-                quantity=quantity,
+                available=available,
                 currency=currency,
                 image=image,
                 added_by=request.user
@@ -203,6 +204,8 @@ def update_product(request, product_id):
         product.name = request.POST.get('name')
         product.description = request.POST.get('description')
         product.price = request.POST.get('price')
+        product.available = request.POST.get("available")
+        product.currency = request.POST.get("currency", "FCFA")
 
         # If a new image is uploaded, delete the old one
         if request.FILES.get('image'):
@@ -331,12 +334,18 @@ def delete_rating(request, product_id):
 
 
 
+
+
+
+
+
+
 @login_required
 def checkout(request):
     cart = request.session.get('cart', {})
     if not cart:
         messages.error(request, "Votre panier est vide.")
-        return redirect('products')
+        return redirect('marketplace')
 
     # Fetch all products in the cart
     products = Product.objects.filter(id__in=cart.keys())
@@ -344,7 +353,7 @@ def checkout(request):
     total = 0
 
     for product in products:
-        quantity = cart.get(str(product.id), 1)  # session cart quantity
+        quantity = cart.get(str(product.id), 1)
         subtotal = product.price * quantity
         cart_items.append({
             'product': product,
@@ -353,61 +362,66 @@ def checkout(request):
         })
         total += subtotal
 
-    payment_error = None  # will be passed to template
+    # Create the order now with status pending
+    order = Order.objects.create(
+        ordered_by=request.user,
+        total_price=total,
+        currency="FCFA",
+        status="pending"
+    )
 
-    if request.method == 'POST':
-        # Create the order
-        order = Order.objects.create(
-            ordered_by=request.user,
-            total_price=total,
-            currency="XOF",
-            status='pending'
+    # Create OrderProduct entries
+    for item in cart_items:
+        OrderProduct.objects.create(
+            order=order,
+            product=item['product'],
+            quantity=item['quantity']
         )
 
-        # Create OrderProduct entries
-        for item in cart_items:
-            OrderProduct.objects.create(
-                order=order,
-                product=item['product'],
-                quantity=item['quantity']
-            )
+    # Generate unique transaction ID for Kkiapay
+    transaction_id = f"ORDER-{order.pk}-{int(timezone.now().timestamp())}"
+    order.transaction_id = transaction_id
+    order.save()
 
-        # Initialize payment
-        client = get_client()
-        transaction_id = f"ORDER-{order.pk}-{int(timezone.now().timestamp())}"
-        order.transaction_id = transaction_id
+    # Pass all necessary info to template
+    context = {
+        "cart_items": cart_items,
+        "total": total,
+        "order": order,
+        "timestamp": int(timezone.now().timestamp()),
+        "public_key": settings.KKIAPAY_PUBLIC_KEY,
+        "user": request.user
+    }
+
+    return render(request, "products/checkout.html", context)
+
+
+
+@login_required
+def payment_success(request):
+    transaction_id = request.GET.get("transaction_id")
+    try:
+        order = Order.objects.get(transaction_id=transaction_id)
+        order.status = "processing"  # or "paid" if you prefer
         order.save()
 
-        data = {
-            "transaction_id": transaction_id,
-            "amount": int(order.total_price),
-            "currency": order.currency,
-            "description": f"Commande #{order.pk}",
-            "return_url": request.build_absolute_uri(reverse('payment_return')),
-            "notify_url": request.build_absolute_uri(reverse('payment_notify')),
-            "customer_name": request.user.first_name,
-            "customer_surname": request.user.last_name,
-            "customer_email": request.user.email,
-        }
+        # Save payment record
+        PaymentHistory.objects.create(
+            user=request.user,
+            order=order,
+            amount=order.total_price,
+            transaction_id=transaction_id,
+            status='success'
+        )
 
-        resp = client.PaymentInitialization(data)
-        print(resp)
+        # Clear cart
+        request.session['cart'] = {}
 
-        if not resp or resp.get("code") != "201":
-            error_message = resp.get("message", "Erreur inconnue")
-            error_description = resp.get("description", "")
-            payment_error = f"{error_message} - {error_description}"
-            messages.error(request, payment_error)
-        else:
-            # Clear cart only after successful payment initialization
-            request.session['cart'] = {}
-            return redirect(resp["data"]["payment_url"])
+        messages.success(request, f"Paiement de {order.total_price} FCFA réussi !")
+    except Order.DoesNotExist:
+        messages.error(request, "Commande introuvable.")
 
-    return render(request, 'products/checkout.html', {
-        'cart_items': cart_items,
-        'total': total,
-        'payment_error': payment_error,
-    })
+    return redirect('products')  # or wherever you want to redirect after success
 
 
 
@@ -896,7 +910,7 @@ def cart_view(request):
             'subtotal': subtotal
         })
 
-    return render(request, 'products/cart_2.html', {
+    return render(request, 'products/cart.html', {
         'cart_items': cart_items,
         'total': total
     })
@@ -937,46 +951,6 @@ def update_cart_item(request, product_id):
 
 
 
-from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
-from .models import PaymentHistory
-
-@csrf_exempt
-def payment_notify(request):
-    trans_id = request.POST.get('cpm_trans_id')
-    client = get_client()
-    resp = client.TransactionVerfication_trx(trans_id)
-    
-    if resp.json.get("data", {}).get("status") == "ACCEPTED":
-        order = Order.objects.filter(transaction_id=trans_id).first()
-        if order:
-            PaymentHistory.objects.get_or_create(
-                order=order,
-                defaults={
-                    'user': order.ordered_by,
-                    'amount': order.total_price,
-                    'transaction_id': trans_id,
-                    'status': 'success'
-                }
-            )
-            order.status = 'processing'
-            order.save()
-    return HttpResponse(status=200)
-
-
-def payment_return(request):
-    trans_id = request.GET.get('transaction_id')
-    client = get_client()
-    resp = client.TransactionVerfication_trx(trans_id)
-
-    status = resp.json.get("data", {}).get("status")
-    if status == "ACCEPTED":
-        messages.success(request, "Paiement réussi ! Merci pour votre commande.")
-    else:
-        messages.error(request, "Paiement échoué. Veuillez réessayer.")
-
-    return redirect('products')
-
 
 
 
@@ -1003,3 +977,182 @@ def remove_from_cart(request, product_id):
         request.session['cart'] = cart
         messages.success(request, "Produit retiré du panier.")
     return redirect('products')
+
+
+
+
+
+
+
+
+def payment_return(request):
+    trans_id = request.GET.get('transaction_id')
+    client = get_client()
+    resp = client.TransactionVerfication_trx(trans_id)
+
+    status = resp.json.get("data", {}).get("status")
+    if status == "ACCEPTED":
+        messages.success(request, "Paiement réussi ! Merci pour votre commande.")
+    else:
+        messages.error(request, "Paiement échoué. Veuillez réessayer.")
+
+    return redirect('products')
+
+
+
+
+
+
+
+
+
+
+
+
+
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+import requests
+import json
+
+@csrf_exempt
+def kkiapay_callback(request):
+    """
+    Handle KKIAPAY payment callback - both success and failure
+    This handles both GET (redirect) and POST (webhook) requests
+    """
+    if request.method == 'GET':
+        # Handle success redirect with transaction_id
+        transaction_id = request.GET.get('transaction_id')
+        if transaction_id:
+            return handle_payment_verification(request, transaction_id)
+    
+    elif request.method == 'POST':
+        # Handle webhook callback
+        try:
+            data = json.loads(request.body)
+            transaction_id = data.get('transactionId')
+            status = data.get('status')
+            
+            if transaction_id and status:
+                return handle_payment_status(request, transaction_id, status)
+        except json.JSONDecodeError:
+            pass
+    
+    # If we can't process the callback, redirect to products page
+    return redirect('products')
+
+def handle_payment_verification(request, transaction_id):
+    """
+    Verify payment status with KKIAPAY API
+    """
+    try:
+        # Verify transaction with KKIAPAY
+        verify_url = f"https://api.kkiapay.me/api/v1/transactions/{transaction_id}/verify"
+        headers = {
+            'Accept': 'application/json',
+            'X-API-KEY': settings.KKIAPAY_SECRET_KEY,
+            'X-SECRET-KEY': settings.KKIAPAY_SECRET_KEY,
+            'X-PRIVATE-KEY': settings.KKIAPAY_PRIVATE_KEY
+        }
+        
+
+        
+        response = requests.get(verify_url, headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            status = data.get('status')
+            amount = data.get('amount')
+            
+            return handle_payment_status(request, transaction_id, status, amount)
+        else:
+            messages.error(request, "Impossible de vérifier le statut du paiement.")
+            
+    except Exception as e:
+        print(f"Error verifying payment: {e}")
+        messages.error(request, "Erreur lors de la vérification du paiement.")
+    
+    return redirect('products')
+
+def handle_payment_status(request, transaction_id, status, amount=None):
+    """
+    Handle different payment statuses
+    """
+    try:
+        # Find the order by transaction_id
+        order = Order.objects.get(transaction_id=transaction_id)
+        
+        if status.upper() in ['SUCCESS', 'SUCCEEDED', 'ACCEPTED']:
+            # Payment successful
+            order.status = "paid"
+            order.save()
+            
+            # Create payment record
+            PaymentHistory.objects.create(
+                user=request.user if request.user.is_authenticated else order.ordered_by,
+                order=order,
+                amount=amount or order.total_price,
+                transaction_id=transaction_id,
+                status='success',
+                payment_method='KKIAPAY'
+            )
+            
+            # Clear cart
+            if request.user.is_authenticated:
+                request.session['cart'] = {}
+                request.session.modified = True
+            
+            messages.success(request, f"Paiement de {order.total_price} FCFA réussi ! Votre commande est en cours de traitement.")
+            
+            # Redirect to success page or order confirmation
+            return redirect('order_confirmation', order_id=order.id)
+            
+        else:
+            # Payment failed
+            order.status = "failed"
+            order.save()
+            
+            # Create failed payment record
+            PaymentHistory.objects.create(
+                user=request.user if request.user.is_authenticated else order.ordered_by,
+                order=order,
+                amount=amount or order.total_price,
+                transaction_id=transaction_id,
+                status='failed',
+                payment_method='KKIAPAY'
+            )
+            
+            messages.error(request, "Le paiement a échoué. Veuillez réessayer.")
+            return redirect('payment_failed')
+            
+    except Order.DoesNotExist:
+        messages.error(request, "Commande introuvable.")
+        return redirect('products')
+    except Exception as e:
+        print(f"Error handling payment status: {e}")
+        messages.error(request, "Erreur lors du traitement du paiement.")
+        return redirect('products')
+
+def order_confirmation(request, order_id):
+    """
+    Show order confirmation page after successful payment
+    """
+    order = get_object_or_404(Order, id=order_id)
+    if request.user.is_authenticated and order.ordered_by != request.user:
+        messages.error(request, "Vous n'avez pas accès à cette commande.")
+        return redirect('products')
+    
+    order_products = order.order_products.all()
+    
+    context = {
+        'order': order,
+        'order_products': order_products,
+    }
+    return render(request, 'products/order_confirmation.html', context)
+
+def payment_failed(request):
+    """
+    Show payment failed page
+    """
+    return render(request, 'products/payment_failed.html')

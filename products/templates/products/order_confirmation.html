@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Confirmation de Commande | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+    .confirmation-hero {
+        background: linear-gradient(135deg, #23a455 0%, #1e8c4a 100%);
+        color: white;
+        padding: 80px 0;
+        text-align: center;
+        margin-top: -70px;
+        padding-top: 150px;
+    }
+
+    .confirmation-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        padding: 2rem;
+        margin: 2rem auto;
+        max-width: 800px;
+        border: 2px solid #23a455;
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        color: #23a455;
+        margin-bottom: 1rem;
+    }
+
+    .order-details {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .detail-row:last-child {
+        border-bottom: none;
+    }
+
+    .product-list {
+        margin: 1rem 0;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .confirmation-card {
+            margin: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="confirmation-hero">
+    <div class="container">
+        <h1 class="title is-1 has-text-white">Paiement Réussi !</h1>
+        <p class="subtitle has-text-white">Merci pour votre commande</p>
+    </div>
+</section>
+
+<!-- Confirmation Card -->
+<section class="section">
+    <div class="container">
+        <div class="confirmation-card">
+            <div class="has-text-centered">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="title is-3">Commande Confirmée</h2>
+                <p class="subtitle is-5">Votre paiement a été traité avec succès</p>
+            </div>
+
+            <!-- Order Details -->
+            <div class="order-details">
+                <h3 class="title is-4">Détails de la commande</h3>
+                
+                <div class="detail-row">
+                    <strong>Numéro de commande:</strong>
+                    <span>#{{ order.id }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <strong>Date:</strong>
+                    <span>{{ order.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <strong>Statut:</strong>
+                    <span class="tag is-success">{{ order.get_status_display }}</span>
+                </div>
+                
+                <div class="detail-row">
+                    <strong>Transaction ID:</strong>
+                    <span>{{ order.transaction_id }}</span>
+                </div>
+
+                <!-- Products -->
+                <div class="product-list">
+                    <h4 class="title is-5">Produits commandés</h4>
+                    {% for order_product in order_products %}
+                    <div class="product-item">
+                        <div>
+                            <strong>{{ order_product.product.name }}</strong>
+                            <br>
+                            <small>Quantité: {{ order_product.quantity }}</small>
+                        </div>
+                        <div>
+                            {{ order_product.product.price }} {{ order_product.product.currency }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="detail-row">
+                    <strong>Total:</strong>
+                    <strong class="title is-5">{{ order.total_price }} {{ order.currency }}</strong>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="content">
+                <h4 class="title is-5">Prochaines étapes</h4>
+                <ul>
+                    <li>Vous recevrez un email de confirmation sous peu</li>
+                    <li>Notre équipe traitera votre commande dans les 24 heures</li>
+                    <li>Pour toute question, contactez notre service client</li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions">
+                <a href="{% url 'products' %}" class="button is-primary is-large">
+                    <i class="fas fa-shopping-bag mr-2"></i>
+                    Continuer les achats
+                </a>
+                <a href="{% url 'payment_history' %}" class="button is-light is-large">
+                    <i class="fas fa-receipt mr-2"></i>
+                    Voir l'historique
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

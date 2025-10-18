@@ -637,13 +637,13 @@
 {% endblock %}
 
 {% block content %}
-<!-- ===== TOAST NOTIFICATION ===== -->
+{% comment %} <!-- ===== TOAST NOTIFICATION ===== -->
 <div class="toast" id="toast">
   <div class="toast-content">
     <strong id="toast-title">Success</strong>
     <p id="toast-message">Operation completed successfully</p>
   </div>
-</div>
+</div> {% endcomment %}
 
 <!-- ===== PRODUCT HERO SECTION ===== -->
 <section class="product-detail-hero">
@@ -684,13 +684,13 @@
           <p class="product-price">{{ product.price }} {{ product.currency }}</p>
 
           <!-- Stock Status -->
-          <div class="stock-status {% if product.quantity > 10 %}in-stock{% elif product.quantity > 0 %}low-stock{% else %}out-of-stock{% endif %}">
-            {% if product.quantity > 10 %}
+          <div class="stock-status {% if product.available > 10 %}in-stock{% elif product.available > 0 %}low-stock{% else %}out-of-stock{% endif %}">
+            {% if product.available > 10 %}
               <i class="fas fa-check-circle"></i>
               En stock
-            {% elif product.quantity > 0 %}
+            {% elif product.available > 0 %}
               <i class="fas fa-exclamation-triangle"></i>
-              Plus que {{ product.quantity }} disponible{{ product.quantity|pluralize:"s" }}
+              Plus que {{ product.available }} disponible{{ product.available|pluralize:"s" }}
             {% else %}
               <i class="fas fa-times-circle"></i>
               Rupture de stock
@@ -713,27 +713,7 @@
             </div>
           </div>
 
-          {% comment %} <!-- Cart Section -->
-          <div class="cart-section">
-            {% if product.id|stringformat:"s" in cart_product_ids %}
-              <div class="in-cart-indicator">
-                <i class="fas fa-check-circle mr-2"></i>Dans le panier
-              </div>
-              <button class="cart-btn remove-from-cart" data-product-id="{{ product.id }}">
-                <i class="fas fa-trash mr-2"></i>Retirer du panier
-              </button>
-            {% else %}
-              <button class="cart-btn add-to-cart {% if product.quantity == 0 %}disabled{% endif %}" 
-                      data-product-id="{{ product.id }}" 
-                      {% if product.quantity == 0 %}disabled{% endif %}>
-                {% if product.quantity == 0 %}
-                  <i class="fas fa-ban mr-2"></i>Rupture de stock
-                {% else %}
-                  <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
-                {% endif %}
-              </button>
-            {% endif %}
-          </div> {% endcomment %}
+         
 
 
           <!-- Cart Section -->
@@ -765,7 +745,7 @@
               </div>
             {% else %}
               <div class="cart-state">
-                {% if product.quantity == 0 %}
+                {% if product.available == 0 %}
                   <!-- Out of Stock State -->
                   <div class="out-of-stock-indicator">
                     <div class="out-of-stock-icon">

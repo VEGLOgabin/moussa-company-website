@@ -804,13 +804,13 @@
 {% endblock %}
 
 {% block content %}
-<!-- ===== TOAST NOTIFICATION ===== -->
+{% comment %} <!-- ===== TOAST NOTIFICATION ===== -->
 <div class="toast" id="toast">
   <div class="toast-content">
     <strong id="toast-title">Success</strong>
     <p id="toast-message">Operation completed successfully</p>
   </div>
-</div>
+</div> {% endcomment %}
 
 <!-- ===== HERO SECTION ===== -->
 <section class="products-hero">
@@ -869,6 +869,7 @@
            data-name="{{ product.name|lower }}" 
            data-description="{{ product.description|lower }}"
            data-price="{{ product.price }}"
+           data-available="{{ product.available }}"
            data-date="{{ product.created_at|date:'Y-m-d' }}">
         
         <div class="product-card">
@@ -946,15 +947,15 @@
 
 
               <div class="stock-badges">
-                {% if product.quantity > 10 %}
+                {% if product.available > 10 %}
                   <span class="tag is-success is-light">
                     <i class="fas fa-check mr-1"></i>
-                    {{ product.quantity }} En stock
+                    {{ product.available }} En stock
                   </span>
-                {% elif product.quantity > 0 %}
+                {% elif product.available > 0 %}
                   <span class="tag is-warning is-light">
                     <i class="fas fa-exclamation-triangle mr-1"></i>
-                    {{ product.quantity }} Restant{{ product.quantity|pluralize:"s" }}
+                    {{ product.available }} Restant{{ product.available|pluralize:"s" }}
                   </span>
                 {% else %}
                   <span class="tag is-danger is-light">
@@ -992,6 +993,7 @@
                       data-name="{{ product.name }}"
                       data-description="{{ product.description }}"
                       data-price="{{ product.price }}"
+                      data-available="{{ product.available }}"
                       data-image="{{ product.image.url }}">
                 <i class="fas fa-edit mr-2"></i>Modifier
               </button>
@@ -1192,9 +1194,9 @@
           </div>
           <div class="column is-6">
             <div class="field">
-              <label class="label">Quantité</label>
+              <label class="label">Disponible</label>
               <div class="control">
-                <input class="input" type="number" name="quantity" value="1" min="1">
+                <input class="input" type="number" name="available" value="0" min="0">
               </div>
             </div>
           </div>
@@ -1273,9 +1275,9 @@
           </div>
           <div class="column is-6">
             <div class="field">
-              <label class="label">Quantité</label>
+              <label class="label">Disponible</label>
               <div class="control">
-                <input class="input" type="number" name="quantity" value="1" min="1">
+                <input class="input" type="number" name="available" value="0" min="0">
               </div>
             </div>
           </div>
@@ -1650,8 +1652,8 @@ function clearSearch() {
     form.querySelector("textarea[name='description']").value = button.getAttribute("data-description");
     form.querySelector("input[name='price']").value = button.getAttribute("data-price");
     
-    if (button.hasAttribute("data-quantity")) {
-      form.querySelector("input[name='quantity']").value = button.getAttribute("data-quantity");
+    if (button.hasAttribute("data-available")) {
+      form.querySelector("input[name='available']").value = button.getAttribute("data-available");
     }
 
     const imgPreview = document.getElementById("updateProductImagePreview");
