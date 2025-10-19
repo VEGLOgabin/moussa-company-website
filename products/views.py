@@ -1024,6 +1024,7 @@ def kkiapay_callback(request):
     if request.method == 'GET':
         # Handle success redirect with transaction_id
         transaction_id = request.GET.get('transaction_id')
+        print(transaction_id)
         if transaction_id:
             return handle_payment_verification(request, transaction_id)
     
@@ -1031,6 +1032,7 @@ def kkiapay_callback(request):
         # Handle webhook callback
         try:
             data = json.loads(request.body)
+            print(data)
             transaction_id = data.get('transactionId')
             status = data.get('status')
             
@@ -1046,6 +1048,8 @@ def handle_payment_verification(request, transaction_id):
     """
     Verify payment status with KKIAPAY API
     """
+    #https://afraid-sides-follow.loca.lt/payment/callback/?transaction_id=zLdYdWYX1
+    #https://api.kkiapay.me/api/v1/transactions/zLdYdWYX1/verify
     try:
         # Verify transaction with KKIAPAY
         verify_url = f"https://api.kkiapay.me/api/v1/transactions/{transaction_id}/verify"

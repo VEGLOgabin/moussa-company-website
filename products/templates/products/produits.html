@@ -5,6 +5,53 @@
 
 {% block style %}
 <style>
+
+
+
+
+  .notification-modern {
+    border-radius: 15px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    font-weight: 500;
+    border-left: 4px solid;
+    animation: slideIn 0.5s ease-out;
+    max-width: 1200px;
+  }
+  
+  .notification-success {
+    background: #d4edda;
+    color: #155724;
+    border-left-color: #28a745;
+  }
+  
+  .notification-error {
+    background: #f8d7da;
+    color: #721c24;
+    border-left-color: #dc3545;
+  }
+  
+  .notification-info {
+    background: #cce7ff;
+    color: #004085;
+    border-left-color: #007bff;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+
+
+
+
+
+
+
+
+
+
   /* ===== VARIABLES ===== */
   :root {
     --primary: #23a455;
@@ -829,6 +876,36 @@
 <!-- ===== FILTER SECTION ===== -->
 <section class="filter-section">
   <div class="container">
+
+
+
+
+
+  <!-- Messages -->
+  {% if messages %}
+  <div class="container">
+    {% for message in messages %}
+      <div class="notification-modern 
+        {% if message.tags == 'success' %}notification-success
+        {% elif message.tags == 'error' %}notification-error
+        {% else %}notification-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+
+
+
+
+
     <div class="columns is-vcentered">
       <div class="column is-8">
         <div class="search-box">

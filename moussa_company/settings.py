@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-qyh$9(9%c%&%nh7638_+c0kjgjd$o4+_9a(qskwbg!==1270yf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS=['*']
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+    'localhost',
+    'ten-plums-care.loca.lt',
+]
 
 
 # Application definition
@@ -148,30 +152,23 @@ LOGGING = {
             "format": "{levelname} {asctime} {module} {message}",
             "style": "{",
         },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
     },
     "handlers": {
-        "user_actions_file": {  # Nom du gestionnaire de journal pour les actions de l'utilisateur
+        "sqlite_handler": {
             "level": "INFO",
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "filename": f"user_actions{datetime.now().strftime('%Y-%m-%d')}.log",  # Nom du fichier de journal pour les actions de l'utilisateur
-            "when": "D",  # Rotation quotidienne
-            "interval": 1,  # Créez un nouveau fichier chaque jour
-            "backupCount": 7,  # Conservez jusqu'à 7 fichiers de journal
+            "class": "products.sqlite_logger.SQLiteHandler",  # Adjust to your app path
             "formatter": "verbose",
         },
     },
     "loggers": {
-        "user_actions": {  # Nom du logger pour les actions de l'utilisateur
-            "handlers": ["user_actions_file"],
+        "user_actions": {
+            "handlers": ["sqlite_handler"],
             "level": "INFO",
             "propagate": False,
         },
     },
 }
+
 
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
