@@ -66,9 +66,25 @@ class ProductRating(models.Model):
 
 
 
+# class Order(models.Model):
+#     STATUS_CHOICES = [
+#         ('pending', 'En attente'),
+#         ('processing', 'En cours'),
+#         ('shipped', 'Expédié'),
+#         ('delivered', 'Livré'),
+#         ('cancelled', 'Annulé'),
+#     ]
+
+#     ordered_by = models.ForeignKey(User, on_delete=models.CASCADE)
+#     products = models.ManyToManyField(Product, through='OrderProduct')
+#     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+#     currency = models.CharField(max_length=100, default="FCFA")
+#     ordered_at = models.DateTimeField(auto_now_add=True)
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
 class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'En attente'),
+        ('paid', 'Payé'),
         ('processing', 'En cours'),
         ('shipped', 'Expédié'),
         ('delivered', 'Livré'),
@@ -81,16 +97,34 @@ class Order(models.Model):
     currency = models.CharField(max_length=100, default="FCFA")
     ordered_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    
+    # Our internal transaction ID for reference
+    internal_transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    
+    
+    
+    # Kkiapay's transaction ID (will be null until payment is successful)
+    kkiapay_transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+
+    def __str__(self):
+        return f"Order {self.id} by {self.ordered_by}"
 
 
 
+# class OrderProduct(models.Model):
+#     order = models.ForeignKey('Order', on_delete=models.CASCADE)
+#     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#     quantity = models.PositiveIntegerField(default=1)
+    
+    
 class OrderProduct(models.Model):
-    order = models.ForeignKey('Order', on_delete=models.CASCADE)
+    order = models.ForeignKey('Order', on_delete=models.CASCADE, related_name='order_products')  # Add related_name here
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     
-    
-    
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name} for Order {self.order.id}"
 
 
 
@@ -136,6 +170,24 @@ class BlogPost(models.Model):
     
     
     
+# class PaymentHistory(models.Model):
+#     PAYMENT_STATUS_CHOICES = [
+#         ('success', 'Succès'),
+#         ('failed', 'Échoué'),
+#         ('pending', 'En attente'),
+#     ]
+
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+#     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     payment_date = models.DateTimeField(auto_now_add=True)
+#     transaction_id = models.CharField(max_length=100, unique=True)
+#     payment_method = models.CharField(max_length=100, default="CinetPay")
+#     status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+
+#     def __str__(self):
+#         return f"{self.user.username} - {self.amount} {self.order.currency} - {self.status}"
+
 class PaymentHistory(models.Model):
     PAYMENT_STATUS_CHOICES = [
         ('success', 'Succès'),
@@ -147,10 +199,13 @@ class PaymentHistory(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_date = models.DateTimeField(auto_now_add=True)
-    transaction_id = models.CharField(max_length=100, unique=True)
-    payment_method = models.CharField(max_length=100, default="CinetPay")
+    
+    # Store both transaction IDs
+    internal_transaction_id = models.CharField(max_length=100)
+    kkiapay_transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    payment_method = models.CharField(max_length=100, default="KKIAPAY")
     status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
 
     def __str__(self):
-        return f"{self.user.username} - {self.amount} {self.order.currency} - {self.status}"
-
+        return f"{self.user.first_name} - {self.amount} {self.order.currency} - {self.status}"

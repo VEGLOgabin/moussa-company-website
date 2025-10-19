@@ -340,61 +340,6 @@ def delete_rating(request, product_id):
 
 
 
-@login_required
-def checkout(request):
-    cart = request.session.get('cart', {})
-    if not cart:
-        messages.error(request, "Votre panier est vide.")
-        return redirect('marketplace')
-
-    # Fetch all products in the cart
-    products = Product.objects.filter(id__in=cart.keys())
-    cart_items = []
-    total = 0
-
-    for product in products:
-        quantity = cart.get(str(product.id), 1)
-        subtotal = product.price * quantity
-        cart_items.append({
-            'product': product,
-            'quantity': quantity,
-            'subtotal': subtotal
-        })
-        total += subtotal
-
-    # Create the order now with status pending
-    order = Order.objects.create(
-        ordered_by=request.user,
-        total_price=total,
-        currency="FCFA",
-        status="pending"
-    )
-
-    # Create OrderProduct entries
-    for item in cart_items:
-        OrderProduct.objects.create(
-            order=order,
-            product=item['product'],
-            quantity=item['quantity']
-        )
-
-    # Generate unique transaction ID for Kkiapay
-    transaction_id = f"ORDER-{order.pk}-{int(timezone.now().timestamp())}"
-    order.transaction_id = transaction_id
-    order.save()
-
-    # Pass all necessary info to template
-    context = {
-        "cart_items": cart_items,
-        "total": total,
-        "order": order,
-        "timestamp": int(timezone.now().timestamp()),
-        "public_key": settings.KKIAPAY_PUBLIC_KEY,
-        "user": request.user
-    }
-
-    return render(request, "products/checkout.html", context)
-
 
 
 @login_required
@@ -788,12 +733,89 @@ def delete_contact_message(request, message_id):
 
 
 
+# @login_required
+# def payment_history(request):
+#     payments = PaymentHistory.objects.filter(user=request.user).order_by('-payment_date')
+#     return render(request, 'products/payment_history.html', {'payments': payments})
+# At the top of your views.py
+from django.db import models
+
+
 @login_required
 def payment_history(request):
+    
+    # # First, delete all pending payment records for this user
+    # PaymentHistory.objects.filter(user=request.user, status='pending').delete()
+    
+    
+    
     payments = PaymentHistory.objects.filter(user=request.user).order_by('-payment_date')
-    return render(request, 'products/payment_history.html', {'payments': payments})
+    
+    # Calculate statistics
+    total_payments = payments.count()
+    successful_payments = payments.filter(status='success').count()
+    pending_payments = payments.filter(status='pending').count()
+    failed_payments = payments.filter(status='failed').count()
+    
+    # Calculate total amount spent (only successful payments)
+    total_amount_spent = payments.filter(status='success').aggregate(
+        total=models.Sum('amount')
+    )['total'] or 0
+    
+    # Get currency from first successful payment or default to FCFA
+    currency = "FCFA"
+    successful_payment = payments.filter(status='success').first()
+    if successful_payment:
+        currency = successful_payment.order.currency
+    
+    context = {
+        'payments': payments,
+        'total_payments': total_payments,
+        'successful_payments': successful_payments,
+        'pending_payments': pending_payments,
+        'failed_payments': failed_payments,
+        'total_amount_spent': total_amount_spent,
+        'currency': currency,
+    }
+    
+    return render(request, 'products/payment_history.html', context)
 
 
+
+@login_required
+@require_POST
+def delete_pending_payment(request, payment_id):
+    """Delete a pending payment and its associated order"""
+    try:
+        payment = PaymentHistory.objects.get(id=payment_id, user=request.user)
+        
+        # Only allow deletion of pending payments
+        if payment.status != 'pending':
+            return JsonResponse({
+                'success': False, 
+                'message': 'Seuls les paiements en attente peuvent être supprimés.'
+            })
+        
+        # Delete the associated order and payment
+        order = payment.order
+        payment.delete()
+        order.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': 'Paiement en attente supprimé avec succès.'
+        })
+        
+    except PaymentHistory.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'message': 'Paiement non trouvé.'
+        })
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Erreur lors de la suppression: {str(e)}'
+        })
 
 
 # Authentication
@@ -1010,133 +1032,176 @@ def payment_return(request):
 
 
 
+
+
+
+
+
+
+
+@login_required
+def checkout(request):
+    cart = request.session.get('cart', {})
+    if not cart:
+        messages.error(request, "Votre panier est vide.")
+        return redirect('marketplace')
+
+    # Fetch all products in the cart
+    products = Product.objects.filter(id__in=cart.keys())
+    cart_items = []
+    total = 0
+
+    for product in products:
+        quantity = cart.get(str(product.id), 1)
+        subtotal = product.price * quantity
+        cart_items.append({
+            'product': product,
+            'quantity': quantity,
+            'subtotal': subtotal
+        })
+        total += subtotal
+
+    # Generate unique INTERNAL transaction ID for our reference
+    internal_transaction_id = f"ORDER-{int(timezone.now().timestamp())}-{request.user.id}"
+
+    # Create the order with our internal transaction ID
+    order = Order.objects.create(
+        ordered_by=request.user,
+        total_price=total,
+        currency="FCFA",
+        status="pending",
+        internal_transaction_id=internal_transaction_id
+        # kkiapay_transaction_id remains null until payment is successful
+    )
+
+    # Create OrderProduct entries
+    for item in cart_items:
+        OrderProduct.objects.create(
+            order=order,
+            product=item['product'],
+            quantity=item['quantity']
+        )
+
+    # Create pending payment record
+    PaymentHistory.objects.create(
+        user=request.user,
+        order=order,
+        amount=order.total_price,
+        internal_transaction_id=internal_transaction_id,
+        kkiapay_transaction_id=None,  # Will be updated on success
+        status='pending',
+        payment_method='KKIAPAY'
+    )
+
+    # Pass all necessary info to template
+    context = {
+        "cart_items": cart_items,
+        "total": total,
+        "order": order,
+        "internal_transaction_id": internal_transaction_id,
+        "timestamp": int(timezone.now().timestamp()),
+        "public_key": settings.KKIAPAY_PUBLIC_KEY,
+        "user": request.user
+    }
+
+    return render(request, "products/checkout.html", context)
+
+
+
+
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-import requests
 import json
+
+
 
 @csrf_exempt
 def kkiapay_callback(request):
     """
-    Handle KKIAPAY payment callback - both success and failure
-    This handles both GET (redirect) and POST (webhook) requests
+    Handle KKIAPAY payment callback - alternative approach
     """
     if request.method == 'GET':
-        # Handle success redirect with transaction_id
-        transaction_id = request.GET.get('transaction_id')
-        print(transaction_id)
-        if transaction_id:
-            return handle_payment_verification(request, transaction_id)
-    
-    elif request.method == 'POST':
-        # Handle webhook callback
-        try:
-            data = json.loads(request.body)
-            print(data)
-            transaction_id = data.get('transactionId')
-            status = data.get('status')
-            
-            if transaction_id and status:
-                return handle_payment_status(request, transaction_id, status)
-        except json.JSONDecodeError:
-            pass
-    
-    # If we can't process the callback, redirect to products page
-    return redirect('products')
-
-def handle_payment_verification(request, transaction_id):
-    """
-    Verify payment status with KKIAPAY API
-    """
-    #https://afraid-sides-follow.loca.lt/payment/callback/?transaction_id=zLdYdWYX1
-    #https://api.kkiapay.me/api/v1/transactions/zLdYdWYX1/verify
-    try:
-        # Verify transaction with KKIAPAY
-        verify_url = f"https://api.kkiapay.me/api/v1/transactions/{transaction_id}/verify"
-        headers = {
-            'Accept': 'application/json',
-            'X-API-KEY': settings.KKIAPAY_SECRET_KEY,
-            'X-SECRET-KEY': settings.KKIAPAY_SECRET_KEY,
-            'X-PRIVATE-KEY': settings.KKIAPAY_PRIVATE_KEY
-        }
+        kkiapay_transaction_id = request.GET.get('transaction_id')
         
-
-        
-        response = requests.get(verify_url, headers=headers)
-        
-        if response.status_code == 200:
-            data = response.json()
-            status = data.get('status')
-            amount = data.get('amount')
-            
-            return handle_payment_status(request, transaction_id, status, amount)
-        else:
-            messages.error(request, "Impossible de vérifier le statut du paiement.")
-            
-    except Exception as e:
-        print(f"Error verifying payment: {e}")
-        messages.error(request, "Erreur lors de la vérification du paiement.")
+        if kkiapay_transaction_id:
+            # Since we can't get our internal ID from Kkiapay callback,
+            # we'll need to find the most recent pending order for this user
+            try:
+                if request.user.is_authenticated:
+                    # Find the most recent pending order for this user
+                    order = Order.objects.filter(
+                        ordered_by=request.user,
+                        status='pending',
+                        kkiapay_transaction_id__isnull=True
+                    ).order_by('-ordered_at').first()
+                    
+                    if order:
+                        return handle_payment_success(request, kkiapay_transaction_id, order.internal_transaction_id)
+                    else:
+                        messages.error(request, "Aucune commande en attente trouvée.")
+                else:
+                    messages.error(request, "Utilisateur non authentifié.")
+            except Exception as e:
+                print(f"Error finding pending order: {e}")
+                messages.error(request, "Erreur lors de la recherche de la commande.")
     
     return redirect('products')
 
-def handle_payment_status(request, transaction_id, status, amount=None):
+
+
+
+
+def handle_payment_success(request, kkiapay_transaction_id, internal_transaction_id=None):
     """
-    Handle different payment statuses
+    Handle successful payment - store both transaction IDs
     """
     try:
-        # Find the order by transaction_id
-        order = Order.objects.get(transaction_id=transaction_id)
-        
-        if status.upper() in ['SUCCESS', 'SUCCEEDED', 'ACCEPTED']:
-            # Payment successful
-            order.status = "paid"
-            order.save()
-            
-            # Create payment record
-            PaymentHistory.objects.create(
-                user=request.user if request.user.is_authenticated else order.ordered_by,
-                order=order,
-                amount=amount or order.total_price,
-                transaction_id=transaction_id,
-                status='success',
-                payment_method='KKIAPAY'
-            )
-            
-            # Clear cart
-            if request.user.is_authenticated:
-                request.session['cart'] = {}
-                request.session.modified = True
-            
-            messages.success(request, f"Paiement de {order.total_price} FCFA réussi ! Votre commande est en cours de traitement.")
-            
-            # Redirect to success page or order confirmation
-            return redirect('order_confirmation', order_id=order.id)
-            
+        # Find the order by our internal transaction ID
+        if internal_transaction_id:
+            order = Order.objects.get(internal_transaction_id=internal_transaction_id)
         else:
-            # Payment failed
-            order.status = "failed"
-            order.save()
-            
-            # Create failed payment record
-            PaymentHistory.objects.create(
-                user=request.user if request.user.is_authenticated else order.ordered_by,
-                order=order,
-                amount=amount or order.total_price,
-                transaction_id=transaction_id,
-                status='failed',
-                payment_method='KKIAPAY'
-            )
-            
-            messages.error(request, "Le paiement a échoué. Veuillez réessayer.")
-            return redirect('payment_failed')
+            # Fallback: try to find by kkiapay transaction ID in payment history
+            payment = PaymentHistory.objects.get(kkiapay_transaction_id=kkiapay_transaction_id)
+            order = payment.order
+        
+        # Update order with Kkiapay's transaction ID and mark as paid
+        order.kkiapay_transaction_id = kkiapay_transaction_id
+        order.status = "paid"
+        order.save()
+        
+        # Update payment record
+        payment = PaymentHistory.objects.get(order=order, status='pending')
+        payment.kkiapay_transaction_id = kkiapay_transaction_id
+        payment.status = 'success'
+        payment.save()
+        
+        # Clear cart
+        if request.user.is_authenticated:
+            request.session['cart'] = {}
+            request.session.modified = True
+        
+        messages.success(request, f"Paiement de {order.total_price} FCFA réussi ! Votre commande est confirmée.")
+        
+        # Redirect to order confirmation
+        return redirect('order_confirmation', order_id=order.id)
             
     except Order.DoesNotExist:
+        print(f"Order not found with internal_transaction_id: {internal_transaction_id}")
         messages.error(request, "Commande introuvable.")
-        return redirect('products')
+    except PaymentHistory.DoesNotExist:
+        print(f"Payment history not found for kkiapay_transaction_id: {kkiapay_transaction_id}")
+        messages.error(request, "Historique de paiement introuvable.")
     except Exception as e:
-        print(f"Error handling payment status: {e}")
+        print(f"Error handling payment: {e}")
         messages.error(request, "Erreur lors du traitement du paiement.")
-        return redirect('products')
+    
+    return redirect('products')
 
 def order_confirmation(request, order_id):
     """
@@ -1154,9 +1219,3 @@ def order_confirmation(request, order_id):
         'order_products': order_products,
     }
     return render(request, 'products/order_confirmation.html', context)
-
-def payment_failed(request):
-    """
-    Show payment failed page
-    """
-    return render(request, 'products/payment_failed.html')

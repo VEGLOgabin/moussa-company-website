@@ -74,13 +74,13 @@ urlpatterns = [
     # path('payment/return/', views.payment_return, name='payment_return'),
     path('payment/return/', views.payment_return, name='payment_return'),
     path('payment-history/', views.payment_history, name='payment_history'),
-    
+    path('payment/delete-pending/<int:payment_id>/', views.delete_pending_payment, name='delete_pending_payment'),
 
 
     # Payment callbacks
     path('payment/callback/', views.kkiapay_callback, name='kkiapay_callback'),
     path('order/confirmation/<int:order_id>/', views.order_confirmation, name='order_confirmation'),
-    path('payment/failed/', views.payment_failed, name='payment_failed'),
+    # path('payment/failed/', views.payment_failed, name='payment_failed'),
     
 
 ]
