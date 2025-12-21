@@ -1,5 +1,1971 @@
 {% extends 'base.html' %}
 
+{% block title %}Connexion | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Login Page */
+  :root {
+    --input-bg: rgba(255, 255, 255, 0.95);
+    --input-border: rgba(48, 126, 51, 0.2);
+    --input-focus: rgba(48, 126, 51, 0.4);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Hero Section with Background Image */
+  .login-hero {
+    position: relative;
+    height: 60vh;
+    min-height: 400px;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1519996529931-28324d5a630e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.85) 0%, rgba(30, 109, 45, 0.8) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .login-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .login-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 0;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .hero-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .hero-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hero-dot.active {
+    background: var(--primary-yellow);
+    transform: scale(1.2);
+  }
+
+  .login-section {
+    flex: 1;
+    padding: 4rem 0 6rem;
+    position: relative;
+  }
+
+  .login-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease 1s forwards;
+  }
+
+  .login-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg), 0 30px 60px rgba(48, 126, 51, 0.15);
+  }
+
+  .login-illustration {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-illustration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100,0 C155.228,0 200,44.772 200,100 C200,155.228 155.228,200 100,200 C44.772,200 0,155.228 0,100 C0,44.772 44.772,0 100,0 Z" fill="rgba(255,255,255,0.1)"/></svg>') center/contain no-repeat;
+  }
+
+  .illustration-content {
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+
+  .illustration-icon {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .illustration-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .illustration-text {
+    font-family: 'Quicksand', sans-serif;
+    opacity: 0.9;
+  }
+
+  .login-form {
+    padding: 3rem;
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+
+  .form-field {
+    margin-bottom: 2rem;
+  }
+
+  .field-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 1rem;
+  }
+
+  .input-group {
+    position: relative;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    border: 2px solid var(--input-border);
+    border-radius: 15px;
+    background: var(--input-bg);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-green);
+    font-size: 1.2rem;
+    z-index: 2;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+
+  .password-toggle:hover {
+    color: var(--primary-green);
+  }
+
+  .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+  }
+
+  .remember-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--input-border);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .remember-checkbox.checked {
+    background: var(--primary-green);
+    border-color: var(--primary-green);
+  }
+
+  .remember-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .forgot-link {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .forgot-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-yellow);
+    transition: width 0.3s ease;
+  }
+
+  .forgot-link:hover {
+    color: var(--primary-green-dark);
+  }
+
+  .forgot-link:hover::after {
+    width: 100%;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(48, 126, 51, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(48, 126, 51, 0.3);
+  }
+
+  .submit-btn:active {
+    transform: translateY(-1px);
+  }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+  }
+
+  .submit-btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    color: var(--gray);
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+
+  .divider span {
+    padding: 0 1rem;
+    font-size: 0.9rem;
+  }
+
+  .social-login {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .social-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .social-btn:hover {
+    border-color: var(--primary-green);
+    transform: translateY(-2px);
+  }
+
+  .social-icon {
+    font-size: 1.2rem;
+  }
+
+  .signup-link {
+    text-align: center;
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .signup-link a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .signup-link a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-yellow);
+    transition: width 0.3s ease;
+  }
+
+  .signup-link a:hover::after {
+    width: 100%;
+  }
+
+  /* Messages */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error,
+  .notification.is-danger {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #3498db;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+  }
+
+  /* Floating Background Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(40, 40);
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .login-hero h1 {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .login-section {
+      padding: 2rem 0 4rem;
+    }
+    
+    .login-hero {
+      height: 50vh;
+      min-height: 300px;
+    }
+    
+    .login-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .login-hero p {
+      font-size: 1.1rem;
+    }
+    
+    .login-card {
+      border-radius: 20px;
+    }
+    
+    .login-form {
+      padding: 2rem;
+    }
+    
+    .form-title {
+      font-size: 1.8rem;
+    }
+    
+    .social-login {
+      flex-direction: column;
+    }
+    
+    .notification-container {
+      left: 20px;
+      right: 20px;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .login-hero {
+      height: 40vh;
+    }
+    
+    .login-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .login-hero p {
+      font-size: 1rem;
+    }
+    
+    .login-form {
+      padding: 1.5rem;
+    }
+    
+    .form-title {
+      font-size: 1.5rem;
+    }
+    
+    .illustration-title {
+      font-size: 1.4rem;
+    }
+    
+    .remember-forgot {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Carousel -->
+<section class="login-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Bienvenue sur Ecofeed</h1>
+    <p>Connectez-vous pour accéder à votre compte et découvrir nos produits naturels</p>
+  </div>
+  
+  <!-- Carousel Dots -->
+  <div class="hero-dots">
+    <span class="hero-dot active" data-slide="0"></span>
+    <span class="hero-dot" data-slide="1"></span>
+    <span class="hero-dot" data-slide="2"></span>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% elif message.tags == 'info' %}is-info
+        {% else %}is-info{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Login Section -->
+<section class="login-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container login-container">
+    <div class="columns is-centered">
+      <div class="column is-10">
+        <div class="login-card">
+          <div class="columns is-vcentered">
+            <!-- Left Column - Illustration -->
+            <div class="column is-6">
+              <div class="login-illustration">
+                <div class="illustration-content">
+                  <div class="illustration-icon">
+                    <i class="fas fa-seedling"></i>
+                  </div>
+                  <h2 class="illustration-title">Rejoignez la communauté</h2>
+                  <p class="illustration-text">
+                    Accédez à votre espace personnel, suivez vos commandes et découvrez nos produits exclusifs.
+                  </p>
+                  <div class="mt-5">
+                    <div class="columns is-centered is-mobile">
+                      <div class="column is-narrow">
+                        <i class="fas fa-leaf has-text-white fa-lg mr-3"></i>
+                        <i class="fas fa-heart has-text-white fa-lg mr-3"></i>
+                        <i class="fas fa-recycle has-text-white fa-lg"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column - Login Form -->
+            <div class="column is-6">
+              <div class="login-form">
+                <div class="form-header">
+                  <h2 class="form-title">Connectez-vous</h2>
+                  <p class="form-subtitle">Entrez vos identifiants pour continuer</p>
+                </div>
+
+                <form method="POST" id="loginForm">
+                  {% csrf_token %}
+                  
+                  <!-- Email Field -->
+                  <div class="form-field">
+                    <label class="field-label">Adresse email</label>
+                    <div class="input-group">
+                      <span class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                      </span>
+                      <input class="form-input" 
+                             type="email" 
+                             name="email" 
+                             placeholder="votre@email.com" 
+                             required
+                             autocomplete="email">
+                    </div>
+                  </div>
+
+                  <!-- Password Field -->
+                  <div class="form-field">
+                    <label class="field-label">Mot de passe</label>
+                    <div class="input-group">
+                      <span class="input-icon">
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      <input class="form-input" 
+                             type="password" 
+                             name="password" 
+                             id="passwordInput"
+                             placeholder="Votre mot de passe" 
+                             required
+                             autocomplete="current-password">
+                      <button type="button" class="password-toggle" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Remember Me & Forgot Password -->
+                  <div class="remember-forgot">
+                    <div class="remember-me" id="rememberMe">
+                      <div class="remember-checkbox"></div>
+                      <span>Se souvenir de moi</span>
+                    </div>
+                    <a href="#" class="forgot-link">
+                      Mot de passe oublié ?
+                    </a>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">Se connecter</span>
+                  </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="divider">
+                  <span>Ou continuez avec</span>
+                </div>
+
+                <!-- Social Login -->
+                <div class="social-login">
+                  <button type="button" class="social-btn google-btn">
+                    <i class="fab fa-google social-icon"></i>
+                    <span>Google</span>
+                  </button>
+                  <button type="button" class="social-btn facebook-btn">
+                    <i class="fab fa-facebook-f social-icon"></i>
+                    <span>Facebook</span>
+                  </button>
+                </div>
+
+                <!-- Signup Link -->
+                <div class="signup-link">
+                  <p>Pas encore de compte ? <a href="{% url 'register' %}">Créer un compte</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Hero background carousel
+    const heroImages = document.querySelectorAll('.hero-image');
+    const heroDots = document.querySelectorAll('.hero-dot');
+    let currentHeroImage = 0;
+    
+    function showHeroImage(n) {
+      heroImages.forEach(img => img.classList.remove('active'));
+      heroDots.forEach(dot => dot.classList.remove('active'));
+      
+      currentHeroImage = (n + heroImages.length) % heroImages.length;
+      heroImages[currentHeroImage].classList.add('active');
+      heroDots[currentHeroImage].classList.add('active');
+    }
+    
+    function nextHeroImage() {
+      showHeroImage(currentHeroImage + 1);
+    }
+    
+    // Auto rotate hero images
+    let heroInterval = setInterval(nextHeroImage, 4000);
+    
+    // Dot click handlers
+    heroDots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        clearInterval(heroInterval);
+        showHeroImage(parseInt(this.dataset.slide));
+        heroInterval = setInterval(nextHeroImage, 4000);
+      });
+    });
+
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // Remember me checkbox
+    const rememberCheckbox = document.querySelector('.remember-checkbox');
+    const rememberMe = document.getElementById('rememberMe');
+    
+    rememberMe.addEventListener('click', function() {
+      rememberCheckbox.classList.toggle('checked');
+    });
+
+    // Form submission animation
+    const loginForm = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    loginForm.addEventListener('submit', function(e) {
+      // Check if form is valid
+      if (!this.checkValidity()) {
+        e.preventDefault();
+        // Add shake animation to invalid fields
+        const invalidFields = this.querySelectorAll(':invalid');
+        invalidFields.forEach(field => {
+          field.style.animation = 'none';
+          setTimeout(() => {
+            field.style.animation = 'shake 0.5s ease';
+          }, 10);
+        });
+        return;
+      }
+      
+      // Add loading state to button
+      submitBtn.disabled = true;
+      btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connexion...';
+    });
+
+    // Input focus effects
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Social login buttons hover effect
+    const socialBtns = document.querySelectorAll('.social-btn');
+    socialBtns.forEach(btn => {
+      btn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px)';
+      });
+      
+      btn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Auto-hide notifications after 5 seconds
+    const notifications = document.querySelectorAll('.notification');
+    notifications.forEach(notification => {
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 5000);
+    });
+
+    // Add shake animation for invalid fields
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateX(0) scale(1);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%) scale(0.8);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Auto-focus email field
+    const emailInput = document.querySelector('input[name="email"]');
+    if (emailInput) {
+      setTimeout(() => {
+        emailInput.focus();
+      }, 300);
+    }
+
+    // Load saved email if remember me was checked
+    const savedEmail = localStorage.getItem('ecofeed_remember_email');
+    if (savedEmail) {
+      emailInput.value = savedEmail;
+      rememberCheckbox.classList.add('checked');
+    }
+
+    // Save email on form submit if remember me is checked
+    loginForm.addEventListener('submit', function() {
+      if (rememberCheckbox.classList.contains('checked')) {
+        localStorage.setItem('ecofeed_remember_email', emailInput.value);
+      } else {
+        localStorage.removeItem('ecofeed_remember_email');
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}Connexion | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Login Page */
+  :root {
+    --input-bg: rgba(255, 255, 255, 0.95);
+    --input-border: rgba(48, 126, 51, 0.2);
+    --input-focus: rgba(48, 126, 51, 0.4);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .login-hero {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    padding: 4rem 0 2rem;
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.05)"/></svg>') bottom left/contain no-repeat;
+  }
+
+  .login-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+
+  .login-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.2rem;
+    opacity: 0.9;
+    position: relative;
+    z-index: 1;
+  }
+
+  .login-section {
+    flex: 1;
+    padding: 3rem 0 6rem;
+    position: relative;
+  }
+
+  .login-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  .login-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg), 0 30px 60px rgba(48, 126, 51, 0.15);
+  }
+
+  .login-illustration {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .login-illustration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100,0 C155.228,0 200,44.772 200,100 C200,155.228 155.228,200 100,200 C44.772,200 0,155.228 0,100 C0,44.772 44.772,0 100,0 Z" fill="rgba(255,255,255,0.1)"/></svg>') center/contain no-repeat;
+  }
+
+  .illustration-content {
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+
+  .illustration-icon {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .illustration-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .illustration-text {
+    font-family: 'Quicksand', sans-serif;
+    opacity: 0.9;
+  }
+
+  .login-form {
+    padding: 3rem;
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+
+  .form-field {
+    margin-bottom: 2rem;
+  }
+
+  .field-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 1rem;
+  }
+
+  .input-group {
+    position: relative;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    border: 2px solid var(--input-border);
+    border-radius: 15px;
+    background: var(--input-bg);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-green);
+    font-size: 1.2rem;
+    z-index: 2;
+  }
+
+  .password-toggle {
+    position: absolute;
+    right: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray);
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+
+  .password-toggle:hover {
+    color: var(--primary-green);
+  }
+
+  .remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .remember-me {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+  }
+
+  .remember-checkbox {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--input-border);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .remember-checkbox.checked {
+    background: var(--primary-green);
+    border-color: var(--primary-green);
+  }
+
+  .remember-checkbox.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .forgot-link {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .forgot-link::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-yellow);
+    transition: width 0.3s ease;
+  }
+
+  .forgot-link:hover {
+    color: var(--primary-green-dark);
+  }
+
+  .forgot-link:hover::after {
+    width: 100%;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(48, 126, 51, 0.2);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(48, 126, 51, 0.3);
+  }
+
+  .submit-btn:active {
+    transform: translateY(-1px);
+  }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+  }
+
+  .submit-btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+    color: var(--gray);
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .divider::before,
+  .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+
+  .divider span {
+    padding: 0 1rem;
+    font-size: 0.9rem;
+  }
+
+  .social-login {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .social-btn {
+    flex: 1;
+    padding: 0.8rem;
+    border: 2px solid var(--border);
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .social-btn:hover {
+    border-color: var(--primary-green);
+    transform: translateY(-2px);
+  }
+
+  .social-icon {
+    font-size: 1.2rem;
+  }
+
+  .signup-link {
+    text-align: center;
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .signup-link a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .signup-link a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-yellow);
+    transition: width 0.3s ease;
+  }
+
+  .signup-link a:hover::after {
+    width: 100%;
+  }
+
+  /* Messages */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error,
+  .notification.is-danger {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #3498db;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+  }
+
+  /* Floating Background Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(40, 40);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .login-hero h1 {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .login-section {
+      padding: 2rem 0 4rem;
+    }
+    
+    .login-hero {
+      padding: 3rem 0 1.5rem;
+    }
+    
+    .login-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .login-card {
+      border-radius: 20px;
+    }
+    
+    .login-form {
+      padding: 2rem;
+    }
+    
+    .form-title {
+      font-size: 1.8rem;
+    }
+    
+    .social-login {
+      flex-direction: column;
+    }
+    
+    .notification-container {
+      left: 20px;
+      right: 20px;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .login-form {
+      padding: 1.5rem;
+    }
+    
+    .form-title {
+      font-size: 1.5rem;
+    }
+    
+    .illustration-title {
+      font-size: 1.4rem;
+    }
+    
+    .remember-forgot {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="login-hero">
+  <div class="container">
+    <h1>Bienvenue sur Ecofeed</h1>
+    <p>Connectez-vous pour accéder à votre compte et découvrir nos produits naturels</p>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% elif message.tags == 'info' %}is-info
+        {% else %}is-info{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Login Section -->
+<section class="login-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container login-container">
+    <div class="columns is-centered">
+      <div class="column is-10">
+        <div class="login-card">
+          <div class="columns is-vcentered">
+            <!-- Left Column - Illustration -->
+            <div class="column is-6">
+              <div class="login-illustration">
+                <div class="illustration-content">
+                  <div class="illustration-icon">
+                    <i class="fas fa-seedling"></i>
+                  </div>
+                  <h2 class="illustration-title">Rejoignez la communauté</h2>
+                  <p class="illustration-text">
+                    Accédez à votre espace personnel, suivez vos commandes et découvrez nos produits exclusifs.
+                  </p>
+                  <div class="mt-5">
+                    <div class="columns is-centered is-mobile">
+                      <div class="column is-narrow">
+                        <i class="fas fa-leaf has-text-white fa-lg mr-3"></i>
+                        <i class="fas fa-heart has-text-white fa-lg mr-3"></i>
+                        <i class="fas fa-recycle has-text-white fa-lg"></i>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column - Login Form -->
+            <div class="column is-6">
+              <div class="login-form">
+                <div class="form-header">
+                  <h2 class="form-title">Connectez-vous</h2>
+                  <p class="form-subtitle">Entrez vos identifiants pour continuer</p>
+                </div>
+
+                <form method="POST" id="loginForm">
+                  {% csrf_token %}
+                  
+                  <!-- Email Field -->
+                  <div class="form-field">
+                    <label class="field-label">Adresse email</label>
+                    <div class="input-group">
+                      <span class="input-icon">
+                        <i class="fas fa-envelope"></i>
+                      </span>
+                      <input class="form-input" 
+                             type="email" 
+                             name="email" 
+                             placeholder="votre@email.com" 
+                             required
+                             autocomplete="email">
+                    </div>
+                  </div>
+
+                  <!-- Password Field -->
+                  <div class="form-field">
+                    <label class="field-label">Mot de passe</label>
+                    <div class="input-group">
+                      <span class="input-icon">
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      <input class="form-input" 
+                             type="password" 
+                             name="password" 
+                             id="passwordInput"
+                             placeholder="Votre mot de passe" 
+                             required
+                             autocomplete="current-password">
+                      <button type="button" class="password-toggle" id="togglePassword">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Remember Me & Forgot Password -->
+                  <div class="remember-forgot">
+                    <div class="remember-me" id="rememberMe">
+                      <div class="remember-checkbox"></div>
+                      <span>Se souvenir de moi</span>
+                    </div>
+                    <a href="" class="forgot-link">
+                      Mot de passe oublié ?
+                    </a>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">Se connecter</span>
+                  </button>
+                </form>
+
+                <!-- Divider -->
+                <div class="divider">
+                  <span>Ou continuez avec</span>
+                </div>
+
+                <!-- Social Login -->
+                <div class="social-login">
+                  <button type="button" class="social-btn google-btn">
+                    <i class="fab fa-google social-icon"></i>
+                    <span>Google</span>
+                  </button>
+                  <button type="button" class="social-btn facebook-btn">
+                    <i class="fab fa-facebook-f social-icon"></i>
+                    <span>Facebook</span>
+                  </button>
+                </div>
+
+                <!-- Signup Link -->
+                <div class="signup-link">
+                  <p>Pas encore de compte ? <a href="{% url 'register' %}">Créer un compte</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Password toggle functionality
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    
+    togglePassword.addEventListener('click', function() {
+      const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordInput.setAttribute('type', type);
+      this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
+    });
+
+    // Remember me checkbox
+    const rememberCheckbox = document.querySelector('.remember-checkbox');
+    const rememberMe = document.getElementById('rememberMe');
+    
+    rememberMe.addEventListener('click', function() {
+      rememberCheckbox.classList.toggle('checked');
+    });
+
+    // Form submission animation
+    const loginForm = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    loginForm.addEventListener('submit', function(e) {
+      // Check if form is valid
+      if (!this.checkValidity()) {
+        e.preventDefault();
+        // Add shake animation to invalid fields
+        const invalidFields = this.querySelectorAll(':invalid');
+        invalidFields.forEach(field => {
+          field.style.animation = 'none';
+          setTimeout(() => {
+            field.style.animation = 'shake 0.5s ease';
+          }, 10);
+        });
+        return;
+      }
+      
+      // Add loading state to button
+      submitBtn.disabled = true;
+      btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Connexion...';
+    });
+
+    // Input focus effects
+    const inputs = document.querySelectorAll('.form-input');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Social login buttons hover effect
+    const socialBtns = document.querySelectorAll('.social-btn');
+    socialBtns.forEach(btn => {
+      btn.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-3px)';
+      });
+      
+      btn.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Auto-hide notifications after 5 seconds
+    const notifications = document.querySelectorAll('.notification');
+    notifications.forEach(notification => {
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 5000);
+    });
+
+    // Add shake animation for invalid fields
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateX(0) scale(1);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%) scale(0.8);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Auto-focus email field
+    const emailInput = document.querySelector('input[name="email"]');
+    if (emailInput) {
+      setTimeout(() => {
+        emailInput.focus();
+      }, 300);
+    }
+
+    // Load saved email if remember me was checked
+    const savedEmail = localStorage.getItem('ecofeed_remember_email');
+    if (savedEmail) {
+      emailInput.value = savedEmail;
+      rememberCheckbox.classList.add('checked');
+    }
+
+    // Save email on form submit if remember me is checked
+    loginForm.addEventListener('submit', function() {
+      if (rememberCheckbox.classList.contains('checked')) {
+        localStorage.setItem('ecofeed_remember_email', emailInput.value);
+      } else {
+        localStorage.removeItem('ecofeed_remember_email');
+      }
+    });
+
+    // Add floating animation to login card on load
+    const loginCard = document.querySelector('.login-card');
+    loginCard.style.opacity = '0';
+    loginCard.style.transform = 'translateY(20px) scale(0.95)';
+    
+    setTimeout(() => {
+      loginCard.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      loginCard.style.opacity = '1';
+      loginCard.style.transform = 'translateY(0) scale(1)';
+    }, 300);
+  });
+</script>
+{% endblock %} {% endcomment %}
+
+
+
+{% comment %} {% extends 'base.html' %}
+
 {% block title %}Connexion | Sojainnovation{% endblock %}
 
 {% block style %}
@@ -71,4 +2037,4 @@
     </div>
   </div>
 </section>
-{% endblock %}
+{% endblock %} {% endcomment %}

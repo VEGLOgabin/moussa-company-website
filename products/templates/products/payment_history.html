@@ -4,6 +4,1184 @@
 
 {% block style %}
 <style>
+  /* Modern Payment History Page */
+  :root {
+    --stats-bg: rgba(255, 255, 255, 0.95);
+    --stats-border: rgba(48, 126, 51, 0.1);
+    --table-header-bg: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    --table-row-hover: rgba(232, 245, 233, 0.3);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Hero Section with Background */
+  .payment-hero {
+    position: relative;
+    height: 35vh;
+    min-height: 250px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.9) 0%, rgba(30, 109, 45, 0.85) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .payment-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .payment-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.2rem;
+    opacity: 0.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  /* Stats Overview */
+  .stats-section {
+    margin-bottom: 3rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--stats-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--stats-border);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .stat-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .stat-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.8rem;
+    color: white;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    box-shadow: 0 10px 20px rgba(48, 126, 51, 0.2);
+  }
+
+  .stat-card:nth-child(2) .stat-icon {
+    background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+  }
+
+  .stat-card:nth-child(3) .stat-icon {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+  }
+
+  .stat-card:nth-child(4) .stat-icon {
+    background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+  }
+
+  .stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+
+  .stat-label {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  /* Payment History Table */
+  .table-section {
+    margin-bottom: 4rem;
+  }
+
+  .table-container {
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+
+  .table-container:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg), 0 25px 50px rgba(0,0,0,0.1);
+  }
+
+  .table-header {
+    background: var(--table-header-bg);
+    padding: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .table-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .table-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--dark);
+    margin: 0;
+  }
+
+  .table-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Search Box */
+  .search-box {
+    position: relative;
+    min-width: 300px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+    border: 2px solid var(--input-border);
+    border-radius: 50px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-green);
+    font-size: 1.1rem;
+  }
+
+  /* Table Styling */
+  .payment-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .payment-table thead {
+    background: var(--primary-green-light);
+  }
+
+  .payment-table th {
+    padding: 1.5rem;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--primary-green);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .payment-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: all 0.3s ease;
+  }
+
+  .payment-table tbody tr:hover {
+    background: var(--table-row-hover);
+    transform: scale(1.01);
+  }
+
+  .payment-table td {
+    padding: 1.5rem;
+    vertical-align: middle;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .payment-table tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  /* Order ID */
+  .order-id {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .order-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-green);
+    font-size: 1.2rem;
+  }
+
+  .order-details h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .order-details .date {
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  /* Amount Display */
+  .amount-display {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--primary-green);
+  }
+
+  /* Payment Method */
+  .payment-method {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .method-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary-green-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-green);
+  }
+
+  .method-name {
+    font-weight: 500;
+  }
+
+  /* Status Badges */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+
+  .status-success {
+    background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%);
+    color: #2E7D32;
+  }
+
+  .status-pending {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    color: #EF6C00;
+  }
+
+  .status-failed {
+    background: linear-gradient(135deg, #FFEBEE 0%, #FFCDD2 100%);
+    color: #C62828;
+  }
+
+  /* Transaction ID */
+  .transaction-id {
+    font-family: 'Courier New', monospace;
+    background: #f8f9fa;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--gray);
+    word-break: break-all;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.6rem 1.2rem;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+  }
+
+  .btn-warning {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+    color: white;
+  }
+
+  .btn-light {
+    background: var(--primary-green-light);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+  }
+
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: var(--primary-green);
+    font-size: 3rem;
+  }
+
+  .empty-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  .empty-description {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    max-width: 400px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+
+  .browse-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+  }
+
+  .browse-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(48, 126, 51, 0.2);
+    color: white;
+  }
+
+  /* Notifications */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error {
+    border-left-color: #F44336;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .payment-table {
+      display: block;
+      overflow-x: auto;
+    }
+    
+    .table-header-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .search-box {
+      width: 100%;
+      min-width: auto;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .payment-hero {
+      height: 30vh;
+      min-height: 200px;
+    }
+    
+    .payment-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .payment-table th,
+    .payment-table td {
+      padding: 1rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .payment-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .empty-title {
+      font-size: 1.5rem;
+    }
+    
+    .order-id {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+
+  /* Staggered animations */
+  .stat-card:nth-child(1) { animation-delay: 0.1s; }
+  .stat-card:nth-child(2) { animation-delay: 0.2s; }
+  .stat-card:nth-child(3) { animation-delay: 0.3s; }
+  .stat-card:nth-child(4) { animation-delay: 0.4s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Carousel -->
+<section class="payment-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Historique des Paiements</h1>
+    <p>Suivez toutes vos transactions et l'état de vos commandes</p>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% else %}is-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <!-- Stats Overview -->
+  <section class="stats-section">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-wallet"></i>
+        </div>
+        <div class="stat-value">{{ total_amount_spent }} {{ currency }}</div>
+        <div class="stat-label">Total Dépensé</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-value">{{ successful_payments }}</div>
+        <div class="stat-label">Paiements Réussis</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-value">{{ pending_payments }}</div>
+        <div class="stat-label">En Attente</div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">
+          <i class="fas fa-times-circle"></i>
+        </div>
+        <div class="stat-value">{{ failed_payments }}</div>
+        <div class="stat-label">Échecs</div>
+      </div>
+    </div>
+  </section>
+
+  {% if payments %}
+  <!-- Payment History Table -->
+  <section class="table-section">
+    <div class="table-container">
+      <!-- Table Header -->
+      <div class="table-header">
+        <div class="table-header-content">
+          <div>
+            <h2 class="table-title">Détails des Transactions</h2>
+            <p class="table-subtitle">Total de {{ total_payments }} transaction{{ total_payments|pluralize }}</p>
+          </div>
+          <div class="search-box">
+            <span class="search-icon">
+              <i class="fas fa-search"></i>
+            </span>
+            <input type="text" 
+                   class="search-input" 
+                   placeholder="Rechercher une transaction..." 
+                   id="searchInput">
+          </div>
+        </div>
+      </div>
+
+      <!-- Table Body -->
+      <div class="table-responsive">
+        <table class="payment-table">
+          <thead>
+            <tr>
+              <th>Commande</th>
+              <th>Date</th>
+              <th>Montant</th>
+              <th>Méthode</th>
+              <th>Statut</th>
+              <th>Transaction ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for payment in payments %}
+            <tr class="payment-row" id="payment-{{ payment.id }}">
+              <!-- Order -->
+              <td>
+                <div class="order-id">
+                  <div class="order-icon">
+                    <i class="fas fa-receipt"></i>
+                  </div>
+                  <div class="order-details">
+                    <h4>Commande #{{ payment.order.id }}</h4>
+                    <div class="date">Créée le {{ payment.order.ordered_at|date:"d M Y" }}</div>
+                  </div>
+                </div>
+              </td>
+              
+              <!-- Date -->
+              <td>
+                <div>
+                  <div style="font-weight: 600;">{{ payment.payment_date|date:"d M Y" }}</div>
+                  <div class="date">{{ payment.payment_date|date:"H:i" }}</div>
+                </div>
+              </td>
+              
+              <!-- Amount -->
+              <td>
+                <span class="amount-display">{{ payment.amount }} {{ payment.order.currency }}</span>
+              </td>
+              
+              <!-- Method -->
+              <td>
+                <div class="payment-method">
+                  <div class="method-icon">
+                    <i class="fas fa-{% if payment.payment_method == 'mobile_money' %}mobile-alt{% else %}credit-card{% endif %}"></i>
+                  </div>
+                  <div class="method-name">
+                    {% if payment.payment_method == 'mobile_money' %}
+                      Mobile Money
+                    {% elif payment.payment_method == 'credit_card' %}
+                      Carte Bancaire
+                    {% else %}
+                      {{ payment.payment_method|title }}
+                    {% endif %}
+                  </div>
+                </div>
+              </td>
+              
+              <!-- Status -->
+              <td>
+                <span class="status-badge status-{{ payment.status }}">
+                  <i class="fas 
+                    {% if payment.status == 'success' %}fa-check-circle
+                    {% elif payment.status == 'failed' %}fa-times-circle
+                    {% else %}fa-clock{% endif %}"></i>
+                  {{ payment.get_status_display }}
+                </span>
+              </td>
+              
+              <!-- Transaction ID -->
+              <td>
+                <code class="transaction-id">{{ payment.internal_transaction_id|truncatechars:12 }}</code>
+              </td>
+              
+              <!-- Actions -->
+              <td>
+                <div class="action-buttons">
+                  {% if payment.status == 'success' %}
+                    <button class="action-btn btn-success" disabled>
+                      <i class="fas fa-check"></i> Complété
+                    </button>
+                    <a href="{% url 'order_detail' payment.order.id %}" class="action-btn btn-light">
+                      <i class="fas fa-eye"></i> Voir
+                    </a>
+                  {% elif payment.status == 'pending' %}
+                    <button class="action-btn btn-warning" onclick="continuePayment('{{ payment.internal_transaction_id }}')">
+                      <i class="fas fa-credit-card"></i> Payer
+                    </button>
+                    <button class="action-btn btn-danger" onclick="deletePendingPayment({{ payment.id }})">
+                      <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                  {% else %}
+                    <button class="action-btn btn-warning" onclick="retryPayment('{{ payment.internal_transaction_id }}')">
+                      <i class="fas fa-redo"></i> Réessayer
+                    </button>
+                  {% endif %}
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  {% else %}
+  <!-- Empty State -->
+  <section class="table-section">
+    <div class="table-container">
+      <div class="empty-state">
+        <div class="empty-icon">
+          <i class="fas fa-receipt"></i>
+        </div>
+        <h2 class="empty-title">Aucun historique de paiement</h2>
+        <p class="empty-description">
+          Vous n'avez pas encore effectué de paiements. Parcourez notre sélection 
+          de produits naturels et faites votre premier achat !
+        </p>
+        <a href="{% url 'products' %}" class="browse-btn">
+          <i class="fas fa-shopping-cart"></i>
+          Découvrir les produits
+        </a>
+      </div>
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<!-- Floating Background Elements -->
+<div class="floating-elements">
+  <div class="floating-element"></div>
+  <div class="floating-element"></div>
+  <div class="floating-element"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Background carousel
+    const heroImages = document.querySelectorAll('.hero-image');
+    let currentHeroImage = 0;
+    
+    function rotateHeroImages() {
+      heroImages.forEach(img => img.classList.remove('active'));
+      currentHeroImage = (currentHeroImage + 1) % heroImages.length;
+      heroImages[currentHeroImage].classList.add('active');
+    }
+    
+    // Start carousel
+    let heroInterval = setInterval(rotateHeroImages, 4000);
+
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.payment-row');
+        
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          if (text.includes(searchTerm)) {
+            row.style.display = '';
+            row.style.opacity = '1';
+          } else {
+            row.style.opacity = '0.3';
+            row.style.display = '';
+          }
+        });
+      });
+    }
+
+    // Animate stats cards on scroll
+    const statCards = document.querySelectorAll('.stat-card');
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 100);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    statCards.forEach(card => observer.observe(card));
+
+    // Animate table rows
+    const tableRows = document.querySelectorAll('.payment-row');
+    tableRows.forEach((row, index) => {
+      row.style.opacity = '0';
+      row.style.transform = 'translateY(20px)';
+      
+      setTimeout(() => {
+        row.style.transition = 'all 0.6s ease';
+        row.style.opacity = '1';
+        row.style.transform = 'translateY(0)';
+      }, 300 + (index * 50));
+    });
+
+    // Auto-hide notifications
+    const notifications = document.querySelectorAll('.notification');
+    notifications.forEach(notification => {
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 5000);
+    });
+
+    // Enhanced hover effects for table rows
+    tableRows.forEach(row => {
+      row.addEventListener('mouseenter', function() {
+        this.style.transform = 'translateY(-2px)';
+        this.style.boxShadow = '0 5px 20px rgba(0,0,0,0.1)';
+      });
+      
+      row.addEventListener('mouseleave', function() {
+        this.style.transform = 'translateY(0)';
+        this.style.boxShadow = 'none';
+      });
+    });
+  });
+
+  // Payment action functions
+  function continuePayment(transactionId) {
+    const button = event.target;
+    const originalHTML = button.innerHTML;
+    
+    // Show loading state
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Redirection...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+      window.location.href = `/checkout/?transaction_id=${transactionId}`;
+    }, 800);
+  }
+
+  function retryPayment(transactionId) {
+    if (confirm('Voulez-vous réessayer ce paiement ?')) {
+      const button = event.target;
+      const originalHTML = button.innerHTML;
+      
+      // Show loading state
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation...';
+      button.disabled = true;
+      
+      setTimeout(() => {
+        window.location.href = `/checkout/?retry=${transactionId}`;
+      }, 800);
+    }
+  }
+
+  function deletePendingPayment(paymentId) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce paiement en attente ?')) {
+      const button = event.target;
+      const originalHTML = button.innerHTML;
+      
+      // Show loading state
+      button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      button.disabled = true;
+      
+      // Send AJAX request
+      fetch(`/payment/delete-pending/${paymentId}/`, {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken'),
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Animate removal
+          const row = document.getElementById(`payment-${paymentId}`);
+          if (row) {
+            row.style.opacity = '0';
+            row.style.transform = 'translateX(-100%)';
+            
+            setTimeout(() => {
+              row.remove();
+              showNotification(data.message, 'success');
+              
+              // Reload after delay to update stats
+              setTimeout(() => {
+                window.location.reload();
+              }, 1500);
+            }, 500);
+          }
+        } else {
+          showNotification(data.message, 'error');
+          button.innerHTML = originalHTML;
+          button.disabled = false;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showNotification('Erreur lors de la suppression', 'error');
+        button.innerHTML = originalHTML;
+        button.disabled = false;
+      });
+    }
+  }
+
+  // Helper functions
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
+  function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification is-${type}`;
+    notification.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        <span>${message}</span>
+      </div>
+    `;
+    
+    document.querySelector('.notification-container').appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+      notification.style.animation = 'slideIn 0.5s ease-out';
+    }, 10);
+    
+    // Auto remove
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  }
+
+  // Add subtle animation to table container
+  const tableContainer = document.querySelector('.table-container');
+  if (tableContainer) {
+    tableContainer.style.opacity = '0';
+    tableContainer.style.transform = 'translateY(20px) scale(0.98)';
+    
+    setTimeout(() => {
+      tableContainer.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+      tableContainer.style.opacity = '1';
+      tableContainer.style.transform = 'translateY(0) scale(1)';
+    }, 400);
+  }
+</script>
+{% endblock %}
+
+
+
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}Historique des paiements | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
     .payment-hero {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
@@ -716,4 +1894,4 @@ document.querySelectorAll('.payment-row').forEach(row => {
 </script>
 {% endblock %}
 
-
+ {% endcomment %}

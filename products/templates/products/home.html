@@ -5,6 +5,1041 @@
 
 {% block style %}
 <style>
+  /* Hero Section with Carousel */
+  .hero-section {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    color: white;
+    margin-top: -70px;
+    padding-top: 70px;
+    overflow: hidden;
+  }
+
+  .hero-carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .carousel-slide.active {
+    opacity: 1;
+  }
+
+  .carousel-slide::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.85) 0%, rgba(30, 109, 45, 0.8) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  .hero-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease;
+  }
+
+  .hero-title.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 2.5rem;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease 0.2s;
+  }
+
+  .hero-subtitle.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero-cta {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    border: none;
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease 0.4s;
+  }
+
+  .hero-cta.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(239, 125, 18, 0.3);
+  }
+
+  .carousel-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .carousel-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .carousel-dot.active {
+    background: var(--primary-yellow);
+    transform: scale(1.2);
+  }
+
+  /* Features Section */
+  .features-section {
+    padding: 5rem 0;
+    background: var(--light);
+  }
+
+  .section-title {
+    text-align: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+    color: var(--dark);
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .section-title.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.8s ease;
+  }
+
+  .feature-card {
+    text-align: center;
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    background: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .feature-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  }
+
+  .feature-icon {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: var(--primary-green);
+    font-size: 2.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover .feature-icon {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+  }
+
+  /* Products Section */
+  .products-section {
+    padding: 5rem 0;
+    background: white;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+
+  .product-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .product-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+  }
+
+  .product-image {
+    height: 280px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.1) 100%);
+  }
+
+  .product-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(48, 126, 51, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.4s ease;
+    z-index: 2;
+  }
+
+  .product-card:hover .product-overlay {
+    opacity: 1;
+  }
+
+  .add-to-cart-btn {
+    background: white;
+    color: var(--primary-green);
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 30px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    transition: all 0.3s ease;
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  .product-card:hover .add-to-cart-btn {
+    transform: translateY(0);
+    opacity: 1;
+    transition-delay: 0.2s;
+  }
+
+  .add-to-cart-btn:hover {
+    background: var(--primary-yellow);
+    color: white;
+    transform: scale(1.1) !important;
+  }
+
+  .product-info {
+    padding: 2rem;
+    text-align: center;
+  }
+
+  .product-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+
+  .product-price {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: var(--primary-green);
+  }
+
+  /* New Arrivals */
+  .new-arrivals-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    padding: 5rem 0;
+  }
+
+  /* Testimonials */
+  .testimonials-section {
+    background: linear-gradient(135deg, var(--dark) 0%, #1a2530 100%);
+    color: white;
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .testimonials-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(252, 193, 16, 0.05)"/></svg>') bottom left/contain no-repeat;
+  }
+
+  .testimonial-card {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 3rem;
+    border-radius: 20px;
+    margin: 1rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  .testimonial-card.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .testimonial-card:hover {
+    transform: translateY(-10px);
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-yellow);
+  }
+
+  .testimonial-text {
+    font-family: 'Quicksand', sans-serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .testimonial-text::before {
+    content: '"';
+    position: absolute;
+    top: -1rem;
+    left: -1.5rem;
+    font-size: 4rem;
+    color: var(--primary-yellow);
+    opacity: 0.3;
+    font-family: Georgia, serif;
+  }
+
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+  }
+
+  .author-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    margin-right: 1.5rem;
+    object-fit: cover;
+    border: 3px solid var(--primary-yellow);
+  }
+
+  /* Newsletter */
+  .newsletter-section {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    padding: 5rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .newsletter-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,100 L100,0 L100,100 Z" fill="rgba(255,255,255,0.05)"/></svg>') bottom right/contain no-repeat;
+  }
+
+  .newsletter-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .newsletter-form {
+    max-width: 600px;
+    margin: 3rem auto 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .newsletter-input {
+    border-radius: 50px 0 0 50px;
+    border: none;
+    padding: 1.2rem 2rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .newsletter-btn {
+    border-radius: 0 50px 50px 0;
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    border: none;
+    padding: 1.2rem 3rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .newsletter-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(239, 125, 18, 0.3);
+  }
+
+  /* Blog Section */
+  .blog-section {
+    padding: 5rem 0;
+    background: var(--light);
+  }
+
+  .blog-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .blog-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .blog-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  }
+
+  .blog-image {
+    height: 250px;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.8s ease;
+  }
+
+  .blog-card:hover .blog-image {
+    transform: scale(1.1);
+  }
+
+  .blog-content {
+    padding: 2rem;
+  }
+
+  .blog-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    color: var(--dark);
+    transition: color 0.3s ease;
+  }
+
+  .blog-card:hover .blog-title {
+    color: var(--primary-green);
+  }
+
+  .blog-excerpt {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+  }
+
+  .read-more {
+    color: var(--primary-green);
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    position: relative;
+    padding-bottom: 5px;
+  }
+
+  .read-more::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-yellow);
+    transition: width 0.3s ease;
+  }
+
+  .read-more:hover::after {
+    width: 100%;
+  }
+
+  /* Partners */
+  .partners-section {
+    padding: 4rem 0;
+    background: white;
+    text-align: center;
+  }
+
+  .partner-logo {
+    height: 60px;
+    margin: 1rem;
+    opacity: 0.6;
+    transition: all 0.4s ease;
+    filter: grayscale(100%);
+    padding: 1rem;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+
+  .partner-logo:hover {
+    opacity: 1;
+    filter: grayscale(0%);
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  }
+
+  /* View More Button */
+  .view-more-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .view-more-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(48, 126, 51, 0.3);
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .hero-title {
+      font-size: 2.8rem;
+    }
+    
+    .feature-card {
+      padding: 2rem 1rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 80vh;
+      min-height: 500px;
+    }
+    
+    .hero-title {
+      font-size: 2.2rem;
+    }
+    
+    .hero-subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .section-title {
+      font-size: 2rem;
+    }
+    
+    .testimonial-card {
+      padding: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-title {
+      font-size: 1.8rem;
+    }
+    
+    .section-title {
+      font-size: 1.6rem;
+    }
+    
+    .feature-icon {
+      width: 70px;
+      height: 70px;
+      font-size: 2rem;
+    }
+  }
+
+  /* Animation delays for staggered effects */
+  .feature-card:nth-child(1) { transition-delay: 0.1s; }
+  .feature-card:nth-child(2) { transition-delay: 0.2s; }
+  .feature-card:nth-child(3) { transition-delay: 0.3s; }
+  .feature-card:nth-child(4) { transition-delay: 0.4s; }
+  
+  .product-card:nth-child(1) { transition-delay: 0.1s; }
+  .product-card:nth-child(2) { transition-delay: 0.2s; }
+  .product-card:nth-child(3) { transition-delay: 0.3s; }
+  .product-card:nth-child(4) { transition-delay: 0.4s; }
+  
+  .blog-card:nth-child(1) { transition-delay: 0.1s; }
+  .blog-card:nth-child(2) { transition-delay: 0.2s; }
+  .blog-card:nth-child(3) { transition-delay: 0.3s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Carousel -->
+<section class="hero-section">
+  <!-- Background Carousel -->
+  <div class="hero-carousel">
+    <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1519996529931-28324d5a630e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-8 has-text-centered">
+          <h1 class="hero-title">Produits Naturels pour une Vie Saine</h1>
+          <p class="hero-subtitle">
+            Découvrez notre sélection exclusive de produits biologiques, locaux et respectueux de l'environnement
+          </p>
+          <a href="{% url 'products' %}" class="button hero-cta">
+            Découvrir nos produits
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Carousel Dots -->
+  <div class="carousel-dots">
+    <span class="carousel-dot active" data-slide="0"></span>
+    <span class="carousel-dot" data-slide="1"></span>
+    <span class="carousel-dot" data-slide="2"></span>
+    <span class="carousel-dot" data-slide="3"></span>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+  <div class="container">
+    <h2 class="section-title">Pourquoi Choisir Ecofeed</h2>
+    <div class="columns is-multiline">
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <h3 class="title is-5">100% Naturel</h3>
+          <p class="subtitle is-6">Produits biologiques certifiés sans produits chimiques</p>
+        </div>
+      </div>
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-truck"></i>
+          </div>
+          <h3 class="title is-5">Livraison Rapide</h3>
+          <p class="subtitle is-6">Expédition sous 24h pour toute commande au Bénin</p>
+        </div>
+      </div>
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="title is-5">Paiement Sécurisé</h3>
+          <p class="subtitle is-6">Transactions cryptées et 100% sécurisées</p>
+        </div>
+      </div>
+      <div class="column is-3">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <h3 class="title is-5">Qualité Garantie</h3>
+          <p class="subtitle is-6">Satisfaction garantie ou remboursé sous 30 jours</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% comment %} <!-- Featured Products -->
+<section class="products-section">
+  <div class="container">
+    <h2 class="section-title">Nos Produits Phares</h2>
+    <div class="columns is-multiline">
+      {% for product in featured_products %}
+      <div class="column is-3">
+        <div class="product-card">
+          <div class="product-image" style="background-image: url('{{ product.image.url }}')">
+            <div class="product-overlay">
+              <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="button add-to-cart-btn">
+                  <i class="fas fa-cart-plus mr-2"></i>Ajouter au panier
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-price">{{ product.price }} {{ product.currency }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="has-text-centered mt-5">
+      <a href="{% url 'products' %}" class="button view-more-btn">
+        Voir tous les produits
+      </a>
+    </div>
+  </div>
+</section> {% endcomment %}
+
+<!-- New Arrivals -->
+<section class="new-arrivals-section">
+  <div class="container">
+    <h2 class="section-title">Nouveautés</h2>
+    <div class="columns is-multiline">
+      {% for product in new_arrivals %}
+      <div class="column is-2">
+        <div class="product-card">
+          <div class="product-image" style="background-image: url('{{ product.image.url }}')">
+            <div class="product-overlay">
+              <form method="POST" action="{% url 'add_to_cart' product.id %}">
+                {% csrf_token %}
+                <button type="submit" class="button add-to-cart-btn">
+                  <i class="fas fa-cart-plus mr-2"></i>Ajouter
+                </button>
+              </form>
+            </div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-name is-size-6">{{ product.name|truncatechars:30 }}</h3>
+            <p class="product-price is-size-5">{{ product.price }} {{ product.currency }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="testimonials-section">
+  <div class="container">
+    <h2 class="section-title has-text-white">Ce Que Disent Nos Clients</h2>
+    <div class="columns is-multiline">
+      {% for testimonial in testimonials %}
+      <div class="column is-6">
+        <div class="testimonial-card">
+          <p class="testimonial-text">"{{ testimonial.content }}"</p>
+          <div class="testimonial-author">
+            {% if testimonial.photo %}
+            <img src="{{ testimonial.photo.url }}" alt="{{ testimonial.name }}" class="author-avatar">
+            {% else %}
+            <div class="author-avatar has-background-primary-yellow has-text-white is-flex is-align-items-center is-justify-content-center">
+              <i class="fas fa-user"></i>
+            </div>
+            {% endif %}
+            <div>
+              <strong>{{ testimonial.name }}</strong>
+              <br>
+              <small>{{ testimonial.date }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Newsletter -->
+<section class="newsletter-section">
+  <div class="container">
+    <h2 class="newsletter-title">Restez Connecté</h2>
+    <p class="subtitle is-5 has-text-white mb-4">
+      Recevez nos dernières offres exclusives et actualités
+    </p>
+    <form class="newsletter-form">
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <input class="input newsletter-input" type="email" placeholder="Votre adresse email" required>
+        </div>
+        <div class="control">
+          <button class="button newsletter-btn" type="submit">
+            S'abonner
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Blog Section -->
+<section class="blog-section">
+  <div class="container">
+    <h2 class="section-title">Conseils & Actualités</h2>
+    <div class="columns is-multiline">
+      {% for post in blogs %}
+      <div class="column is-4">
+        <div class="blog-card">
+          {% if post.cover_image %}
+          <div class="blog-image" style="background-image: url('{{ post.cover_image.url }}')"></div>
+          {% else %}
+          <div class="blog-image" style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);"></div>
+          {% endif %}
+          <div class="blog-content">
+            <h3 class="blog-title">{{ post.title }}</h3>
+            <p class="blog-excerpt">{{ post.content|truncatewords:20 }}</p>
+            <a href="{% url 'blog_detail' post.slug %}" class="read-more">
+              Lire la suite →
+            </a>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="has-text-centered mt-5">
+      <a href="{% url 'blog' %}" class="button view-more-btn">
+        Voir tous les articles
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Partners -->
+<section class="partners-section">
+  <div class="container">
+    <h2 class="section-title">Ils Nous Font Confiance</h2>
+    <div class="columns is-multiline is-centered is-vcentered">
+      {% for partner in partners %}
+      <div class="column is-2">
+        {% if partner.logo %}
+        <img src="{{ partner.logo.url }}" alt="{{ partner.name }}" class="partner-logo">
+        {% endif %}
+      </div>
+      {% empty %}
+      <div class="column is-12 has-text-centered">
+        <p class="subtitle">Nos partenaires seront bientôt annoncés</p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Background Carousel
+  document.addEventListener('DOMContentLoaded', function() {
+    // Carousel functionality
+    const slides = document.querySelectorAll('.carousel-slide');
+    const dots = document.querySelectorAll('.carousel-dot');
+    let currentSlide = 0;
+    
+    function showSlide(n) {
+      slides.forEach(slide => slide.classList.remove('active'));
+      dots.forEach(dot => dot.classList.remove('active'));
+      
+      currentSlide = (n + slides.length) % slides.length;
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
+    }
+    
+    // Auto rotate carousel
+    function nextSlide() {
+      showSlide(currentSlide + 1);
+    }
+    
+    // Setup carousel auto-rotation
+    let carouselInterval = setInterval(nextSlide, 5000);
+    
+    // Dot click handlers
+    dots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        clearInterval(carouselInterval);
+        showSlide(parseInt(this.dataset.slide));
+        carouselInterval = setInterval(nextSlide, 5000);
+      });
+    });
+    
+    // Hero text animation
+    const heroTitle = document.querySelector('.hero-title');
+    const heroSubtitle = document.querySelector('.hero-subtitle');
+    const heroCta = document.querySelector('.hero-cta');
+    
+    setTimeout(() => {
+      heroTitle.classList.add('visible');
+    }, 300);
+    
+    setTimeout(() => {
+      heroSubtitle.classList.add('visible');
+    }, 600);
+    
+    setTimeout(() => {
+      heroCta.classList.add('visible');
+    }, 900);
+    
+    // Advanced Scroll Animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          
+          // Additional effects for specific elements
+          if (entry.target.classList.contains('product-card')) {
+            setTimeout(() => {
+              entry.target.style.transitionDelay = '0s';
+            }, entry.target.dataset.delay || 0);
+          }
+          
+          // Stop observing after animation
+          observer.unobserve(entry.target);
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all animatable elements
+    const animatedElements = document.querySelectorAll(
+      '.section-title, .feature-card, .product-card, .testimonial-card, .blog-card'
+    );
+    
+    animatedElements.forEach(el => {
+      observer.observe(el);
+    });
+    
+    // Parallax effect for hero section
+    window.addEventListener('scroll', function() {
+      const scrolled = window.pageYOffset;
+      const heroSection = document.querySelector('.hero-section');
+      const heroContent = document.querySelector('.hero-content');
+      
+      if (heroSection && heroContent) {
+        const rate = scrolled * -0.5;
+        heroContent.style.transform = `translateY(${rate}px)`;
+      }
+    });
+    
+    // Add hover sound effect for buttons (optional)
+    const buttons = document.querySelectorAll('.hero-cta, .view-more-btn, .newsletter-btn');
+    buttons.forEach(button => {
+      button.addEventListener('mouseenter', function() {
+        this.style.transform = this.style.transform.replace('scale(1.05)', 'scale(1.08)');
+      });
+      
+      button.addEventListener('mouseleave', function() {
+        this.style.transform = this.style.transform.replace('scale(1.08)', 'scale(1.05)');
+      });
+    });
+    
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          window.scrollTo({
+            top: targetElement.offsetTop - 100,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+{% comment %} {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ecofeed - Produits Naturels & Biologiques{% endblock %}
+
+{% block style %}
+<style>
   /* Hero Section */
   .hero-section {
     background: linear-gradient(135deg, rgba(35, 164, 85, 0.9) 0%, rgba(30, 140, 74, 0.9) 100%),
@@ -583,4 +1618,4 @@
     });
   });
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

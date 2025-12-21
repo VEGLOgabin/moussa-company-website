@@ -1,4 +1,1005 @@
-<
+{% extends 'base.html' %}
+
+{% block title %}Contact | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Contact Page */
+  :root {
+    --form-bg: rgba(255, 255, 255, 0.98);
+    --map-bg: rgba(248, 249, 250, 0.95);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Hero Section with Background Carousel */
+  .contact-hero {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 4rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1534536281715-e28d76689b4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.9) 0%, rgba(30, 109, 45, 0.85) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .contact-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.2rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .contact-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.4rem;
+    opacity: 0.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  /* Contact Section */
+  .contact-section {
+    padding: 0 0 6rem;
+    position: relative;
+  }
+
+  .contact-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    position: relative;
+    z-index: 10;
+  }
+
+  @media (max-width: 1024px) {
+    .contact-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Contact Form */
+  .contact-form-card {
+    background: var(--form-bg);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(48, 126, 51, 0.1);
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  .contact-form-card.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .contact-form-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+
+  /* Form Styling */
+  .form-field {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    border: 2px solid rgba(48, 126, 51, 0.2);
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .form-textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 2.5rem;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(48, 126, 51, 0.2);
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(48, 126, 51, 0.3);
+  }
+
+  .submit-btn:active {
+    transform: translateY(-1px);
+  }
+
+  /* Map Section */
+  .map-section {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  .map-section.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .map-card {
+    background: var(--map-bg);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(48, 126, 51, 0.1);
+    transition: all 0.4s ease;
+  }
+
+  .map-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .map-header {
+    margin-bottom: 2rem;
+  }
+
+  .map-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .map-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+
+  /* Map Container */
+  .map-container {
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    height: 400px;
+    position: relative;
+  }
+
+  .map-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.1) 0%, rgba(30, 109, 45, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .map-frame {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  /* Contact Info */
+  .contact-info {
+    background: var(--form-bg);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(48, 126, 51, 0.1);
+  }
+
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(48, 126, 51, 0.1);
+  }
+
+  .info-item:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+
+  .info-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .info-content h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .info-content p {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(48, 126, 51, 0.1);
+  }
+
+  .action-btn {
+    padding: 1rem 2rem;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    border: none;
+  }
+
+  .whatsapp-btn {
+    background: linear-gradient(135deg, #25D366 0%, #1EAE56 100%);
+    color: white;
+  }
+
+  .admin-btn {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+  }
+
+  .action-btn i {
+    font-size: 1.2rem;
+  }
+
+  /* Availability Badge */
+  .availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-green-light);
+    color: var(--primary-green);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+  }
+
+  /* Notifications */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error {
+    border-left-color: #F44336;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #2196F3;
+    background: linear-gradient(135-gradient, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .contact-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .contact-container {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .contact-hero {
+      height: 40vh;
+      min-height: 300px;
+    }
+    
+    .contact-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .contact-hero p {
+      font-size: 1.2rem;
+    }
+    
+    .contact-form-card {
+      padding: 2rem;
+    }
+    
+    .map-card {
+      padding: 2rem;
+    }
+    
+    .contact-info {
+      padding: 2rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .contact-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .info-item {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .form-title,
+    .map-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Carousel -->
+<section class="contact-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Contactez-nous</h1>
+    <p>Envie d'échanger avec nous ? Écrivez-nous ou passez nous voir !</p>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% else %}is-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Contact Section -->
+<section class="contact-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <div class="contact-container">
+      <!-- Contact Form -->
+      <div class="contact-form-card" id="contactForm">
+        <div class="form-header">
+          <h2 class="form-title">Envoyer un message</h2>
+          <p class="form-subtitle">Nous vous répondrons dans les plus brefs délais</p>
+        </div>
+
+        <form method="POST" action="{% url 'contact_message_add' %}" id="contactMessageForm">
+          {% csrf_token %}
+          
+          <div class="form-field">
+            <label class="form-label">Nom & Prénoms</label>
+            <input class="form-input" 
+                   type="text" 
+                   name="name" 
+                   placeholder="Votre nom complet" 
+                   required>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Adresse Email</label>
+            <input class="form-input" 
+                   type="email" 
+                   name="email" 
+                   placeholder="votre@email.com" 
+                   required>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Sujet du message</label>
+            <input class="form-input" 
+                   type="text" 
+                   name="subject" 
+                   placeholder="Sujet de votre message" 
+                   required>
+          </div>
+
+          <div class="form-field">
+            <label class="form-label">Votre Message</label>
+            <textarea class="form-textarea" 
+                      name="message" 
+                      placeholder="Écrivez votre message ici..." 
+                      required></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <i class="fas fa-paper-plane"></i>
+            Envoyer le message
+          </button>
+        </form>
+      </div>
+
+      <!-- Map & Contact Info -->
+      <div class="map-section" id="mapSection">
+        <!-- Location Map -->
+        <div class="map-card">
+          <div class="map-header">
+            <h2 class="map-title">Où nous trouver</h2>
+            <p class="map-subtitle">Venez nous rencontrer à notre bureau principal</p>
+          </div>
+          
+          <div class="map-container">
+            <div class="map-overlay"></div>
+            <iframe 
+              class="map-frame"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3975.823182263603!2d2.4404033151740045!3d6.367099427256668!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103c9f23c8fca4f7%3A0xf7454c33e95ea48c!2sCotonou%2C%20Benin!5e0!3m2!1sfr!2sbj!4v1659612174871!5m2!1sfr!2sbj" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="contact-info">
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="info-content">
+              <h4>Notre Adresse</h4>
+              <p>
+                Abomey Calavi<br>
+                Bénin
+              </p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="info-content">
+              <h4>Téléphone</h4>
+              <p>
+                <a href="tel:+2290148233119" style="color: var(--primary-green); text-decoration: none;">
+                  +229 01 48 23 31 19
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="info-content">
+              <h4>Email</h4>
+              <p>
+                <a href="mailto:contact@ecofeed.com" style="color: var(--primary-green); text-decoration: none;">
+                  contact@ecofeed.com
+                </a>
+              </p>
+            </div>
+          </div>
+
+          <div class="info-item">
+            <div class="info-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="info-content">
+              <h4>Horaires d'Ouverture</h4>
+              <p>
+                Lundi - Vendredi : 8h - 18h<br>
+                Samedi : 9h - 16h<br>
+                Dimanche : Fermé
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="https://wa.me/22991234567" 
+             target="_blank" 
+             class="action-btn whatsapp-btn">
+            <i class="fab fa-whatsapp"></i>
+            Nous écrire sur WhatsApp
+          </a>
+          
+          {% if user.is_authenticated %}
+          <a href="{% url 'contact_messages' %}" 
+             class="action-btn admin-btn">
+            <i class="fas fa-envelope-open-text"></i>
+            Consulter les messages
+          </a>
+          {% endif %}
+        </div>
+
+        <!-- Availability Badge -->
+        <div class="availability-badge">
+          <i class="fas fa-check-circle"></i>
+          Disponible du lundi au samedi, de 8h à 18h
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Background carousel
+  const heroImages = document.querySelectorAll('.hero-image');
+  let currentHeroImage = 0;
+  
+  function rotateHeroImages() {
+    heroImages.forEach(img => img.classList.remove('active'));
+    currentHeroImage = (currentHeroImage + 1) % heroImages.length;
+    heroImages[currentHeroImage].classList.add('active');
+  }
+  
+  // Start carousel
+  let heroInterval = setInterval(rotateHeroImages, 4000);
+
+  // Animate form and map sections on scroll
+  const contactForm = document.getElementById('contactForm');
+  const mapSection = document.getElementById('mapSection');
+  
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 300);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  if (contactForm) observer.observe(contactForm);
+  if (mapSection) observer.observe(mapSection);
+
+  // Form submission handling
+  const contactFormElement = document.getElementById('contactMessageForm');
+  const submitBtn = document.getElementById('submitBtn');
+  
+  if (contactFormElement) {
+    contactFormElement.addEventListener('submit', function(e) {
+      // Check if form is valid
+      if (!this.checkValidity()) {
+        e.preventDefault();
+        // Add shake animation to invalid fields
+        const invalidFields = this.querySelectorAll(':invalid');
+        invalidFields.forEach(field => {
+          field.style.animation = 'none';
+          setTimeout(() => {
+            field.style.animation = 'shake 0.5s ease';
+          }, 10);
+        });
+        return;
+      }
+      
+      // Add loading state to button
+      submitBtn.disabled = true;
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi en cours...';
+      
+      // Re-enable after submission (in case of error)
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }, 5000);
+    });
+  }
+
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll('.notification');
+  notifications.forEach(notification => {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // Input focus effects
+  const inputs = document.querySelectorAll('.form-input, .form-textarea');
+  inputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      this.style.transform = 'translateY(-2px)';
+      this.style.boxShadow = '0 5px 15px rgba(48, 126, 51, 0.1)';
+    });
+    
+    input.addEventListener('blur', function() {
+      this.style.transform = 'translateY(0)';
+      this.style.boxShadow = 'var(--shadow-sm)';
+    });
+  });
+
+  // Real-time form validation
+  const validateField = (field) => {
+    if (!field.checkValidity()) {
+      field.style.borderColor = '#F44336';
+      field.style.background = 'linear-gradient(135deg, rgba(244, 67, 54, 0.05) 0%, rgba(211, 47, 47, 0.02) 100%)';
+    } else {
+      field.style.borderColor = 'var(--primary-green)';
+      field.style.background = 'white';
+    }
+  };
+
+  // Add validation on blur
+  inputs.forEach(input => {
+    input.addEventListener('blur', function() {
+      validateField(this);
+    });
+    
+    input.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        validateField(this);
+      }
+    });
+  });
+
+  // Add shake animation for invalid fields
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Interactive map overlay effect
+  const mapOverlay = document.querySelector('.map-overlay');
+  const mapFrame = document.querySelector('.map-frame');
+  
+  if (mapOverlay && mapFrame) {
+    mapFrame.addEventListener('mouseenter', function() {
+      mapOverlay.style.opacity = '0';
+    });
+    
+    mapFrame.addEventListener('mouseleave', function() {
+      mapOverlay.style.opacity = '1';
+    });
+  }
+
+  // Animate action buttons on load
+  const actionButtons = document.querySelectorAll('.action-btn');
+  actionButtons.forEach((button, index) => {
+    button.style.opacity = '0';
+    button.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      button.style.transition = 'all 0.6s ease';
+      button.style.opacity = '1';
+      button.style.transform = 'translateY(0)';
+    }, 500 + (index * 200));
+  });
+
+  // Copy contact info on click
+  const contactLinks = document.querySelectorAll('.info-content a');
+  contactLinks.forEach(link => {
+    link.addEventListener('click', function(e) {
+      // Add visual feedback
+      this.style.transform = 'scale(0.95)';
+      setTimeout(() => {
+        this.style.transform = 'scale(1)';
+      }, 200);
+    });
+  });
+
+  // Add parallax effect to hero section
+  window.addEventListener('scroll', function() {
+    const scrolled = window.pageYOffset;
+    const heroSection = document.querySelector('.contact-hero');
+    const heroContent = document.querySelector('.hero-content');
+    
+    if (heroSection && heroContent) {
+      const rate = scrolled * -0.5;
+      heroContent.style.transform = `translateY(${rate}px)`;
+    }
+  });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+{% comment %} <
 {% extends 'base.html' %}
 
 {% block title %}Contact | Ecofeed{% endblock %}
@@ -178,5 +1179,5 @@
 {% endblock %}
 
 {% block scripts %}
-{% endblock scripts %}
+{% endblock scripts %} {% endcomment %}
 

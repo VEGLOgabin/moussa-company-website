@@ -1,5 +1,1137 @@
 {% extends 'base.html' %}
 
+{% block title %}Créer un compte | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Signup Page */
+  :root {
+    --input-bg: rgba(255, 255, 255, 0.95);
+    --input-border: rgba(48, 126, 51, 0.2);
+    --input-focus: rgba(48, 126, 51, 0.4);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Hero Section with Background Image */
+  .signup-hero {
+    position: relative;
+    height: 60vh;
+    min-height: 400px;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1579113800032-c38bd7635818?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1512621776951-a57141f2eefd?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.85) 0%, rgba(30, 109, 45, 0.8) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .signup-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .signup-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
+    margin-bottom: 0;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .hero-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .hero-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hero-dot.active {
+    background: var(--primary-yellow);
+    transform: scale(1.2);
+  }
+
+  .signup-section {
+    flex: 1;
+    padding: 4rem 0 6rem;
+    position: relative;
+  }
+
+  .signup-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  .signup-card {
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease 1s forwards;
+  }
+
+  .signup-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg), 0 30px 60px rgba(48, 126, 51, 0.15);
+  }
+
+  .signup-illustration {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .signup-illustration::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100,0 C155.228,0 200,44.772 200,100 C200,155.228 155.228,200 100,200 C44.772,200 0,155.228 0,100 C0,44.772 44.772,0 100,0 Z" fill="rgba(255,255,255,0.1)"/></svg>') center/contain no-repeat;
+  }
+
+  .illustration-content {
+    text-align: center;
+    color: white;
+    position: relative;
+    z-index: 1;
+  }
+
+  .illustration-icon {
+    font-size: 4rem;
+    margin-bottom: 2rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .illustration-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  .illustration-text {
+    font-family: 'Quicksand', sans-serif;
+    opacity: 0.9;
+    line-height: 1.6;
+  }
+
+  .benefits-list {
+    margin-top: 2rem;
+    text-align: left;
+  }
+
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .benefit-icon {
+    color: var(--primary-yellow);
+    font-size: 1.2rem;
+  }
+
+  .benefit-text {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+  }
+
+  .signup-form {
+    padding: 3rem;
+  }
+
+  .form-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .form-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1.1rem;
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .form-field {
+    margin-bottom: 0;
+  }
+
+  .field-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .input-group {
+    position: relative;
+  }
+
+  .form-input,
+  .form-select {
+    width: 100%;
+    padding: 1rem 1.5rem 1rem 3.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    border: 2px solid var(--input-border);
+    border-radius: 15px;
+    background: var(--input-bg);
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .form-input:focus,
+  .form-select:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-green);
+    font-size: 1.2rem;
+    z-index: 2;
+  }
+
+  /* File Upload Styling */
+  .file-upload-container {
+    margin-top: 1rem;
+  }
+
+  .file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background-color: var(--input-bg);
+    border: 2px dashed var(--input-border);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-label:hover {
+    background-color: rgba(232, 245, 233, 0.5);
+    border-color: var(--primary-green);
+  }
+
+  .file-upload-text {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+  }
+
+  .file-upload-button {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(252, 193, 16, 0.3);
+  }
+
+  .file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .file-name {
+    margin-top: 0.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    color: var(--primary-green);
+    font-style: italic;
+    padding-left: 0.5rem;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 1.2rem 2rem;
+    border-radius: 15px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 25px rgba(48, 126, 51, 0.2);
+    position: relative;
+    overflow: hidden;
+    margin-top: 2rem;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(48, 126, 51, 0.3);
+  }
+
+  .submit-btn:active {
+    transform: translateY(-1px);
+  }
+
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%, -50%);
+    transform-origin: 50% 50%;
+  }
+
+  .submit-btn:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+  }
+
+  .login-link {
+    text-align: center;
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .login-link a {
+    color: var(--primary-green);
+    text-decoration: none;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 2px;
+  }
+
+  .login-link a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-yellow);
+    transition: width 0.3s ease;
+  }
+
+  .login-link a:hover::after {
+    width: 100%;
+  }
+
+  /* Password Strength Indicator */
+  .password-strength {
+    margin-top: 0.5rem;
+  }
+
+  .strength-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .strength-fill {
+    height: 100%;
+    width: 0%;
+    background: #e74c3c;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  .strength-text {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.85rem;
+    color: var(--gray);
+  }
+
+  /* Messages */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error,
+  .notification.is-danger {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #3498db;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+  }
+
+  /* Floating Background Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(40, 40);
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .signup-hero h1 {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .signup-section {
+      padding: 2rem 0 4rem;
+    }
+    
+    .signup-hero {
+      height: 50vh;
+      min-height: 300px;
+    }
+    
+    .signup-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .signup-hero p {
+      font-size: 1.1rem;
+    }
+    
+    .signup-card {
+      border-radius: 20px;
+    }
+    
+    .signup-form {
+      padding: 2rem;
+    }
+    
+    .form-title {
+      font-size: 1.8rem;
+    }
+    
+    .notification-container {
+      left: 20px;
+      right: 20px;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .signup-hero {
+      height: 40vh;
+    }
+    
+    .signup-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .signup-hero p {
+      font-size: 1rem;
+    }
+    
+    .signup-form {
+      padding: 1.5rem;
+    }
+    
+    .form-title {
+      font-size: 1.5rem;
+    }
+    
+    .illustration-title {
+      font-size: 1.4rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Carousel -->
+<section class="signup-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Rejoignez Ecofeed</h1>
+    <p>Créez votre compte pour découvrir nos produits naturels et bénéficier d'offres exclusives</p>
+  </div>
+  
+  <!-- Carousel Dots -->
+  <div class="hero-dots">
+    <span class="hero-dot active" data-slide="0"></span>
+    <span class="hero-dot" data-slide="1"></span>
+    <span class="hero-dot" data-slide="2"></span>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% elif message.tags == 'info' %}is-info
+        {% else %}is-info{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Signup Section -->
+<section class="signup-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container signup-container">
+    <div class="columns is-centered">
+      <div class="column is-10">
+        <div class="signup-card">
+          <div class="columns is-vcentered">
+            <!-- Left Column - Illustration -->
+            <div class="column is-6">
+              <div class="signup-illustration">
+                <div class="illustration-content">
+                  <div class="illustration-icon">
+                    <i class="fas fa-user-plus"></i>
+                  </div>
+                  <h2 class="illustration-title">Pourquoi nous rejoindre ?</h2>
+                  <p class="illustration-text">
+                    En créant un compte, vous accédez à des avantages exclusifs et un suivi personnalisé.
+                  </p>
+                  
+                  <div class="benefits-list">
+                    <div class="benefit-item">
+                      <i class="fas fa-check-circle benefit-icon"></i>
+                      <span class="benefit-text">Accès à tous nos produits naturels</span>
+                    </div>
+                    <div class="benefit-item">
+                      <i class="fas fa-check-circle benefit-icon"></i>
+                      <span class="benefit-text">Livraison rapide et gratuite à partir de 30 000 FCFA</span>
+                    </div>
+                    <div class="benefit-item">
+                      <i class="fas fa-check-circle benefit-icon"></i>
+                      <span class="benefit-text">Offres et réductions exclusives</span>
+                    </div>
+                    <div class="benefit-item">
+                      <i class="fas fa-check-circle benefit-icon"></i>
+                      <span class="benefit-text">Suivi de commande en temps réel</span>
+                    </div>
+                    <div class="benefit-item">
+                      <i class="fas fa-check-circle benefit-icon"></i>
+                      <span class="benefit-text">Accès à notre communauté</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column - Signup Form -->
+            <div class="column is-6">
+              <div class="signup-form">
+                <div class="form-header">
+                  <h2 class="form-title">Créez votre compte</h2>
+                  <p class="form-subtitle">Remplissez vos informations personnelles</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" id="signupForm">
+                  {% csrf_token %}
+                  
+                  <div class="form-grid">
+                    <!-- First Name -->
+                    <div class="form-field">
+                      <label class="field-label">Prénom</label>
+                      <div class="input-group">
+                        <span class="input-icon">
+                          <i class="fas fa-user"></i>
+                        </span>
+                        <input class="form-input" 
+                               type="text" 
+                               name="first_name" 
+                               placeholder="Votre prénom" 
+                               required
+                               autocomplete="given-name">
+                      </div>
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="form-field">
+                      <label class="field-label">Nom</label>
+                      <div class="input-group">
+                        <span class="input-icon">
+                          <i class="fas fa-user"></i>
+                        </span>
+                        <input class="form-input" 
+                               type="text" 
+                               name="last_name" 
+                               placeholder="Votre nom" 
+                               required
+                               autocomplete="family-name">
+                      </div>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="form-field">
+                      <label class="field-label">Sexe</label>
+                      <div class="input-group">
+                        <span class="input-icon">
+                          <i class="fas fa-venus-mars"></i>
+                        </span>
+                        <select class="form-select" name="sex" required>
+                          <option value="" disabled selected>Sélectionnez</option>
+                          <option value="Homme">Homme</option>
+                          <option value="Femme">Femme</option>
+                          <option value="Autre">Autre</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <!-- Birthdate -->
+                    <div class="form-field">
+                      <label class="field-label">Date de naissance</label>
+                      <div class="input-group">
+                        <span class="input-icon">
+                          <i class="fas fa-birthday-cake"></i>
+                        </span>
+                        <input class="form-input" 
+                               type="date" 
+                               name="birthdate"
+                               autocomplete="bday">
+                      </div>
+                    </div>
+
+                    <!-- Phone Number -->
+                    <div class="form-field">
+                      <label class="field-label">Téléphone</label>
+                      <div class="input-group">
+                        <span class="input-icon">
+                          <i class="fas fa-phone"></i>
+                        </span>
+                        <input class="form-input" 
+                               type="tel" 
+                               name="phone_number" 
+                               placeholder="+229 XX XX XX XX" 
+                               required
+                               autocomplete="tel">
+                      </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-field">
+                      <label class="field-label">Email</label>
+                      <div class="input-group">
+                        <span class="input-icon">
+                          <i class="fas fa-envelope"></i>
+                        </span>
+                        <input class="form-input" 
+                               type="email" 
+                               name="email" 
+                               placeholder="votre@email.com" 
+                               required
+                               autocomplete="email">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Password -->
+                  <div class="form-field">
+                    <label class="field-label">Mot de passe</label>
+                    <div class="input-group">
+                      <span class="input-icon">
+                        <i class="fas fa-lock"></i>
+                      </span>
+                      <input class="form-input" 
+                             type="password" 
+                             name="password" 
+                             id="passwordInput"
+                             placeholder="Votre mot de passe" 
+                             required
+                             autocomplete="new-password">
+                    </div>
+                    <div class="password-strength">
+                      <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                      </div>
+                      <div class="strength-text" id="strengthText">Force du mot de passe</div>
+                    </div>
+                  </div>
+
+                  <!-- Profile Photo -->
+                  <div class="form-field">
+                    <label class="field-label">Photo de profil (optionnel)</label>
+                    <div class="file-upload-container">
+                      <div class="file-upload-label" id="fileUploadLabel">
+                        <span class="file-upload-text">Cliquez pour choisir un fichier</span>
+                        <span class="file-upload-button">Parcourir</span>
+                        <input class="file-input" 
+                               type="file" 
+                               name="photo" 
+                               id="fileInput"
+                               accept="image/*">
+                      </div>
+                      <div class="file-name" id="fileName">Aucun fichier choisi</div>
+                    </div>
+                  </div>
+
+                  <!-- Submit Button -->
+                  <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="btn-text">Créer mon compte</span>
+                  </button>
+                </form>
+
+                <!-- Login Link -->
+                <div class="login-link">
+                  <p>Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Hero background carousel
+    const heroImages = document.querySelectorAll('.hero-image');
+    const heroDots = document.querySelectorAll('.hero-dot');
+    let currentHeroImage = 0;
+    
+    function showHeroImage(n) {
+      heroImages.forEach(img => img.classList.remove('active'));
+      heroDots.forEach(dot => dot.classList.remove('active'));
+      
+      currentHeroImage = (n + heroImages.length) % heroImages.length;
+      heroImages[currentHeroImage].classList.add('active');
+      heroDots[currentHeroImage].classList.add('active');
+    }
+    
+    function nextHeroImage() {
+      showHeroImage(currentHeroImage + 1);
+    }
+    
+    // Auto rotate hero images
+    let heroInterval = setInterval(nextHeroImage, 4000);
+    
+    // Dot click handlers
+    heroDots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        clearInterval(heroInterval);
+        showHeroImage(parseInt(this.dataset.slide));
+        heroInterval = setInterval(nextHeroImage, 4000);
+      });
+    });
+
+    // File upload functionality
+    const fileInput = document.getElementById('fileInput');
+    const fileUploadLabel = document.getElementById('fileUploadLabel');
+    const fileName = document.getElementById('fileName');
+    
+    fileUploadLabel.addEventListener('click', function() {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', function() {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = fileInput.files[0].name;
+        fileName.style.color = 'var(--primary-green)';
+      } else {
+        fileName.textContent = "Aucun fichier choisi";
+        fileName.style.color = 'var(--gray)';
+      }
+    });
+
+    // Password strength indicator
+    const passwordInput = document.getElementById('passwordInput');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    passwordInput.addEventListener('input', function() {
+      const password = this.value;
+      let strength = 0;
+      let text = '';
+      let color = '#e74c3c';
+      
+      // Check password strength
+      if (password.length >= 8) strength++;
+      if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+      if (password.match(/\d/)) strength++;
+      if (password.match(/[^a-zA-Z\d]/)) strength++;
+      
+      // Update UI
+      switch(strength) {
+        case 0:
+          text = 'Très faible';
+          color = '#e74c3c';
+          break;
+        case 1:
+          text = 'Faible';
+          color = '#e74c3c';
+          break;
+        case 2:
+          text = 'Moyen';
+          color = '#f39c12';
+          break;
+        case 3:
+          text = 'Fort';
+          color = '#27ae60';
+          break;
+        case 4:
+          text = 'Très fort';
+          color = '#2ecc71';
+          break;
+      }
+      
+      strengthFill.style.width = `${strength * 25}%`;
+      strengthFill.style.background = color;
+      strengthText.textContent = text;
+      strengthText.style.color = color;
+    });
+
+    // Form submission animation
+    const signupForm = document.getElementById('signupForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = submitBtn.querySelector('.btn-text');
+    
+    signupForm.addEventListener('submit', function(e) {
+      // Check if form is valid
+      if (!this.checkValidity()) {
+        e.preventDefault();
+        // Add shake animation to invalid fields
+        const invalidFields = this.querySelectorAll(':invalid');
+        invalidFields.forEach(field => {
+          field.style.animation = 'none';
+          setTimeout(() => {
+            field.style.animation = 'shake 0.5s ease';
+          }, 10);
+        });
+        return;
+      }
+      
+      // Add loading state to button
+      submitBtn.disabled = true;
+      btnText.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Création du compte...';
+    });
+
+    // Input focus effects
+    const inputs = document.querySelectorAll('.form-input, .form-select');
+    inputs.forEach(input => {
+      input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'translateY(-2px)';
+      });
+      
+      input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'translateY(0)';
+      });
+    });
+
+    // Auto-hide notifications after 5 seconds
+    const notifications = document.querySelectorAll('.notification');
+    notifications.forEach(notification => {
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 5000);
+    });
+
+    // Add shake animation for invalid fields
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+      
+      @keyframes slideOut {
+        from {
+          transform: translateX(0) scale(1);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%) scale(0.8);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Auto-focus first name field
+    const firstNameInput = document.querySelector('input[name="first_name"]');
+    if (firstNameInput) {
+      setTimeout(() => {
+        firstNameInput.focus();
+      }, 300);
+    }
+  });
+</script>
+{% endblock %}
+
+
+{% comment %} {% extends 'base.html' %}
+
 {% block title %}Créer un compte | Sojainnovation{% endblock %}
 
 {% block style %}
@@ -356,172 +1488,11 @@
     }
   });
 </script>
-{% endblock %}
-
-
-
-
-
-
-
-{% comment %} {% extends 'base.html' %}
-
-{% block title %}Créer un compte | Sojainnovation{% endblock %}
-
-{% block style %}
-<style>
-  .form-box {
-    border-radius: 15px;
-    background-color: #fdfcfb;
-    padding: 2rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  .form-box h1.title {
-    color: #4caf50;
-    font-weight: 700;
-  }
-
-  .file-label .file-cta {
-    background-color: #4caf50;
-    color: white;
-    border-radius: 6px;
-  }
-
-  .file-name {
-    font-style: italic;
-  }
-</style>
-{% endblock %}
-
-{% block content %}
-
-
-<!-- Messages -->
-{% if messages %}
-<div class="container mt-4">
-  {% for message in messages %}
-    <div class="notification 
-      {% if message.tags == 'success' %}is-success
-      {% elif message.tags == 'error' %}is-danger
-      {% else %}is-info{% endif %}">
-      {{ message }}
-    </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-
-<section class="section">
-  <div class="container">
-    <div class="columns is-centered">
-      <div class="column is-7">
-        <div class="form-box">
-          <h1 class="title has-text-centered">Créer un compte</h1>
-
-          <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            <div class="field">
-              <label class="label">Prénom</label>
-              <div class="control">
-                <input class="input" type="text" name="first_name" placeholder="Votre prénom" required>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Nom</label>
-              <div class="control">
-                <input class="input" type="text" name="last_name" placeholder="Votre nom" required>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Sexe</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="sex">
-                    <option value="Homme">Homme</option>
-                    <option value="Femme">Femme</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Date de naissance</label>
-              <div class="control">
-                <input class="input" type="date" name="birthdate">
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Téléphone</label>
-              <div class="control">
-                <input class="input" type="tel" name="phone_number" placeholder="+229..." required>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Email</label>
-              <div class="control">
-                <input class="input" type="email" name="email" placeholder="exemple@sojainnovation.bj" required>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Mot de passe</label>
-              <div class="control">
-                <input class="input" type="password" name="password" required>
-              </div>
-            </div>
-
-            <div class="field">
-              <label class="label">Photo de profil</label>
-              <div class="file has-name is-fullwidth is-boxed">
-                <label class="file-label">
-                  <input class="file-input" type="file" name="photo">
-                  <span class="file-cta">
-                    <span class="file-icon"><i class="fas fa-upload"></i></span>
-                    <span class="file-label">Choisir un fichier</span>
-                  </span>
-                  <span class="file-name">Aucun fichier choisi</span>
-                </label>
-              </div>
-            </div>
-
-            <div class="field mt-5">
-              <div class="control">
-                <button type="submit" class="button is-success is-fullwidth">Créer mon compte</button>
-              </div>
-            </div>
-          </form>
-
-          <p class="has-text-centered mt-4">
-            Vous avez déjà un compte ? <a href="{% url 'login' %}">Connectez-vous</a>
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-{% endblock %}
-
-{% block scripts %}
-<script>
-  // Show selected filename for file input
-  document.addEventListener('DOMContentLoaded', function () {
-    const fileInput = document.querySelector('.file-input');
-    if (fileInput) {
-      fileInput.addEventListener('change', function () {
-        const fileName = document.querySelector('.file-name');
-        if (fileInput.files.length > 0) {
-          fileName.textContent = fileInput.files[0].name;
-        } else {
-          fileName.textContent = "Aucun fichier choisi";
-        }
-      });
-    }
-  });
-</script>
 {% endblock %} {% endcomment %}
+
+
+
+
+
+
+

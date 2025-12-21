@@ -4,6 +4,1224 @@
 
 {% block style %}
 <style>
+  /* Modern Contact Messages Admin Page */
+  :root {
+    --message-bg: rgba(255, 255, 255, 0.98);
+    --message-border: rgba(48, 126, 51, 0.1);
+    --unread-bg: rgba(232, 245, 233, 0.95);
+    --modal-bg: rgba(255, 255, 255, 0.98);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Hero Section with Background Carousel */
+  .messages-hero {
+    position: relative;
+    height: 40vh;
+    min-height: 300px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 3rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1534536281715-e28d76689b4d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1497366754035-f200968a6e72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.9) 0%, rgba(30, 109, 45, 0.85) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .messages-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .messages-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
+    opacity: 0.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  /* Stats Overview */
+  .stats-section {
+    margin-bottom: 3rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background: var(--message-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--message-border);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .stat-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .stat-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .stat-icon {
+    width: 70px;
+    height: 70px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 1.8rem;
+    color: white;
+  }
+
+  .stat-total .stat-icon {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+  }
+
+  .stat-unread .stat-icon {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+  }
+
+  .stat-today .stat-icon {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  }
+
+  .stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+
+  .stat-label {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+
+  /* Action Bar */
+  .action-bar {
+    background: var(--message-bg);
+    border-radius: 20px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--message-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .action-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--dark);
+    margin: 0;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    text-decoration: none;
+  }
+
+  .add-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+  }
+
+  .filter-btn {
+    background: var(--primary-green-light);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  /* Messages Grid */
+  .messages-section {
+    padding: 0 0 6rem;
+    position: relative;
+  }
+
+  .messages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+  }
+
+  @media (max-width: 768px) {
+    .messages-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Message Card */
+  .message-card {
+    background: var(--message-bg);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--message-border);
+    opacity: 0;
+    transform: translateY(40px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .message-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .message-card.unread {
+    background: var(--unread-bg);
+    border-left: 4px solid var(--primary-yellow);
+  }
+
+  .message-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(48, 126, 51, 0.1);
+  }
+
+  .sender-info h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .sender-email {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--primary-green);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .message-date {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  .message-subject {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  .message-content {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    max-height: 120px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .message-content.expanded {
+    max-height: none;
+  }
+
+  .read-more {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, var(--message-bg));
+    padding-top: 2rem;
+    text-align: center;
+    cursor: pointer;
+    color: var(--primary-green);
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  .message-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .message-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    border: none;
+  }
+
+  .edit-btn {
+    background: var(--primary-green-light);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+  }
+
+  .delete-btn {
+    background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+    color: white;
+  }
+
+  .reply-btn {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+    color: white;
+  }
+
+  .message-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--message-bg);
+    border-radius: 25px;
+    box-shadow: var(--shadow-md);
+    grid-column: 1 / -1;
+  }
+
+  .empty-icon {
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: var(--primary-green);
+    font-size: 3rem;
+  }
+
+  .empty-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  .empty-description {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    max-width: 400px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+
+  /* Modal Styles */
+  .modal-card {
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background: var(--modal-bg);
+    border: 1px solid var(--message-border);
+  }
+
+  .modal-card-head {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    border-bottom: none;
+    padding: 2rem;
+  }
+
+  .modal-card-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .modal-card-body {
+    padding: 2rem;
+  }
+
+  .modal-card-foot {
+    background: var(--primary-green-light);
+    border-top: 1px solid var(--message-border);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  /* Form Styling */
+  .form-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    border: 2px solid rgba(48, 126, 51, 0.2);
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+  }
+
+  .form-textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  /* Notifications */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error {
+    border-left-color: #F44336;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .messages-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .action-bar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .action-buttons {
+      justify-content: center;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .messages-hero {
+      height: 35vh;
+      min-height: 250px;
+    }
+    
+    .messages-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .message-card {
+      padding: 2rem;
+    }
+    
+    .modal-card {
+      margin: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .messages-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .message-actions {
+      flex-direction: column;
+    }
+    
+    .message-btn {
+      width: 100%;
+      justify-content: center;
+    }
+    
+    .empty-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  /* Staggered animations */
+  .stat-card:nth-child(1) { transition-delay: 0.1s; }
+  .stat-card:nth-child(2) { transition-delay: 0.2s; }
+  .stat-card:nth-child(3) { transition-delay: 0.3s; }
+  
+  .message-card:nth-child(1) { transition-delay: 0.1s; }
+  .message-card:nth-child(2) { transition-delay: 0.2s; }
+  .message-card:nth-child(3) { transition-delay: 0.3s; }
+  .message-card:nth-child(4) { transition-delay: 0.4s; }
+  .message-card:nth-child(5) { transition-delay: 0.5s; }
+  .message-card:nth-child(6) { transition-delay: 0.6s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Carousel -->
+<section class="messages-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Messages de contact</h1>
+    <p>Gestion des messages envoyés via le formulaire de contact</p>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% else %}is-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Stats Overview -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card stat-total">
+        <div class="stat-icon">
+          <i class="fas fa-envelope"></i>
+        </div>
+        <div class="stat-value">{{ messages|length }}</div>
+        <div class="stat-label">Total Messages</div>
+      </div>
+      
+      <div class="stat-card stat-unread">
+        <div class="stat-icon">
+          <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-value">{{ unread_count|default:"0" }}</div>
+        <div class="stat-label">Non lus</div>
+      </div>
+      
+      <div class="stat-card stat-today">
+        <div class="stat-icon">
+          <i class="fas fa-calendar-day"></i>
+        </div>
+        <div class="stat-value">{{ today_count|default:"0" }}</div>
+        <div class="stat-label">Aujourd'hui</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main Content Section -->
+<section class="messages-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <!-- Action Bar -->
+    <div class="action-bar">
+      <h2 class="action-title">Tous les messages</h2>
+      <div class="action-buttons">
+        <button class="action-btn add-btn js-modal-trigger" data-target="createModal">
+          <i class="fas fa-plus"></i> Ajouter un message
+        </button>
+        <button class="action-btn filter-btn" id="filterUnread">
+          <i class="fas fa-filter"></i> Voir non lus
+        </button>
+      </div>
+    </div>
+
+    {% if messages %}
+    <!-- Messages Grid -->
+    <div class="messages-grid">
+      {% for msg in messages %}
+      <div class="message-card {% if not msg.is_read %}unread{% endif %}" id="message-{{ msg.id }}">
+        <!-- Message Header -->
+        <div class="message-header">
+          <div class="sender-info">
+            <h4>{{ msg.name }}</h4>
+            <div class="sender-email">{{ msg.email }}</div>
+          </div>
+          <div class="message-date">
+            {{ msg.sent_at|date:"d M Y" }}<br>
+            {{ msg.sent_at|date:"H:i" }}
+          </div>
+        </div>
+
+        <!-- Message Subject -->
+        <div class="message-subject">{{ msg.subject }}</div>
+
+        <!-- Message Content -->
+        <div class="message-content" id="content-{{ msg.id }}">
+          {{ msg.message|linebreaksbr }}
+          {% if msg.message|length > 200 %}
+          <div class="read-more" onclick="toggleReadMore('{{ msg.id }}')">
+            Lire la suite
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Message Actions -->
+        <div class="message-actions">
+          <button class="message-btn edit-btn js-modal-trigger-edit"
+                  data-target="editModal"
+                  data-id="{{ msg.id }}"
+                  data-name="{{ msg.name|escapejs }}"
+                  data-email="{{ msg.email|escapejs }}"
+                  data-subject="{{ msg.subject|escapejs }}"
+                  data-message="{{ msg.message|escapejs }}">
+            <i class="fas fa-edit"></i> Modifier
+          </button>
+          
+          <button class="message-btn delete-btn js-modal-trigger-delete"
+                  data-target="deleteModal"
+                  data-id="{{ msg.id }}">
+            <i class="fas fa-trash"></i> Supprimer
+          </button>
+          
+          <a href="mailto:{{ msg.email }}?subject=Re: {{ msg.subject }}" 
+             class="message-btn reply-btn">
+            <i class="fas fa-reply"></i> Répondre
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-envelope-open"></i>
+      </div>
+      <h2 class="empty-title">Aucun message pour le moment</h2>
+      <p class="empty-description">
+        Vous n'avez pas encore reçu de messages via le formulaire de contact.
+        Les messages envoyés par vos visiteurs apparaîtront ici.
+      </p>
+      <button class="action-btn add-btn js-modal-trigger" data-target="createModal">
+        <i class="fas fa-plus"></i> Ajouter un message
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Create Modal -->
+<div id="createModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Ajouter un message</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form method="POST" action="{% url 'contact_message_add' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="form-label">Nom</label>
+          <input class="form-input" type="text" name="name" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" name="email" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Sujet</label>
+          <input class="form-input" type="text" name="subject" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" name="message" required></textarea>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="action-btn add-btn">
+          <i class="fas fa-save"></i> Enregistrer
+        </button>
+        <button type="button" class="action-btn filter-btn js-modal-close">
+          <i class="fas fa-times"></i> Annuler
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier le message</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form id="editForm" method="POST">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="form-label">Nom</label>
+          <input class="form-input" type="text" name="name" id="edit-name" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Email</label>
+          <input class="form-input" type="email" name="email" id="edit-email" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Sujet</label>
+          <input class="form-input" type="text" name="subject" id="edit-subject" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Message</label>
+          <textarea class="form-textarea" name="message" id="edit-message" required></textarea>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="action-btn add-btn">
+          <i class="fas fa-sync-alt"></i> Mettre à jour
+        </button>
+        <button type="button" class="action-btn filter-btn js-modal-close">
+          <i class="fas fa-times"></i> Annuler
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title has-text-white">Supprimer le message</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p style="font-family: 'Quicksand', sans-serif; font-size: 1.1rem; line-height: 1.6;">
+        Êtes-vous sûr de vouloir supprimer ce message ? Cette action est irréversible.
+      </p>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteForm" method="POST">
+        {% csrf_token %}
+        <button type="submit" class="action-btn delete-btn">
+          <i class="fas fa-trash"></i> Oui, supprimer
+        </button>
+        <button type="button" class="action-btn filter-btn js-modal-close">
+          <i class="fas fa-times"></i> Annuler
+        </button>
+      </form>
+    </footer>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Background carousel
+  const heroImages = document.querySelectorAll('.hero-image');
+  let currentHeroImage = 0;
+  
+  function rotateHeroImages() {
+    heroImages.forEach(img => img.classList.remove('active'));
+    currentHeroImage = (currentHeroImage + 1) % heroImages.length;
+    heroImages[currentHeroImage].classList.add('active');
+  }
+  
+  // Start carousel
+  let heroInterval = setInterval(rotateHeroImages, 4000);
+
+  // Modal functionality
+  function openModal(modalId) {
+    const target = document.getElementById(modalId);
+    if (target) {
+      target.classList.add('is-active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeAllModals() {
+    (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+      $modal.classList.remove('is-active');
+    });
+    document.body.style.overflow = 'auto';
+  }
+
+  // Open create modal
+  (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      openModal(modalId);
+    });
+  });
+
+  // Open edit modal & fill data
+  (document.querySelectorAll('.js-modal-trigger-edit') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const msgId = $trigger.dataset.id;
+      const name = $trigger.dataset.name;
+      const email = $trigger.dataset.email;
+      const subject = $trigger.dataset.subject;
+      const message = $trigger.dataset.message;
+
+      const form = document.getElementById('editForm');
+      form.action = `/contact/messages/update/${msgId}/`;
+
+      document.getElementById('edit-name').value = name;
+      document.getElementById('edit-email').value = email;
+      document.getElementById('edit-subject').value = subject;
+      document.getElementById('edit-message').value = message;
+
+      openModal(modalId);
+    });
+  });
+
+  // Open delete modal & set form action
+  (document.querySelectorAll('.js-modal-trigger-delete') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const msgId = $trigger.dataset.id;
+
+      const form = document.getElementById('deleteForm');
+      form.action = `/contact/messages/delete/${msgId}/`;
+
+      openModal(modalId);
+    });
+  });
+
+  // Close modals
+  (document.querySelectorAll('.js-modal-close') || []).forEach(($close) => {
+    $close.addEventListener('click', () => {
+      closeAllModals();
+    });
+  });
+
+  // Toggle read more functionality
+  window.toggleReadMore = function(messageId) {
+    const content = document.getElementById(`content-${messageId}`);
+    const readMore = content.querySelector('.read-more');
+    
+    if (content.classList.contains('expanded')) {
+      content.classList.remove('expanded');
+      readMore.textContent = 'Lire la suite';
+    } else {
+      content.classList.add('expanded');
+      readMore.textContent = 'Réduire';
+    }
+  };
+
+  // Filter unread messages
+  const filterUnreadBtn = document.getElementById('filterUnread');
+  if (filterUnreadBtn) {
+    filterUnreadBtn.addEventListener('click', function() {
+      const messageCards = document.querySelectorAll('.message-card');
+      const hasUnread = Array.from(messageCards).some(card => card.classList.contains('unread'));
+      
+      messageCards.forEach(card => {
+        if (hasUnread) {
+          // Show only unread
+          if (!card.classList.contains('unread')) {
+            card.style.display = 'none';
+          } else {
+            card.style.display = 'block';
+          }
+          this.innerHTML = '<i class="fas fa-eye"></i> Voir tous';
+        } else {
+          // Show all
+          card.style.display = 'block';
+          this.innerHTML = '<i class="fas fa-filter"></i> Voir non lus';
+        }
+      });
+      
+      // Toggle filter state
+      this.dataset.filtered = hasUnread ? 'true' : 'false';
+    });
+  }
+
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll('.notification');
+  notifications.forEach(notification => {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // Animate elements on scroll
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, index * 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  // Observe all animatable elements
+  const animatedElements = document.querySelectorAll(
+    '.stat-card, .message-card, .empty-state'
+  );
+  
+  animatedElements.forEach(el => {
+    observer.observe(el);
+  });
+
+  // Add hover effect to message cards
+  const messageCards = document.querySelectorAll('.message-card');
+  messageCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-10px) scale(1.02)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      if (!this.classList.contains('expanded')) {
+        this.style.transform = 'translateY(-10px) scale(1.02)';
+      }
+    });
+  });
+
+  // Mark as read on click
+  messageCards.forEach(card => {
+    card.addEventListener('click', function(e) {
+      if (!e.target.closest('.message-btn') && !e.target.closest('.read-more')) {
+        if (this.classList.contains('unread')) {
+          this.classList.remove('unread');
+          // You could add AJAX call here to update read status in database
+          updateUnreadCount();
+        }
+      }
+    });
+  });
+
+  // Update unread count (simulated)
+  function updateUnreadCount() {
+    const unreadCards = document.querySelectorAll('.message-card.unread');
+    const unreadStat = document.querySelector('.stat-unread .stat-value');
+    if (unreadStat) {
+      unreadStat.textContent = unreadCards.length;
+    }
+  }
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeAllModals();
+    }
+  });
+
+  // Animate hero elements
+  const heroTitle = document.querySelector('.messages-hero h1');
+  const heroSubtitle = document.querySelector('.messages-hero p');
+
+  if (heroTitle) {
+    heroTitle.style.opacity = '0';
+    heroTitle.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroTitle.style.transition = 'all 0.8s ease';
+      heroTitle.style.opacity = '1';
+      heroTitle.style.transform = 'translateY(0)';
+    }, 300);
+  }
+
+  if (heroSubtitle) {
+    heroSubtitle.style.opacity = '0';
+    heroSubtitle.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroSubtitle.style.transition = 'all 0.8s ease 0.3s';
+      heroSubtitle.style.opacity = '1';
+      heroSubtitle.style.transform = 'translateY(0)';
+    }, 600);
+  }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}Messages de contact | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
   /* Optional custom styles */
 
     /* Hero Section */
@@ -58,7 +1276,7 @@
 
 
 
-  {% comment %} <!-- Messages -->
+  <!-- Messages -->
 {% if messages %}
 <div class="container mt-4">
   {% for message in messages %}
@@ -70,19 +1288,19 @@
     </div>
   {% endfor %}
 </div>
-{% endif %} {% endcomment %}
+{% endif %} 
 
 
 
 
 
   <!-- Add Message Button -->
-  {% comment %} <div class="section has-text-centered">
+  <div class="section has-text-centered">
     <button class="button is-primary js-modal-trigger" data-target="createModal">
       <span class="icon"><i class="fas fa-plus"></i></span>
       <span>Ajouter un message</span>
     </button>
-  </div> {% endcomment %}
+  </div> 
 
   <!-- Messages List -->
   <section class="section">
@@ -319,4 +1537,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
-{% endblock %}
+{% endblock %} {% endcomment %}

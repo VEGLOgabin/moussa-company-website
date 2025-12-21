@@ -209,3 +209,33 @@ class PaymentHistory(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} - {self.amount} {self.order.currency} - {self.status}"
+    
+    
+    
+    
+
+
+
+
+# -------------------- USER ACTION LOG --------------------
+class UserActionLog(models.Model):
+    LEVEL_CHOICES = [
+        ('INFO', 'Info'),
+        ('WARNING', 'Warning'),
+        ('ERROR', 'Error'),
+        ('DEBUG', 'Debug'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='action_logs')
+    action = models.TextField()  # Description of the action
+    level = models.CharField(max_length=10, choices=LEVEL_CHOICES, default='INFO')
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
+    user_agent = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        user_str = f"{self.user}" if self.user else "Anonymous"
+        return f"[{self.level}] {user_str} - {self.action[:50]}"

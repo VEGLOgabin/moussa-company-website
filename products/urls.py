@@ -72,7 +72,7 @@ urlpatterns = [
     # path('payment-success/', views.payment_success, name='payment_success'),
     # path('payment/notify/', views.payment_notify, name='payment_notify'),
     # path('payment/return/', views.payment_return, name='payment_return'),
-    path('payment/return/', views.payment_return, name='payment_return'),
+    # path('payment/return/', views.payment_return, name='payment_return'),
     path('payment-history/', views.payment_history, name='payment_history'),
     path('payment/delete-pending/<int:payment_id>/', views.delete_pending_payment, name='delete_pending_payment'),
 

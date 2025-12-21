@@ -9,7 +9,6 @@ from django.views.decorators.http import require_POST
 from .models import Product, Order, Testimonial, Partner, ContactMessage, BlogPost, PaymentHistory, OrderProduct, ProductRating
 from accounts.models import User
 import logging
-from .payment_utils import get_client
 from django.utils import timezone
 import os
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -18,10 +17,20 @@ from django.db.models import Q
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from .models import UserActionLog
 
+def log_user_action(request, action, level="INFO"):
+    user = request.user if request.user.is_authenticated else None
+    ip = request.META.get("HTTP_X_FORWARDED_FOR", request.META.get("REMOTE_ADDR"))
+    user_agent = request.META.get("HTTP_USER_AGENT", "Unknown")
 
-user_actions_logger = logging.getLogger('user_actions')
-
+    UserActionLog.objects.create(
+        user=user,
+        action=action,
+        level=level,
+        ip_address=ip,
+        user_agent=user_agent
+    )
 
 
 
@@ -111,9 +120,9 @@ def products(request):
 
 @require_POST
 def add_to_cart_ajax(request, product_id):
+    log_user_action(request, f"Add to cart called for product {product_id} ; Headers: {request.headers}")
+    log_user_action(request, f"")
     
-    user_actions_logger.info(f"Add to cart called for product {product_id}")
-    user_actions_logger.info(f"Headers: {request.headers}")
     # Remove the XMLHttpRequest check or make it optional
     try:
         cart = request.session.get('cart', {})
@@ -1007,18 +1016,7 @@ def remove_from_cart(request, product_id):
 
 
 
-def payment_return(request):
-    trans_id = request.GET.get('transaction_id')
-    client = get_client()
-    resp = client.TransactionVerfication_trx(trans_id)
 
-    status = resp.json.get("data", {}).get("status")
-    if status == "ACCEPTED":
-        messages.success(request, "Paiement réussi ! Merci pour votre commande.")
-    else:
-        messages.error(request, "Paiement échoué. Veuillez réessayer.")
-
-    return redirect('products')
 
 
 

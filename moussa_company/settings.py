@@ -139,35 +139,10 @@ MEDIA_ROOT=os.path.join(BASE_DIR,'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-from datetime import datetime
 
 
-#Logs register
 
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "sqlite_handler": {
-            "level": "INFO",
-            "class": "products.sqlite_logger.SQLiteHandler",  # Adjust to your app path
-            "formatter": "verbose",
-        },
-    },
-    "loggers": {
-        "user_actions": {
-            "handlers": ["sqlite_handler"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
+
 
 
 CORS_ORIGIN_ALLOW_ALL = True

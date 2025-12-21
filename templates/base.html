@@ -9,16 +9,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
   <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
+  <!-- Google Fonts for Brand Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
   {% block style %}
   {% endblock style %}
   
   <style>
-    /* Modern E-commerce Styling */
+    /* Brand Color Palette */
     :root {
-      --primary: #23a455;
-      --primary-dark: #1e8c4a;
-      --primary-light: #e8f5e9;
-      --accent: #ff6b35;
+      --primary-green: #307E33;
+      --primary-yellow: #FCC110;
+      --primary-orange: #EF7D12;
+      --primary-green-dark: #2a6d2d;
+      --primary-green-light: #e8f5e9;
       --dark: #2c3e50;
       --light: #f8f9fa;
       --gray: #6c757d;
@@ -26,14 +32,34 @@
       --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     }
 
+    /* Brand Typography */
     body {
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-family: 'Quicksand', 'Segoe UI', Roboto, sans-serif;
+      font-weight: 400;
       background-color: var(--light);
       color: var(--dark);
-      padding-top: 70px; /* Account for fixed navbar */
+      padding-top: 70px;
+      line-height: 1.6;
     }
 
-    /* Modern Navbar */
+    h1, h2, h3, h4, h5, h6,
+    .title, .subtitle,
+    .navbar-modern .navbar-brand .logo,
+    .footer-title {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+    }
+
+    .font-inter {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+    }
+
+    .font-quicksand {
+      font-family: 'Quicksand', sans-serif;
+    }
+
+    /* Modern Navbar - Updated with Brand Colors */
     .navbar-modern {
       background: white;
       box-shadow: var(--shadow);
@@ -43,9 +69,8 @@
     }
 
     .navbar-modern .navbar-brand .logo {
-      font-weight: 700;
       font-size: 1.5rem;
-      color: var(--primary);
+      color: var(--primary-green);
     }
 
     .navbar-modern .navbar-brand img {
@@ -54,6 +79,7 @@
     }
 
     .navbar-modern .navbar-item {
+      font-family: 'Quicksand', sans-serif;
       font-weight: 500;
       color: var(--dark);
       padding: 0.5rem 1rem;
@@ -63,28 +89,35 @@
     }
 
     .navbar-modern .navbar-item:hover {
-      background-color: var(--primary-light);
-      color: var(--primary);
+      background-color: var(--primary-green-light);
+      color: var(--primary-green);
     }
 
     .navbar-modern .navbar-item.is-active {
-      background-color: var(--primary);
+      background-color: var(--primary-green);
       color: white;
     }
 
     .navbar-modern .navbar-item.cart-link {
       position: relative;
-      background-color: var(--primary-light);
+      background-color: var(--primary-yellow);
+      color: var(--dark);
       border-radius: 50px;
       padding: 0.5rem 1rem;
       margin-left: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .navbar-modern .navbar-item.cart-link:hover {
+      background-color: var(--primary-orange);
+      color: white;
     }
 
     .navbar-modern .navbar-item.cart-link .cart-count {
       position: absolute;
       top: -8px;
       right: -8px;
-      background: var(--accent);
+      background: var(--primary-orange);
       color: white;
       border-radius: 50%;
       width: 20px;
@@ -112,6 +145,45 @@
       width: 3rem;
     }
 
+    .navbar-modern .navbar-burger span {
+      background-color: var(--primary-green);
+    }
+
+    /* Buttons with Brand Colors */
+    .button.is-primary {
+      background-color: var(--primary-green);
+      border-color: transparent;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+    }
+
+    .button.is-primary:hover {
+      background-color: var(--primary-green-dark);
+    }
+
+    .button.is-light {
+      background-color: var(--primary-green-light);
+      color: var(--primary-green);
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 500;
+    }
+
+    .button.is-light:hover {
+      background-color: #dcedc8;
+    }
+
+    .button.is-warning {
+      background-color: var(--primary-yellow);
+      color: var(--dark);
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+    }
+
+    .button.is-warning:hover {
+      background-color: #f0b90f;
+    }
+
     /* Search Bar */
     .search-container {
       max-width: 500px;
@@ -127,11 +199,12 @@
       padding-left: 2.5rem;
       border: 1px solid var(--border);
       transition: all 0.3s ease;
+      font-family: 'Quicksand', sans-serif;
     }
 
     .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(35, 164, 85, 0.1);
+      border-color: var(--primary-green);
+      box-shadow: 0 0 0 3px rgba(48, 126, 51, 0.1);
     }
 
     .search-icon {
@@ -143,9 +216,9 @@
       z-index: 5;
     }
 
-    /* Modern Footer */
+    /* Modern Footer with Brand Colors */
     .footer-modern {
-      background: var(--dark);
+      background: linear-gradient(135deg, var(--dark) 0%, #1a2530 100%);
       color: white;
       padding: 3rem 0 1.5rem;
     }
@@ -155,13 +228,12 @@
     }
 
     .footer-modern .footer-logo img {
-      height: 40px;
+      height: 50px;
     }
 
     .footer-modern .footer-title {
       color: white;
       font-size: 1.1rem;
-      font-weight: 600;
       margin-bottom: 1.25rem;
       position: relative;
       padding-bottom: 0.5rem;
@@ -174,7 +246,7 @@
       left: 0;
       width: 40px;
       height: 2px;
-      background: var(--primary);
+      background: var(--primary-yellow);
     }
 
     .footer-modern .footer-links {
@@ -190,10 +262,11 @@
       color: #b0b7c3;
       transition: all 0.2s ease;
       text-decoration: none;
+      font-family: 'Quicksand', sans-serif;
     }
 
     .footer-modern .footer-links a:hover {
-      color: white;
+      color: var(--primary-yellow);
       padding-left: 5px;
     }
 
@@ -216,34 +289,26 @@
     }
 
     .footer-modern .social-links a:hover {
-      background: var(--primary);
+      background: var(--primary-yellow);
+      color: var(--dark);
       transform: translateY(-3px);
     }
 
-    .footer-modern .newsletter-form {
-      margin-top: 1rem;
-    }
-
-    .footer-modern .newsletter-input {
-      border-radius: 4px 0 0 4px;
-      border: none;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-
-    .footer-modern .newsletter-input::placeholder {
+    .footer-modern .contact-info p {
       color: #b0b7c3;
+      font-family: 'Quicksand', sans-serif;
+      line-height: 1.6;
     }
 
-    .footer-modern .newsletter-button {
-      border-radius: 0 4px 4px 0;
-      background: var(--primary);
-      border: none;
-      font-weight: 500;
+    .footer-modern .contact-info a {
+      color: #b0b7c3;
+      text-decoration: none;
+      transition: color 0.2s ease;
+      font-family: 'Quicksand', sans-serif;
     }
 
-    .footer-modern .newsletter-button:hover {
-      background: var(--primary-dark);
+    .footer-modern .contact-info a:hover {
+      color: var(--primary-yellow);
     }
 
     .footer-modern .footer-bottom {
@@ -253,18 +318,54 @@
       text-align: center;
       color: #b0b7c3;
       font-size: 0.9rem;
+      font-family: 'Quicksand', sans-serif;
     }
 
-    .footer-modern .payment-methods {
+    /* Payment Methods */
+    .payment-methods {
       display: flex;
-      justify-content: center;
       gap: 0.75rem;
       margin-top: 1rem;
     }
 
-    .footer-modern .payment-methods i {
+    .payment-methods i {
       font-size: 1.5rem;
       color: #b0b7c3;
+      transition: color 0.3s ease;
+    }
+
+    .payment-methods i:hover {
+      color: var(--primary-yellow);
+    }
+
+    /* Brand Elements for Content Pages */
+    .brand-highlight {
+      color: var(--primary-green);
+      font-weight: 600;
+    }
+
+    .brand-accent {
+      color: var(--primary-yellow);
+    }
+
+    .brand-secondary {
+      color: var(--primary-orange);
+    }
+
+    .btn-brand {
+      background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+      color: white;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      padding: 0.75rem 2rem;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-brand:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 125, 18, 0.2);
     }
 
     /* Responsive Adjustments */
@@ -294,6 +395,10 @@
       .footer-modern .social-links {
         justify-content: center;
       }
+
+      .footer-modern .payment-methods {
+        justify-content: center;
+      }
     }
   </style>
 </head>
@@ -305,7 +410,7 @@
       <div class="navbar-brand">
         <a class="navbar-item logo" href="{% url 'home' %}">
           <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo">
-          <span class="ml-2">Ecofeed</span>
+          <span class="ml-2 font-inter">Ecofeed</span>
         </a>
 
         <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
@@ -326,6 +431,14 @@
           </a>
           <a class="navbar-item {% if request.resolver_match.url_name == 'blog' %}is-active{% endif %}" href="{% url 'blog' %}">
             Blog
+          </a>
+
+
+          <a class="navbar-item {% if request.resolver_match.url_name == 'about' %}is-active{% endif %}" href="{% url 'about' %}">
+            À propos
+          </a>
+          <a class="navbar-item {% if request.resolver_match.url_name == 'contact' %}is-active{% endif %}" href="{% url 'contact' %}">
+            Contact
           </a>
         </div>
 
@@ -408,30 +521,32 @@
   <footer class="footer footer-modern">
     <div class="container">
       <div class="columns is-multiline">
+        
         <!-- Company Info -->
-        <div class="column is-3">
+        <div class="column is-5">
           <div class="footer-logo">
             <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo">
           </div>
-          <p class="mb-4">
-            Produits sains, locaux et naturels pour une vie meilleure. Nous nous engageons à fournir des produits de qualité pour votre bien-être.
+          <p class="mb-4 font-quicksand">
+            Produits sains, locaux et naturels pour une vie meilleure. 
+            Nous nous engageons à fournir des produits de qualité pour votre bien-être.
           </p>
           <div class="social-links">
-            <a href="#">
+            <a href="#" aria-label="Facebook">
               <i class="fab fa-facebook-f"></i>
             </a>
-            <a href="#">
+            <a href="#" aria-label="Instagram">
               <i class="fab fa-instagram"></i>
             </a>
-            <a href="#">
+            <a href="#" aria-label="Twitter">
               <i class="fab fa-twitter"></i>
             </a>
           </div>
         </div>
 
         <!-- Quick Links -->
-        <div class="column is-2">
-          <h4 class="footer-title">Navigation</h4>
+        <div class="column is-4">
+          <h4 class="footer-title font-inter">Liens rapides</h4>
           <ul class="footer-links">
             <li><a href="{% url 'home' %}">Accueil</a></li>
             <li><a href="{% url 'products' %}">Boutique</a></li>
@@ -441,53 +556,24 @@
           </ul>
         </div>
 
-        <!-- Customer Service -->
-        <div class="column is-2">
-          <h4 class="footer-title">Aide</h4>
-          <ul class="footer-links">
-            <li><a href="#">Livraison</a></li>
-            <li><a href="#">Retours</a></li>
-            <li><a href="#">FAQ</a></li>
-            <li><a href="#">Contact</a></li>
-          </ul>
-        </div>
-
-        <!-- Legal -->
-        <div class="column is-2">
-          <h4 class="footer-title">Légal</h4>
-          <ul class="footer-links">
-            <li><a href="#">Mentions légales</a></li>
-            <li><a href="#">Confidentialité</a></li>
-            <li><a href="#">CGV</a></li>
-            <li><a href="#">Cookies</a></li>
-          </ul>
-        </div>
-
-        <!-- Newsletter -->
+        <!-- Contacts Section -->
         <div class="column is-3">
-          <h4 class="footer-title">Newsletter</h4>
-          <p>Recevez nos offres exclusives et actualités.</p>
-          <form class="newsletter-form">
-            <div class="field has-addons">
-              <div class="control is-expanded">
-                <input class="input newsletter-input" type="email" placeholder="Votre email">
-              </div>
-              <div class="control">
-                <button class="button newsletter-button">
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-          
-          <div class="mt-4">
-            <h5 class="is-size-6 has-text-white mb-2">Paiements sécurisés</h5>
-            <div class="payment-methods">
-              <i class="fab fa-cc-visa"></i>
-              <i class="fab fa-cc-mastercard"></i>
-              <i class="fab fa-cc-paypal"></i>
-              <i class="fas fa-mobile-alt"></i>
-            </div>
+          <h4 class="footer-title font-inter">Contacts</h4>
+          <div class="contact-info">
+            <p>
+              Abomey Calavi,<br>
+              Bénin
+            </p>
+            <p class="mt-3">
+              <a href="mailto:contact@ecofeed.com">
+                contact@ecofeed.com
+              </a>
+            </p>
+            <p>
+              <a href="tel:+2290148233119">
+                +229 01 48 23 31 19
+              </a>
+            </p>
           </div>
         </div>
       </div>
@@ -497,12 +583,7 @@
         <div class="columns is-vcentered">
           <div class="column">
             <p>
-              <strong>Ecofeed</strong> © 2025 — Tous droits réservés.
-            </p>
-          </div>
-          <div class="column">
-            <p>
-              Email : <a href="mailto:contact@ecofeed.com" class="has-text-white">contact@ecofeed.com</a>
+              © 2025 Ecofeed. Tous droits réservés.
             </p>
           </div>
         </div>
@@ -527,797 +608,3 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-{% comment %} {% load static %}
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>{% block title %}Ecofeed - Produits Naturels{% endblock title %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
-  {% block style %}
-  {% endblock style %}
-  
-  <style>
-    /* Modern E-commerce Styling */
-    :root {
-      --primary: #23a455;
-      --primary-dark: #1e8c4a;
-      --primary-light: #e8f5e9;
-      --accent: #ff6b35;
-      --dark: #2c3e50;
-      --light: #f8f9fa;
-      --gray: #6c757d;
-      --border: #e9ecef;
-      --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    }
-
-    body {
-      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: var(--light);
-      color: var(--dark);
-      padding-top: 80px; /* Account for fixed navbar */
-    }
-
-    /* Modern Navbar */
-    .navbar-modern {
-      background: white;
-      box-shadow: var(--shadow);
-      border-bottom: none;
-      padding: 0.75rem 0;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-modern .navbar-brand .logo {
-      font-weight: 700;
-      font-size: 1.5rem;
-      color: var(--primary);
-    }
-
-    .navbar-modern .navbar-brand img {
-      height: 42px;
-      transition: all 0.3s ease;
-    }
-
-    .navbar-modern .navbar-item {
-      font-weight: 500;
-      color: var(--dark);
-      padding: 0.5rem 1rem;
-      margin: 0 0.25rem;
-      border-radius: 6px;
-      transition: all 0.2s ease;
-    }
-
-    .navbar-modern .navbar-item:hover {
-      background-color: var(--primary-light);
-      color: var(--primary);
-    }
-
-    .navbar-modern .navbar-item.is-active {
-      background-color: var(--primary);
-      color: white;
-    }
-
-    .navbar-modern .navbar-item.cart-link {
-      position: relative;
-      background-color: var(--primary-light);
-      border-radius: 50px;
-      padding: 0.5rem 1rem;
-      margin-left: 0.5rem;
-    }
-
-    .navbar-modern .navbar-item.cart-link .cart-count {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: var(--accent);
-      color: white;
-      border-radius: 50%;
-      width: 20px;
-      height: 20px;
-      font-size: 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-    }
-
-    .navbar-modern .navbar-dropdown {
-      border-radius: 8px;
-      border: none;
-      box-shadow: var(--shadow);
-      padding: 0.5rem 0;
-    }
-
-    .navbar-modern .navbar-dropdown .navbar-item {
-      padding: 0.75rem 1.5rem;
-    }
-
-    .navbar-modern .navbar-burger {
-      height: 3rem;
-      width: 3rem;
-    }
-
-    /* Search Bar */
-    .search-container {
-      max-width: 500px;
-      margin: 0 auto;
-    }
-
-    .search-box {
-      position: relative;
-    }
-
-    .search-input {
-      border-radius: 50px;
-      padding-left: 2.5rem;
-      border: 1px solid var(--border);
-      transition: all 0.3s ease;
-    }
-
-    .search-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(35, 164, 85, 0.1);
-    }
-
-    .search-icon {
-      position: absolute;
-      left: 1rem;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--gray);
-      z-index: 5;
-    }
-
-    /* Modern Footer */
-    .footer-modern {
-      background: var(--dark);
-      color: white;
-      padding: 3rem 0 1.5rem;
-    }
-
-    .footer-modern .footer-logo {
-      margin-bottom: 1rem;
-    }
-
-    .footer-modern .footer-logo img {
-      height: 40px;
-    }
-
-    .footer-modern .footer-title {
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 1.25rem;
-      position: relative;
-      padding-bottom: 0.5rem;
-    }
-
-    .footer-modern .footer-title:after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 40px;
-      height: 2px;
-      background: var(--primary);
-    }
-
-    .footer-modern .footer-links {
-      list-style: none;
-      padding: 0;
-    }
-
-    .footer-modern .footer-links li {
-      margin-bottom: 0.75rem;
-    }
-
-    .footer-modern .footer-links a {
-      color: #b0b7c3;
-      transition: all 0.2s ease;
-      text-decoration: none;
-    }
-
-    .footer-modern .footer-links a:hover {
-      color: white;
-      padding-left: 5px;
-    }
-
-    .footer-modern .social-links {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .footer-modern .social-links a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 50%;
-      color: white;
-      transition: all 0.3s ease;
-    }
-
-    .footer-modern .social-links a:hover {
-      background: var(--primary);
-      transform: translateY(-3px);
-    }
-
-    .footer-modern .newsletter-form {
-      margin-top: 1rem;
-    }
-
-    .footer-modern .newsletter-input {
-      border-radius: 4px 0 0 4px;
-      border: none;
-      background: rgba(255, 255, 255, 0.1);
-      color: white;
-    }
-
-    .footer-modern .newsletter-input::placeholder {
-      color: #b0b7c3;
-    }
-
-    .footer-modern .newsletter-button {
-      border-radius: 0 4px 4px 0;
-      background: var(--primary);
-      border: none;
-      font-weight: 500;
-    }
-
-    .footer-modern .newsletter-button:hover {
-      background: var(--primary-dark);
-    }
-
-    .footer-modern .footer-bottom {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      text-align: center;
-      color: #b0b7c3;
-      font-size: 0.9rem;
-    }
-
-    .footer-modern .payment-methods {
-      display: flex;
-      justify-content: center;
-      gap: 0.75rem;
-      margin-top: 1rem;
-    }
-
-    .footer-modern .payment-methods i {
-      font-size: 1.5rem;
-      color: #b0b7c3;
-    }
-
-    /* Responsive Adjustments */
-    @media (max-width: 1023px) {
-      .navbar-modern .navbar-menu {
-        background: white;
-        box-shadow: var(--shadow);
-        border-radius: 0 0 8px 8px;
-        padding: 1rem;
-      }
-
-      .search-container {
-        margin: 1rem 0;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .footer-modern .columns {
-        text-align: center;
-      }
-
-      .footer-modern .footer-title:after {
-        left: 50%;
-        transform: translateX(-50%);
-      }
-
-      .footer-modern .social-links {
-        justify-content: center;
-      }
-    }
-  </style>
-</head>
-<body>
-
-  <!-- Modern Navbar -->
-  <nav class="navbar navbar-modern is-fixed-top" role="navigation" aria-label="main navigation">
-    <div class="container">
-      <div class="navbar-brand">
-        <a class="navbar-item logo" href="{% url 'home' %}">
-          <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo">
-          <span class="ml-2">Ecofeed</span>
-        </a>
-
-        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-
-      <div id="mainNavbar" class="navbar-menu">
-        <div class="navbar-start">
-          <a class="navbar-item {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}" href="{% url 'home' %}">
-            Accueil
-          </a>
-          <a class="navbar-item {% if request.resolver_match.url_name == 'products' %}is-active{% endif %}" href="{% url 'products' %}">
-            Produits
-          </a>
-          <a class="navbar-item {% if request.resolver_match.url_name == 'blog' %}is-active{% endif %}" href="{% url 'blog' %}">
-            Actualités
-          </a>
-          <a class="navbar-item {% if request.resolver_match.url_name == 'testimonials' %}is-active{% endif %}" href="{% url 'testimonials' %}">
-            Témoignages
-          </a>
-          <a class="navbar-item {% if request.resolver_match.url_name == 'partners' %}is-active{% endif %}" href="{% url 'partners' %}">
-            Partenaires
-          </a>
-        </div>
-
-        <div class="navbar-center">
-          <div class="search-container">
-            <div class="search-box">
-              <span class="search-icon">
-                <i class="fas fa-search"></i>
-              </span>
-              <input class="input search-input" type="text" placeholder="Rechercher des produits...">
-            </div>
-          </div>
-        </div>
-
-        <div class="navbar-end">
-          <a class="navbar-item cart-link" href="{% url 'cart' %}">
-            <span class="icon">
-              <i class="fas fa-shopping-cart"></i>
-            </span>
-            <span>Panier</span>
-            <span class="cart-count">({{ request.session.cart|length|default:"0" }})</span>
-          </a>
-          
-          {% if user.is_authenticated %}
-            <div class="navbar-item has-dropdown is-hoverable">
-              <a class="navbar-link">
-                <span class="icon">
-                  <i class="fas fa-user-circle"></i>
-                </span>
-                <span>Mon compte</span>
-              </a>
-              <div class="navbar-dropdown is-right">
-                <a class="navbar-item" href="{% url 'profile' %}">
-                  <span class="icon">
-                    <i class="fas fa-user"></i>
-                  </span>
-                  <span>Profil</span>
-                </a>
-                <a class="navbar-item" href="{% url 'payment_history' %}">
-                  <span class="icon">
-                    <i class="fas fa-receipt"></i>
-                  </span>
-                  <span>Mes paiements</span>
-                </a>
-                <hr class="navbar-divider">
-                <a class="navbar-item has-text-danger" href="{% url 'logout' %}">
-                  <span class="icon">
-                    <i class="fas fa-sign-out-alt"></i>
-                  </span>
-                  <span>Déconnexion</span>
-                </a>
-              </div>
-            </div>
-          {% else %}
-            <div class="navbar-item">
-              <div class="buttons">
-                <a class="button is-light" href="{% url 'login' %}">
-                  Connexion
-                </a>
-                <a class="button is-primary" href="{% url 'register' %}">
-                  <strong>Créer un compte</strong>
-                </a>
-              </div>
-            </div>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  </nav>
-
-  {% block content %}
-  {% endblock content %}
-
-  {% block scripts %}
-  {% endblock scripts %}
-
-  <!-- Modern Footer -->
-  <footer class="footer footer-modern">
-    <div class="container">
-      <div class="columns is-multiline">
-        <!-- Company Info -->
-        <div class="column is-3">
-          <div class="footer-logo">
-            <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo">
-          </div>
-          <p class="mb-4">
-            Produits sains, locaux et naturels pour une vie meilleure. Nous nous engageons à fournir des produits de qualité pour votre bien-être.
-          </p>
-          <div class="social-links">
-            <a href="#">
-              <i class="fab fa-facebook-f"></i>
-            </a>
-            <a href="#">
-              <i class="fab fa-instagram"></i>
-            </a>
-            <a href="#">
-              <i class="fab fa-twitter"></i>
-            </a>
-            <a href="#">
-              <i class="fab fa-linkedin-in"></i>
-            </a>
-          </div>
-        </div>
-
-        <!-- Quick Links -->
-        <div class="column is-2">
-          <h4 class="footer-title">Navigation</h4>
-          <ul class="footer-links">
-            <li><a href="{% url 'home' %}">Accueil</a></li>
-            <li><a href="{% url 'products' %}">Produits</a></li>
-            <li><a href="{% url 'blog' %}">Actualités</a></li>
-            <li><a href="{% url 'testimonials' %}">Témoignages</a></li>
-            <li><a href="{% url 'partners' %}">Partenaires</a></li>
-          </ul>
-        </div>
-
-        <!-- Customer Service -->
-        <div class="column is-2">
-          <h4 class="footer-title">Service Client</h4>
-          <ul class="footer-links">
-            <li><a href="{% url 'about' %}">À propos</a></li>
-            <li><a href="{% url 'contact' %}">Contact</a></li>
-            <li><a href="#">Livraison</a></li>
-            <li><a href="#">Retours</a></li>
-            <li><a href="#">FAQ</a></li>
-          </ul>
-        </div>
-
-        <!-- Legal -->
-        <div class="column is-2">
-          <h4 class="footer-title">Informations</h4>
-          <ul class="footer-links">
-            <li><a href="#">Conditions générales</a></li>
-            <li><a href="#">Politique de confidentialité</a></li>
-            <li><a href="#">Mentions légales</a></li>
-            <li><a href="#">CGV</a></li>
-            <li><a href="#">Cookies</a></li>
-          </ul>
-        </div>
-
-        <!-- Newsletter -->
-        <div class="column is-3">
-          <h4 class="footer-title">Newsletter</h4>
-          <p>Recevez nos dernières offres et actualités en vous abonnant à notre newsletter.</p>
-          <form class="newsletter-form">
-            <div class="field has-addons">
-              <div class="control is-expanded">
-                <input class="input newsletter-input" type="email" placeholder="Votre email">
-              </div>
-              <div class="control">
-                <button class="button newsletter-button">
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </div>
-            </div>
-          </form>
-          
-          <div class="mt-4">
-            <h5 class="is-size-6 has-text-white mb-2">Moyens de paiement</h5>
-            <div class="payment-methods">
-              <i class="fab fa-cc-visa"></i>
-              <i class="fab fa-cc-mastercard"></i>
-              <i class="fab fa-cc-paypal"></i>
-              <i class="fas fa-mobile-alt"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Bar -->
-      <div class="footer-bottom">
-        <div class="columns is-vcentered">
-          <div class="column">
-            <p>
-              <strong>Ecofeed</strong> © 2025 — Moussa DARI | Tous droits réservés.
-            </p>
-          </div>
-          <div class="column">
-            <p>
-              Email : <a href="mailto:contact@ecofeed.com" class="has-text-white">contact@ecofeed.com</a>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Navbar toggle -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const burger = document.querySelector('.navbar-burger');
-      const menu = document.getElementById(burger.dataset.target);
-      burger.addEventListener('click', () => {
-        burger.classList.toggle('is-active');
-        menu.classList.toggle('is-active');
-      });
-    });
-  </script>
-
-</body>
-</html> {% endcomment %}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{% comment %} {% load static %}
-
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>{% block title %}ecofeed{% endblock title %}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-  <script defer src="https://use.fontawesome.com/releases/v5.15.4/js/all.js"></script>
-  {% block style %}
-  {% endblock style %}
-</head>
-<body>
-
-  <!-- Navbar -->
-<nav class="navbar is-fixed-top is-spaced" role="navigation" aria-label="main navigation">
-<div class="navbar-brand">
-    <a class="navbar-item logo" href="{% url 'home' %}">
-      <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo" style="height:40px;">
-    </a>
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-
-  <div id="mainNavbar" class="navbar-menu">
-    <div class="navbar-start">
-      <a class="navbar-item {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}" href="{% url 'home' %}">Accueil</a>
-      <a class="navbar-item {% if request.resolver_match.url_name == 'products' %}is-active{% endif %}" href="{% url 'products' %}">Produits</a>
-      <a class="navbar-item {% if request.resolver_match.url_name == 'blog' %}is-active{% endif %}" href="{% url 'blog' %}">Actualités</a>
-      <a class="navbar-item {% if request.resolver_match.url_name == 'testimonials' %}is-active{% endif %}" href="{% url 'testimonials' %}">Témoignages</a>
-      <a class="navbar-item {% if request.resolver_match.url_name == 'partners' %}is-active{% endif %}" href="{% url 'partners' %}">Partenaires</a>
-      <a class="navbar-item {% if request.resolver_match.url_name == 'about' %}is-active{% endif %}" href="{% url 'about' %}">À propos</a>
-      <a class="navbar-item {% if request.resolver_match.url_name == 'contact' %}is-active{% endif %}" href="{% url 'contact' %}">Contact</a>
-    </div>
-
-    <div class="navbar-end">
-      <a class="navbar-item cart-link" href="{% url 'cart' %}">
-        <span class="icon"><i class="fas fa-shopping-cart"></i></span>
-        <span>({{ request.session.cart|length|default:"0" }})</span>
-      </a>
-      {% if user.is_authenticated %}
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link has-text-success">Mon compte</a>
-          <div class="navbar-dropdown is-right">
-            <a class="navbar-item" href="{% url 'profile' %}"><i class="fas fa-user mr-2"></i> Profil</a>
-            <a class="navbar-item" href="{% url 'payment_history' %}"><i class="fas fa-receipt mr-2"></i> Mes paiements</a>
-            <hr class="navbar-divider">
-            <a class="navbar-item has-text-danger" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt mr-2"></i> Déconnexion</a>
-          </div>
-        </div>
-      {% else %}
-        <a class="navbar-item" href="{% url 'login' %}">Connexion</a>
-        <a class="navbar-item" href="{% url 'register' %}">Créer un compte</a>
-      {% endif %}
-    </div>
-  </div>
-</nav>
-
-  {% block content %}
-  {% endblock content %}
-
-  {% block scripts %}
-  {% endblock scripts %}
-
-  <!-- Footer -->
-<footer class="footer has-background-dark has-text-light">
-  <div class="container">
-    <div class="columns is-multiline">
-      
-      <!-- About -->
-      <div class="column is-3">
-        <a class="navbar-item logo" href="{% url 'home' %}">
-      <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo" style="height:40px;">
-      </a>
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="mainNavbar">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-        <p class="is-size-7">
-          Produits sains, locaux et naturels pour une vie meilleure.
-        </p>
-      </div>
-
-      <!-- Quick Links -->
-      <div class="column is-3">
-        <h4 class="title is-6 has-text-white">Navigation</h4>
-        <ul>
-          <li><a href="{% url 'products' %}" class="has-text-light">Produits</a></li>
-          <li><a href="{% url 'blog' %}" class="has-text-light">Actualités</a></li>
-          <li><a class="has-text-light" href="{% url 'partners' %}">Partenaires</a></li>
-          <li><a href="{% url 'about' %}" class="has-text-light">À propos</a></li>
-          <li><a href="{% url 'contact' %}" class="has-text-light">Contact</a></li>
-          
-        </ul>
-      </div>
-
-      <!-- Newsletter -->
-      <div class="column is-3">
-        <h4 class="title is-6 has-text-white">Newsletter</h4>
-        <p class="is-size-7">Recevez nos dernières offres et actualités.</p>
-        <form>
-          <div class="field has-addons">
-            <div class="control is-expanded">
-              <input class="input" type="email" placeholder="Votre email">
-            </div>
-            <div class="control">
-              <button class="button is-success">S'abonner</button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- Social Media -->
-      <div class="column is-3">
-        <h4 class="title is-6 has-text-white">Suivez-nous</h4>
-        <div class="social-icons">
-          <a href="#" class="icon has-text-light"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="icon has-text-light"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="icon has-text-light"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="icon has-text-light"><i class="fab fa-linkedin-in"></i></a>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Bottom Bar -->
-    <div class="has-text-centered mt-5">
-      <p class="is-size-7">
-        <strong>Ecofeed</strong> © 2025 — Moussa DARI | Tous droits réservés.
-        <br>Email : <a href="mailto:contact@ecofeed.com" class="has-text-light">contact@ecofeed.com</a>
-      </p>
-    </div>
-  </div>
-</footer>
-
-<style>
-
-      /* Navbar Styling */
-  .navbar {
-    background-color: #fff;
-    border-bottom: 1px solid #f0f0f0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  }
-  .navbar .logo {
-    font-weight: bold;
-    font-size: 1.2rem;
-  }
-  .navbar-item.is-active {
-    border-bottom: 2px solid #23a455;
-    color: #23a455 !important;
-  }
-  .navbar-item:hover {
-    background-color: transparent !important;
-    color: #23a455 !important;
-  }
-  .cart-link {
-    font-weight: bold;
-    color: #23a455 !important;
-  }
-  .navbar-dropdown a.navbar-item:hover {
-    background-color: #f9f9f9;
-    color: #23a455 !important;
-  }
-
-
-
-
-
-  .footer ul li {
-    margin-bottom: 0.5rem;
-  }
-  .footer .social-icons a {
-    margin-right: 10px;
-    font-size: 1.2rem;
-  }
-  .footer input.input {
-    border-radius: 4px 0 0 4px;
-  }
-  .footer button.button {
-    border-radius: 0 4px 4px 0;
-  }
-</style>
-
-
-  <!-- Navbar toggle -->
-  <script>
-  // Mobile navbar toggle
-  document.addEventListener('DOMContentLoaded', () => {
-    const burger = document.querySelector('.navbar-burger');
-    const menu = document.getElementById(burger.dataset.target);
-    burger.addEventListener('click', () => {
-      burger.classList.toggle('is-active');
-      menu.classList.toggle('is-active');
-    });
-  });
-
-  </script>
-
-</body>
-</html> {% endcomment %}
