@@ -81,14 +81,50 @@ class ProductRating(models.Model):
 #     currency = models.CharField(max_length=100, default="FCFA")
 #     ordered_at = models.DateTimeField(auto_now_add=True)
 #     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+
+
+
+## PREVIOUS VERSION
+# class Order(models.Model):
+#     STATUS_CHOICES = [
+#         ('pending', 'En attente'),
+#         ('paid', 'Payé'),
+#         ('processing', 'En cours'),
+#         ('shipped', 'Expédié'),
+#         ('delivered', 'Livré'),
+#         ('cancelled', 'Annulé'),
+#     ]
+
+#     ordered_by = models.ForeignKey(User, on_delete=models.CASCADE)
+#     products = models.ManyToManyField(Product, through='OrderProduct')
+#     total_price = models.DecimalField(max_digits=10, decimal_places=2)
+#     currency = models.CharField(max_length=100, default="FCFA")
+#     ordered_at = models.DateTimeField(auto_now_add=True)
+#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    
+#     # Our internal transaction ID for reference
+#     internal_transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    
+    
+    
+#     # Kkiapay's transaction ID (will be null until payment is successful)
+#     kkiapay_transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+
+#     def __str__(self):
+#         return f"Order {self.id} by {self.ordered_by}"
+
+
+
+
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'En attente'),
-        ('paid', 'Payé'),
-        ('processing', 'En cours'),
-        ('shipped', 'Expédié'),
-        ('delivered', 'Livré'),
-        ('cancelled', 'Annulé'),
+        ('pending', 'En attente'),       # Order created, not paid
+        ('processing', 'En cours'),      # Payment verification in progress
+        ('paid', 'Payé'),                # Payment successful
+        ('shipped', 'Expédié'),          # Order shipped
+        ('delivered', 'Livré'),          # Order delivered
+        ('cancelled', 'Annulé'),         # Order cancelled
     ]
 
     ordered_by = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -97,15 +133,15 @@ class Order(models.Model):
     currency = models.CharField(max_length=100, default="FCFA")
     ordered_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    
-    
-    # Our internal transaction ID for reference
-    internal_transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
-    
-    
-    
-    # Kkiapay's transaction ID (will be null until payment is successful)
-    kkiapay_transaction_id = models.CharField(max_length=100, unique=True, blank=True, null=True)
+
+    # Our internal transaction ID for reference (never null)
+    internal_transaction_id = models.CharField(
+        max_length=100,
+        unique=True,
+        blank=False,
+        null=False,
+        db_index=True
+    )
 
     def __str__(self):
         return f"Order {self.id} by {self.ordered_by}"
@@ -188,28 +224,84 @@ class BlogPost(models.Model):
 #     def __str__(self):
 #         return f"{self.user.username} - {self.amount} {self.order.currency} - {self.status}"
 
+
+## LAST VERSION
+# class PaymentHistory(models.Model):
+#     PAYMENT_STATUS_CHOICES = [
+#         ('success', 'Succès'),
+#         ('failed', 'Échoué'),
+#         ('pending', 'En attente'),
+#     ]
+
+#     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+#     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+#     amount = models.DecimalField(max_digits=10, decimal_places=2)
+#     payment_date = models.DateTimeField(auto_now_add=True)
+    
+#     # Store both transaction IDs
+#     internal_transaction_id = models.CharField(max_length=100)
+#     kkiapay_transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    
+#     payment_method = models.CharField(max_length=100, default="KKIAPAY")
+#     status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+
+#     def __str__(self):
+#         return f"{self.user.first_name} - {self.amount} {self.order.currency} - {self.status}"
+   
+   
 class PaymentHistory(models.Model):
     PAYMENT_STATUS_CHOICES = [
+        ('pending', 'En attente'),
+        ('processing', 'En cours de vérification'),
         ('success', 'Succès'),
         ('failed', 'Échoué'),
-        ('pending', 'En attente'),
     ]
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payments')
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='payments'
+    )
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        related_name='payments'
+    )
+
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     payment_date = models.DateTimeField(auto_now_add=True)
-    
-    # Store both transaction IDs
-    internal_transaction_id = models.CharField(max_length=100)
-    kkiapay_transaction_id = models.CharField(max_length=100, blank=True, null=True)
-    
-    payment_method = models.CharField(max_length=100, default="KKIAPAY")
-    status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
+
+    # 🔐 CRITICAL IDENTIFIERS
+    internal_transaction_id = models.CharField(
+        max_length=100,
+        unique=True,
+        db_index=True
+    )
+    kkiapay_transaction_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        unique=True
+    )
+
+    payment_method = models.CharField(
+        max_length=100,
+        default="KKIAPAY"
+    )
+
+    status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='pending'
+    )
 
     def __str__(self):
-        return f"{self.user.first_name} - {self.amount} {self.order.currency} - {self.status}"
-    
+        return (
+            f"{self.user.first_name} | "
+            f"{self.amount} {self.order.currency} | "
+            f"{self.status}"
+        )
+ 
     
     
     

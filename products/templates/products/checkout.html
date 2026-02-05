@@ -710,7 +710,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const publicKey = "{{ public_key }}";
   const phone = "{{ user.phone_number|default:'22900000000' }}";
   //const callbackUrl = "{% url 'kkiapay_callback' %}";
-  const callbackUrl  = "http://127.0.0.1:8000/payment/callback/"
+  const callbackUrl  = callbackUrl
 
   function openKkiapay() {
     // Use the new callback URL that handles both success and failure
