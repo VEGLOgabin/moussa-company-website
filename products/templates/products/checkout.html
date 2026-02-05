@@ -683,10 +683,99 @@
 {% endblock %}
 
 
-
-
-
 {% block scripts %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  const payButton = document.getElementById('pay-button');
+  
+  // Payment method selection
+  const paymentMethods = document.querySelectorAll('.payment-method');
+  paymentMethods.forEach(method => {
+    if (!method.style.opacity) { 
+      method.addEventListener('click', function() {
+        paymentMethods.forEach(m => m.classList.remove('selected'));
+        this.classList.add('selected');
+      });
+    }
+  });
+
+  // KKIAPAY config
+  const amount = parseInt("{{ total }}");
+  const transactionId = "{{ order.internal_transaction_id }}";
+  const publicKey = "{{ public_key }}";
+  const phone = "{{ user.phone_number|default:'22900000000' }}";
+  const callbackUrl = "{{ callbackUrl }}";
+
+  function openKkiapay() {
+    //openKkiapayWidget({
+        //amount: amount,
+        //position: "center",
+        //callback: callbackUrl,
+        //data: "Commande #{{ order.pk }}", 
+        //data: "{{ order.internal_transaction_id }}",  // Pass internal ID here
+        //theme: "#9c27b0",
+        //sandbox: true, // set to false in production
+        //key: publicKey,
+        //phone: phone,
+        //name: "{{ user.first_name|default:'Client' }}",
+        //email: "{{ user.email|default:'client@example.com' }}",
+        //transactionId: transactionId
+    //}); 
+
+  openKkiapayWidget({
+      amount: amount,
+      position: "center",
+      callback: callbackUrl,
+      //data: "Commande #{{ order.pk }}", 
+      data: "{{ order.internal_transaction_id }}",  // Pass internal ID here
+      theme: "#9c27b0",
+      sandbox: true,
+      key: publicKey,
+      phone: phone,
+      name: "{{ user.first_name|default:'Client' }}",
+      email: "{{ user.email|default:'client@example.com' }}",
+  });
+
+  }
+
+  // Pay button handler
+  if (payButton) {
+    payButton.addEventListener('click', function() {
+      const originalText = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation du paiement...';
+      this.disabled = true;
+
+      setTimeout(() => {
+        openKkiapay();
+
+        setTimeout(() => {
+          this.innerHTML = originalText;
+          this.disabled = false;
+        }, 5000);
+      }, 1000);
+    });
+  }
+
+  // --- Animation for checkout elements ---
+  const animateElements = document.querySelectorAll('.order-item, .payment-method, .info-item');
+  animateElements.forEach((element, index) => {
+    element.style.opacity = '0';
+    element.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+      element.style.transition = 'all 0.5s ease';
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, index * 100);
+  });
+});
+</script>
+
+{% endblock %} 
+
+
+{% comment %} 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   const payButton = document.getElementById('pay-button');
@@ -764,85 +853,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 });
 </script>
-{% endblock %}
+
+{% endcomment %}
 
 
-
-{% comment %} {% block scripts %}
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const payButton = document.getElementById('pay-button');
-  const paymentMethods = document.querySelectorAll('.payment-method');
-  
-  // Payment method selection
-  paymentMethods.forEach(method => {
-    if (!method.style.opacity) { // Only enable clickable methods
-      method.addEventListener('click', function() {
-        // Remove selected class from all methods
-        paymentMethods.forEach(m => m.classList.remove('selected'));
-        // Add selected class to clicked method
-        this.classList.add('selected');
-      });
-    }
-  });
-
-  // KkiaPay configuration
-  const amount = {{ total }};
-  const transactionId = "ORDER-{{ order.pk }}-{{ timestamp }}";
-  const publicKey = "{{ public_key }}";
-  const phone = "{{ user.phone_number|default:'22900000000' }}";
-
-  function openKkiapay() {
-    openKkiapayWidget({
-        amount: amount,
-        position: "center",
-        callback: "{% url 'payment_success' %}",
-        data: "Commande #{{ order.pk }}",
-        theme: "#9c27b0",
-        sandbox: true, // Set to false in production
-        key: publicKey,
-        phone: phone,
-        name: "{{ user.first_name|default:'Client' }}",
-        email: "{{ user.email|default:'client@example.com' }}",
-        transactionId: transactionId
-    });
-  }
-
-  // Pay button handler
-  if (payButton) {
-    payButton.addEventListener('click', function() {
-      // Show loading state
-      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation du paiement...';
-      this.disabled = true;
-      
-      // Simulate processing delay
-      setTimeout(() => {
-        openKkiapay();
-        
-        // Reset button after a delay (in case payment widget doesn't open)
-        setTimeout(() => {
-          this.innerHTML = '<i class="fas fa-lock"></i> Payer {{ total }} FCFA';
-          this.disabled = false;
-        }, 3000);
-      }, 1000);
-    });
-  }
-
-  // Add animation to elements
-  const animateElements = document.querySelectorAll('.order-item, .payment-method, .info-item');
-  animateElements.forEach((element, index) => {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-      element.style.transition = 'all 0.5s ease';
-      element.style.opacity = '1';
-      element.style.transform = 'translateY(0)';
-    }, index * 100);
-  });
-});
-</script>
-{% endblock %} {% endcomment %}
 
 
 

@@ -1183,111 +1183,48 @@ def checkout(request):
 
 
 
-
-
-
-
-# @csrf_exempt
-# def kkiapay_callback(request):
-#     """
-#     Handle KKIAPAY payment callback - alternative approach
-#     """
-#     if request.method == 'GET':
-#         kkiapay_transaction_id = request.GET.get('transaction_id')
-        
-#         if kkiapay_transaction_id:
-#             # Since we can't get our internal ID from Kkiapay callback,
-#             # we'll need to find the most recent pending order for this user
-#             try:
-#                 if request.user.is_authenticated:
-#                     # Find the most recent pending order for this user
-#                     order = Order.objects.filter(
-#                         ordered_by=request.user,
-#                         status='pending',
-#                         kkiapay_transaction_id__isnull=True
-#                     ).order_by('-ordered_at').first()
-                    
-#                     if order:
-#                         return handle_payment_success(request, kkiapay_transaction_id, order.internal_transaction_id)
-#                     else:
-#                         messages.error(request, "Aucune commande en attente trouvée.")
-#                 else:
-#                     messages.error(request, "Utilisateur non authentifié.")
-#             except Exception as e:
-#                 print(f"Error finding pending order: {e}")
-#                 messages.error(request, "Erreur lors de la recherche de la commande.")
-    
-#     return redirect('products')
-
-
-
 @csrf_exempt
 def kkiapay_callback(request):
     """
-    Handle KKIAPAY callback securely.
-    Always verify transaction server-side.
+    Handle KKIAPAY callback by verifying transaction server-side
     """
     kkiapay_transaction_id = request.GET.get('transaction_id')
-    internal_transaction_id = request.GET.get('transactionId')  # Passed from frontend
     
-    print(kkiapay_transaction_id)
-    print(internal_transaction_id)
+    print("Transaction ID from callback:", kkiapay_transaction_id)
 
-    if not kkiapay_transaction_id or not internal_transaction_id:
-        messages.error(request, "Callback invalide.")
+    if not kkiapay_transaction_id:
+        messages.error(request, "Callback invalide : aucun ID de transaction.")
         return redirect('products')
 
-    # Process payment atomically
+    # Verify transaction directly with KKIAPAY
+    kkiapay = Kkiapay(
+        settings.KKIAPAY_PUBLIC_KEY,
+        settings.KKIAPAY_PRIVATE_KEY,
+        settings.KKIAPAY_SECRET_KEY,
+        sandbox=True
+    )
+    
+    try:
+        transaction_info = kkiapay.verify_transaction(kkiapay_transaction_id)
+        print("Transaction info from KKIAPAY:", transaction_info)
+    except Exception as e:
+        print("Error verifying transaction:", e)
+        messages.error(request, "Impossible de vérifier la transaction.")
+        return redirect('products')
+
+    # Extract internal ID from 'state' instead of 'data'
+    internal_transaction_id = transaction_info.get('state')
+    print("Internal transaction ID from KKIAPAY:", internal_transaction_id)
+
+    if not internal_transaction_id:
+        messages.error(request, "Impossible de récupérer l'ID interne de la commande.")
+        return redirect('products')
+
+    # Now process the payment
     return handle_payment_success(request, kkiapay_transaction_id, internal_transaction_id)
 
 
 
-
-# def handle_payment_success(request, kkiapay_transaction_id, internal_transaction_id=None):
-#     """
-#     Handle successful payment - store both transaction IDs
-#     """
-#     try:
-#         # Find the order by our internal transaction ID
-#         if internal_transaction_id:
-#             order = Order.objects.get(internal_transaction_id=internal_transaction_id)
-#         else:
-#             # Fallback: try to find by kkiapay transaction ID in payment history
-#             payment = PaymentHistory.objects.get(kkiapay_transaction_id=kkiapay_transaction_id)
-#             order = payment.order
-        
-#         # Update order with Kkiapay's transaction ID and mark as paid
-#         order.kkiapay_transaction_id = kkiapay_transaction_id
-#         order.status = "paid"
-#         order.save()
-        
-#         # Update payment record
-#         payment = PaymentHistory.objects.get(order=order, status='pending')
-#         payment.kkiapay_transaction_id = kkiapay_transaction_id
-#         payment.status = 'success'
-#         payment.save()
-        
-#         # Clear cart
-#         if request.user.is_authenticated:
-#             request.session['cart'] = {}
-#             request.session.modified = True
-        
-#         messages.success(request, f"Paiement de {order.total_price} FCFA réussi ! Votre commande est confirmée.")
-        
-#         # Redirect to order confirmation
-#         return redirect('order_confirmation', order_id=order.id)
-            
-#     except Order.DoesNotExist:
-#         print(f"Order not found with internal_transaction_id: {internal_transaction_id}")
-#         messages.error(request, "Commande introuvable.")
-#     except PaymentHistory.DoesNotExist:
-#         print(f"Payment history not found for kkiapay_transaction_id: {kkiapay_transaction_id}")
-#         messages.error(request, "Historique de paiement introuvable.")
-#     except Exception as e:
-#         print(f"Error handling payment: {e}")
-#         messages.error(request, "Erreur lors du traitement du paiement.")
-    
-#     return redirect('products')
 
 def handle_payment_success(request, kkiapay_transaction_id, internal_transaction_id):
     """
@@ -1350,23 +1287,6 @@ def handle_payment_success(request, kkiapay_transaction_id, internal_transaction
         messages.error(request, "Erreur lors du traitement du paiement.")
         return redirect('products')
 
-
-# def order_confirmation(request, order_id):
-#     """
-#     Show order confirmation page after successful payment
-#     """
-#     order = get_object_or_404(Order, id=order_id)
-#     if request.user.is_authenticated and order.ordered_by != request.user:
-#         messages.error(request, "Vous n'avez pas accès à cette commande.")
-#         return redirect('products')
-    
-#     order_products = order.order_products.all()
-    
-#     context = {
-#         'order': order,
-#         'order_products': order_products,
-#     }
-#     return render(request, 'products/order_confirmation.html', context)
 
 
 def order_confirmation(request, order_id):
