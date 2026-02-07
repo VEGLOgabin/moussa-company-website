@@ -19,6 +19,12 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     
+    
+    
+    # ✅ NEW FIELD
+    is_active = models.BooleanField(default=True)
+    
+    
     def average_rating(self):
         """Calculate average rating for the product"""
         ratings = self.ratings.all()
@@ -188,7 +194,7 @@ class PaymentHistory(models.Model):
 
     payment_method = models.CharField(
         max_length=100,
-        default="KKIAPAY"
+        default="MOMO"
     )
 
     status = models.CharField(

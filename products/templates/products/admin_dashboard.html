@@ -1,0 +1,2637 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de Bord Admin | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Admin Dashboard with same color scheme as register page */
+  :root {
+    --input-bg: rgba(255, 255, 255, 0.95);
+    --input-border: rgba(48, 126, 51, 0.2);
+    --input-focus: rgba(48, 126, 51, 0.4);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Admin Hero Header */
+  .admin-hero {
+    position: relative;
+    height: 40vh;
+    min-height: 300px;
+    color: white;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.85) 0%, rgba(30, 109, 45, 0.8) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .admin-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .admin-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .hero-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .hero-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hero-dot.active {
+    background: var(--primary-yellow);
+    transform: scale(1.2);
+  }
+
+  /* Floating Background Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Admin Content */
+  .admin-content {
+    padding-bottom: 4rem;
+    position: relative;
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-title i {
+    color: var(--primary-green);
+    font-size: 1.5rem;
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .action-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .action-card:nth-child(1) { animation-delay: 0.2s; }
+  .action-card:nth-child(2) { animation-delay: 0.4s; }
+  .action-card:nth-child(3) { animation-delay: 0.6s; }
+  .action-card:nth-child(4) { animation-delay: 0.8s; }
+  .action-card:nth-child(5) { animation-delay: 1s; }
+
+  .action-card:hover {
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg), 0 30px 60px rgba(48, 126, 51, 0.15);
+    border-color: var(--primary-green);
+  }
+
+  .action-icon {
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    color: var(--primary-green);
+    animation: float 3s ease-in-out infinite;
+  }
+
+  .action-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+  }
+
+  .action-description {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+    color: var(--gray);
+    line-height: 1.5;
+  }
+
+  /* Statistics Cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .stat-card:nth-child(1) { animation-delay: 0.2s; }
+  .stat-card:nth-child(2) { animation-delay: 0.4s; }
+  .stat-card:nth-child(3) { animation-delay: 0.6s; }
+  .stat-card:nth-child(4) { animation-delay: 0.8s; }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg), 0 20px 40px rgba(48, 126, 51, 0.1);
+  }
+
+  .stat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon {
+    font-size: 1.5rem;
+    padding: 0.8rem;
+    border-radius: 12px;
+    background: rgba(48, 126, 51, 0.1);
+    color: var(--primary-green);
+  }
+
+  .stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    margin-bottom: 0.3rem;
+    color: var(--dark);
+  }
+
+  .stat-label {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.95rem;
+  }
+
+  .stat-change {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .stat-change.positive {
+    color: var(--primary-green);
+  }
+
+  .stat-change.negative {
+    color: #e74c3c;
+  }
+
+  /* Recent Activity */
+  .recent-activity {
+    margin-bottom: 3rem;
+  }
+
+  .activity-card {
+    background: white;
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease 0.5s forwards;
+  }
+
+  .activity-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 1rem;
+  }
+
+  .activity-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .activity-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .activity-list::-webkit-scrollbar-thumb {
+    background: var(--primary-green);
+    border-radius: 10px;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(48, 126, 51, 0.1);
+    transition: all 0.3s ease;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-item:hover {
+    background: rgba(232, 245, 233, 0.3);
+    border-radius: 10px;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    background: rgba(48, 126, 51, 0.1);
+    color: var(--primary-green);
+  }
+
+  .activity-content {
+    flex: 1;
+  }
+
+  .activity-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+    color: var(--dark);
+  }
+
+  .activity-description {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    color: var(--gray);
+  }
+
+  .activity-time {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.8rem;
+    color: #a0aec0;
+    white-space: nowrap;
+  }
+
+  /* Admin Tables */
+  .admin-tables {
+    margin-bottom: 3rem;
+  }
+
+  .table-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .table-card:nth-child(1) { animation-delay: 0.3s; }
+  .table-card:nth-child(2) { animation-delay: 0.5s; }
+
+  .table-header {
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.8) 0%, rgba(232, 245, 233, 0.6) 100%);
+    border-bottom: 1px solid rgba(48, 126, 51, 0.2);
+  }
+
+  .table-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .table-title i {
+    color: var(--primary-green);
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .admin-table th {
+    background: rgba(232, 245, 233, 0.3);
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid rgba(48, 126, 51, 0.2);
+  }
+
+  .admin-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid rgba(48, 126, 51, 0.1);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+  }
+
+  .admin-table tbody tr:hover {
+    background: rgba(232, 245, 233, 0.2);
+  }
+
+  .status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .status-badge.pending {
+    background: rgba(243, 156, 18, 0.1);
+    color: #d35400;
+  }
+
+  .status-badge.processing {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+  }
+
+  .status-badge.paid {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--primary-green);
+  }
+
+  .status-badge.delivered {
+    background: rgba(142, 68, 173, 0.1);
+    color: #8e44ad;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .action-btn.view {
+    background: rgba(48, 126, 51, 0.1);
+    color: var(--primary-green);
+  }
+
+  .action-btn.view:hover {
+    background: var(--primary-green);
+    color: white;
+  }
+
+  .action-btn.edit {
+    background: rgba(252, 193, 16, 0.1);
+    color: var(--primary-yellow);
+  }
+
+  .action-btn.edit:hover {
+    background: var(--primary-yellow);
+    color: var(--dark);
+  }
+
+  .action-btn.delete {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+  }
+
+  .action-btn.delete:hover {
+    background: #e74c3c;
+    color: white;
+  }
+
+  /* User Info Card */
+  .user-info-card {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 0.8s ease 0.2s forwards;
+  }
+
+  .user-info-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .user-avatar {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .user-info h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    margin-bottom: 0.3rem;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  }
+
+  .user-info p {
+    font-family: 'Quicksand', sans-serif;
+    opacity: 0.9;
+    font-size: 0.95rem;
+  }
+
+  .user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .user-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .user-stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .user-stat-label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.85rem;
+    opacity: 0.9;
+  }
+
+  /* Messages Container */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error,
+  .notification.is-danger {
+    border-left-color: #e74c3c;
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, rgba(231, 76, 60, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #3498db;
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.1) 0%, rgba(52, 152, 219, 0.05) 100%);
+  }
+
+  /* Loading Overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(48, 126, 51, 0.1);
+    border-top: 5px solid var(--primary-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Animations from register template */
+  @keyframes float {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(0, 0);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(40, 40);
+      opacity: 0;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .action-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .admin-hero h1 {
+      font-size: 2.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .admin-hero {
+      height: 35vh;
+      min-height: 250px;
+    }
+    
+    .admin-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .admin-hero p {
+      font-size: 1rem;
+    }
+    
+    .action-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .activity-list {
+      max-height: 300px;
+    }
+    
+    .admin-table {
+      font-size: 0.9rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+    
+    .user-info-header {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+    }
+    
+    .notification-container {
+      left: 20px;
+      right: 20px;
+      max-width: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .admin-hero {
+      height: 30vh;
+    }
+    
+    .admin-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .user-stats {
+      grid-template-columns: 1fr;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Hero Header -->
+<section class="admin-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Tableau de Bord Administrateur</h1>
+    <p>Bienvenue, {{ request.user.get_full_name|default:request.user.email }} - {{ request.user.get_admin_role_display|default:"Administrateur" }}</p>
+  </div>
+  
+  <!-- Carousel Dots -->
+  <div class="hero-dots">
+    <span class="hero-dot active" data-slide="0"></span>
+    <span class="hero-dot" data-slide="1"></span>
+    <span class="hero-dot" data-slide="2"></span>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% elif message.tags == 'info' %}is-info
+        {% else %}is-info{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Admin Content -->
+<section class="admin-content">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <!-- User Info Card -->
+    <div class="user-info-card">
+      <div class="user-info-header">
+        {% if request.user.photo %}
+          <img src="{{ request.user.photo.url }}" alt="Photo de profil" class="user-avatar">
+        {% else %}
+          <div class="user-avatar" style="background: rgba(255, 255, 255, 0.3); display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-user" style="font-size: 2.5rem; color: white;"></i>
+          </div>
+        {% endif %}
+        <div class="user-info">
+          <h3>{{ request.user.get_full_name }}</h3>
+          <p>{{ request.user.email }} • {{ request.user.phone_number }}</p>
+        </div>
+      </div>
+      <div class="user-stats">
+        <div class="user-stat">
+          <div class="user-stat-value">{{ request.user.registration_date|date:"d/m/Y" }}</div>
+          <div class="user-stat-label">Membre depuis</div>
+        </div>
+        <div class="user-stat">
+          <div class="user-stat-value">{{ request.user.get_user_type_display }}</div>
+          <div class="user-stat-label">Rôle</div>
+        </div>
+        {% if request.user.department %}
+        <div class="user-stat">
+          <div class="user-stat-value">{{ request.user.department }}</div>
+          <div class="user-stat-label">Département</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <section class="dashboard-stats">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        Statistiques
+      </h2>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ user_count }}</div>
+              <div class="stat-label">Utilisateurs</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 12% ce mois
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ order_count }}</div>
+              <div class="stat-label">Commandes</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 8% ce mois
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ product_count }}</div>
+              <div class="stat-label">Produits</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-box"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 5% ce mois
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ total_revenue|floatformat:0 }} FCFA</div>
+              <div class="stat-label">Revenu Total</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 15% ce mois
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <h2 class="section-title">
+        <i class="fas fa-bolt"></i>
+        Actions Rapides
+      </h2>
+      
+      <div class="action-grid">
+        <a href="{% url 'admin_register' %}" class="action-card">
+          <div class="action-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Administrateur</h3>
+          <p class="action-description">Créer un nouveau compte administrateur avec permissions spécifiques</p>
+        </a>
+        
+        <a href="{% url 'add_product' %}" class="action-card">
+          <div class="action-icon">
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Produit</h3>
+          <p class="action-description">Ajouter un nouveau produit à la boutique</p>
+        </a>
+        
+        <a href="{% url 'post_news' %}" class="action-card">
+          <div class="action-icon">
+            <i class="fas fa-edit"></i>
+          </div>
+          <h3 class="action-title">Créer un Article</h3>
+          <p class="action-description">Rédiger un nouvel article de blog</p>
+        </a>
+        
+        <a href="{% url 'testimonial_add' %}" class="action-card">
+          <div class="action-icon">
+            <i class="fas fa-comment"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Témoignage</h3>
+          <p class="action-description">Ajouter un nouveau témoignage client</p>
+        </a>
+        
+        <a href="{% url 'partner_add' %}" class="action-card">
+          <div class="action-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Partenaire</h3>
+          <p class="action-description">Ajouter un nouveau partenaire à la liste</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Recent Orders -->
+    <section class="admin-tables">
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">
+            <i class="fas fa-shopping-cart"></i>
+            Commandes Récentes
+          </h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in recent_orders %}
+              <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.email }}</td>
+                <td>{{ order.ordered_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ order.total_price }} {{ order.currency }}</td>
+                <td>
+                  <span class="status-badge {{ order.status }}">
+                    {{ order.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="action-btn view">
+                      <i class="fas fa-eye"></i>
+                      Voir
+                    </a>
+                    <a href="#" class="action-btn edit">
+                      <i class="fas fa-edit"></i>
+                      Modifier
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray);">
+                  <i class="fas fa-shopping-cart" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                  Aucune commande récente
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Products -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">
+            <i class="fas fa-box"></i>
+            Produits Récents
+          </h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Prix</th>
+                <th>Disponibilité</th>
+                <th>Ajouté par</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in recent_products %}
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                    {% endif %}
+                    <span>{{ product.name|truncatechars:30 }}</span>
+                  </div>
+                </td>
+                <td>{{ product.price }} {{ product.currency }}</td>
+                <td>{{ product.available }}</td>
+                <td>{{ product.added_by.get_full_name|default:product.added_by.email }}</td>
+                <td>{{ product.created_at|date:"d/m/Y" }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="{% url 'product_detail' product.id %}" class="action-btn view">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="#" class="action-btn edit">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="#" class="action-btn delete">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray);">
+                  <i class="fas fa-box" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+                  Aucun produit récent
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="recent-activity">
+      <h2 class="section-title">
+        <i class="fas fa-history"></i>
+        Activité Récente
+      </h2>
+      
+      <div class="activity-card">
+        <div class="activity-list">
+          {% for activity in recent_activity %}
+          <div class="activity-item">
+            <div class="activity-icon">
+              <i class="fas {{ activity.icon }}"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-description">{{ activity.description }}</div>
+            </div>
+            <div class="activity-time">{{ activity.time }}</div>
+          </div>
+          {% empty %}
+          <div style="text-align: center; padding: 2rem; color: var(--gray);">
+            <i class="fas fa-history" style="font-size: 2rem; margin-bottom: 1rem; display: block; opacity: 0.5;"></i>
+            Aucune activité récente
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p style="font-family: 'Quicksand', sans-serif; color: var(--gray);">Chargement...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Hero background carousel (same as register template)
+    const heroImages = document.querySelectorAll('.hero-image');
+    const heroDots = document.querySelectorAll('.hero-dot');
+    let currentHeroImage = 0;
+    
+    function showHeroImage(n) {
+      heroImages.forEach(img => img.classList.remove('active'));
+      heroDots.forEach(dot => dot.classList.remove('active'));
+      
+      currentHeroImage = (n + heroImages.length) % heroImages.length;
+      heroImages[currentHeroImage].classList.add('active');
+      heroDots[currentHeroImage].classList.add('active');
+    }
+    
+    function nextHeroImage() {
+      showHeroImage(currentHeroImage + 1);
+    }
+    
+    // Auto rotate hero images
+    let heroInterval = setInterval(nextHeroImage, 4000);
+    
+    // Dot click handlers
+    heroDots.forEach(dot => {
+      dot.addEventListener('click', function() {
+        clearInterval(heroInterval);
+        showHeroImage(parseInt(this.dataset.slide));
+        heroInterval = setInterval(nextHeroImage, 4000);
+      });
+    });
+
+    // Auto-hide notifications after 5 seconds
+    const notifications = document.querySelectorAll('.notification');
+    notifications.forEach(notification => {
+      setTimeout(() => {
+        notification.style.animation = 'slideOut 0.5s ease forwards';
+        setTimeout(() => {
+          notification.remove();
+        }, 500);
+      }, 5000);
+    });
+
+    // Add animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideOut {
+        from {
+          transform: translateX(0) scale(1);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%) scale(0.8);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}Tableau de Bord Admin | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern Admin Dashboard */
+  :root {
+    --admin-blue: #2980b9;
+    --admin-blue-dark: #1c5d87;
+    --admin-green: #27ae60;
+    --admin-green-dark: #219653;
+    --admin-purple: #8e44ad;
+    --admin-purple-dark: #6c3483;
+    --admin-orange: #e67e22;
+    --admin-orange-dark: #d35400;
+    --admin-red: #e74c3c;
+    --admin-red-dark: #c0392b;
+    --admin-gray: #34495e;
+    --admin-gray-dark: #2c3e50;
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+    --card-bg: rgba(255, 255, 255, 0.95);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8fafc 0%, #e9edf1 100%);
+    min-height: 100vh;
+  }
+
+  /* Admin Header */
+  .admin-header {
+    background: linear-gradient(135deg, var(--admin-gray-dark) 0%, var(--admin-gray) 100%);
+    color: white;
+    padding: 2.5rem 0;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .admin-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><path d="M100,0 C155.228,0 200,44.772 200,100 C200,155.228 155.228,200 100,200 C44.772,200 0,155.228 0,100 C0,44.772 44.772,0 100,0 Z" fill="rgba(255,255,255,0.05)"/></svg>') center/contain no-repeat;
+  }
+
+  .admin-header-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .admin-header h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-header p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .admin-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .admin-stat-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .admin-stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: white;
+  }
+
+  .admin-stat-label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  /* Admin Content */
+  .admin-content {
+    padding-bottom: 4rem;
+  }
+
+  /* Quick Actions */
+  .quick-actions {
+    margin-bottom: 3rem;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--admin-gray-dark);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .section-title i {
+    color: var(--admin-blue);
+    font-size: 1.5rem;
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .action-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+    border: 2px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--admin-blue);
+  }
+
+  .action-card.primary {
+    background: linear-gradient(135deg, var(--admin-blue) 0%, var(--admin-blue-dark) 100%);
+    color: white;
+  }
+
+  .action-card.success {
+    background: linear-gradient(135deg, var(--admin-green) 0%, var(--admin-green-dark) 100%);
+    color: white;
+  }
+
+  .action-card.warning {
+    background: linear-gradient(135deg, var(--admin-orange) 0%, var(--admin-orange-dark) 100%);
+    color: white;
+  }
+
+  .action-card.danger {
+    background: linear-gradient(135deg, var(--admin-red) 0%, var(--admin-red-dark) 100%);
+    color: white;
+  }
+
+  .action-card.purple {
+    background: linear-gradient(135deg, var(--admin-purple) 0%, var(--admin-purple-dark) 100%);
+    color: white;
+  }
+
+  .action-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .action-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .action-description {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+
+  /* Statistics Cards */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+    border-left: 5px solid;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .stat-card.users {
+    border-left-color: var(--admin-blue);
+  }
+
+  .stat-card.orders {
+    border-left-color: var(--admin-green);
+  }
+
+  .stat-card.products {
+    border-left-color: var(--admin-orange);
+  }
+
+  .stat-card.revenue {
+    border-left-color: var(--admin-purple);
+  }
+
+  .stat-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .stat-icon {
+    font-size: 1.5rem;
+    padding: 0.8rem;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .stat-icon.users {
+    color: var(--admin-blue);
+    background: rgba(41, 128, 185, 0.1);
+  }
+
+  .stat-icon.orders {
+    color: var(--admin-green);
+    background: rgba(39, 174, 96, 0.1);
+  }
+
+  .stat-icon.products {
+    color: var(--admin-orange);
+    background: rgba(230, 126, 34, 0.1);
+  }
+
+  .stat-icon.revenue {
+    color: var(--admin-purple);
+    background: rgba(142, 68, 173, 0.1);
+  }
+
+  .stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .stat-label {
+    font-family: 'Quicksand', sans-serif;
+    color: #718096;
+    font-size: 0.95rem;
+  }
+
+  .stat-change {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+
+  .stat-change.positive {
+    color: var(--admin-green);
+  }
+
+  .stat-change.negative {
+    color: var(--admin-red);
+  }
+
+  /* Recent Activity */
+  .recent-activity {
+    margin-bottom: 3rem;
+  }
+
+  .activity-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .activity-list {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 1rem;
+  }
+
+  .activity-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .activity-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  .activity-list::-webkit-scrollbar-thumb {
+    background: var(--admin-blue);
+    border-radius: 10px;
+  }
+
+  .activity-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+  }
+
+  .activity-item:last-child {
+    border-bottom: none;
+  }
+
+  .activity-item:hover {
+    background: #f8fafc;
+    border-radius: 10px;
+  }
+
+  .activity-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+  }
+
+  .activity-icon.user {
+    background: rgba(41, 128, 185, 0.1);
+    color: var(--admin-blue);
+  }
+
+  .activity-icon.order {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--admin-green);
+  }
+
+  .activity-icon.product {
+    background: rgba(230, 126, 34, 0.1);
+    color: var(--admin-orange);
+  }
+
+  .activity-icon.payment {
+    background: rgba(142, 68, 173, 0.1);
+    color: var(--admin-purple);
+  }
+
+  .activity-content {
+    flex: 1;
+  }
+
+  .activity-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .activity-description {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    color: #718096;
+  }
+
+  .activity-time {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.8rem;
+    color: #a0aec0;
+    white-space: nowrap;
+  }
+
+  /* Charts Section */
+  .charts-section {
+    margin-bottom: 3rem;
+  }
+
+  .chart-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .chart-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .chart-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .chart-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--admin-gray-dark);
+  }
+
+  .chart-container {
+    height: 300px;
+    position: relative;
+  }
+
+  /* Admin Tables */
+  .admin-tables {
+    margin-bottom: 3rem;
+  }
+
+  .table-card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    margin-bottom: 2rem;
+  }
+
+  .table-header {
+    padding: 1.5rem 2rem;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .table-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--admin-gray-dark);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .admin-table th {
+    background: #f1f5f9;
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: var(--admin-gray-dark);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .admin-table td {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid #e2e8f0;
+    font-family: 'Quicksand', sans-serif;
+    color: #4a5568;
+  }
+
+  .admin-table tbody tr:hover {
+    background: #f8fafc;
+  }
+
+  .status-badge {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .status-badge.pending {
+    background: rgba(243, 156, 18, 0.1);
+    color: #d35400;
+  }
+
+  .status-badge.processing {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+  }
+
+  .status-badge.paid {
+    background: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+  }
+
+  .status-badge.delivered {
+    background: rgba(142, 68, 173, 0.1);
+    color: #8e44ad;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .action-btn {
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .action-btn.view {
+    background: rgba(41, 128, 185, 0.1);
+    color: var(--admin-blue);
+  }
+
+  .action-btn.view:hover {
+    background: var(--admin-blue);
+    color: white;
+  }
+
+  .action-btn.edit {
+    background: rgba(39, 174, 96, 0.1);
+    color: var(--admin-green);
+  }
+
+  .action-btn.edit:hover {
+    background: var(--admin-green);
+    color: white;
+  }
+
+  .action-btn.delete {
+    background: rgba(231, 76, 60, 0.1);
+    color: var(--admin-red);
+  }
+
+  .action-btn.delete:hover {
+    background: var(--admin-red);
+    color: white;
+  }
+
+  /* User Info Card */
+  .user-info-card {
+    background: linear-gradient(135deg, var(--admin-blue) 0%, var(--admin-blue-dark) 100%);
+    color: white;
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+  }
+
+  .user-info-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .user-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .user-info h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .user-info p {
+    font-family: 'Quicksand', sans-serif;
+    opacity: 0.9;
+    font-size: 0.95rem;
+  }
+
+  .user-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .user-stat {
+    text-align: center;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+  }
+
+  .user-stat-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 0.2rem;
+  }
+
+  .user-stat-label {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.85rem;
+    opacity: 0.8;
+  }
+
+  /* Loading Animation */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .loading-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--admin-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .action-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .chart-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .admin-header {
+      padding: 2rem 0;
+    }
+    
+    .admin-header h1 {
+      font-size: 2rem;
+    }
+    
+    .action-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .activity-list {
+      max-height: 300px;
+    }
+    
+    .admin-table {
+      font-size: 0.9rem;
+    }
+    
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .admin-header h1 {
+      font-size: 1.6rem;
+    }
+    
+    .admin-stats {
+      flex-direction: column;
+    }
+    
+    .user-info-header {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .section-title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Admin Header -->
+<header class="admin-header">
+  <div class="container">
+    <div class="admin-header-content">
+      <h1>Tableau de Bord Administrateur</h1>
+      <p>Bienvenue, {{ request.user.get_full_name|default:request.user.email }} - {{ request.user.get_admin_role_display|default:"Administrateur" }}</p>
+      
+      <div class="admin-stats">
+        <div class="admin-stat-item">
+          <div class="admin-stat-value">{{ user_count }}</div>
+          <div class="admin-stat-label">Utilisateurs</div>
+        </div>
+        <div class="admin-stat-item">
+          <div class="admin-stat-value">{{ product_count }}</div>
+          <div class="admin-stat-label">Produits</div>
+        </div>
+        <div class="admin-stat-item">
+          <div class="admin-stat-value">{{ order_count }}</div>
+          <div class="admin-stat-label">Commandes</div>
+        </div>
+        <div class="admin-stat-item">
+          <div class="admin-stat-value">{{ total_revenue|floatformat:0 }} FCFA</div>
+          <div class="admin-stat-label">Revenu Total</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Admin Content -->
+<main class="admin-content">
+  <div class="container">
+    <!-- User Info Card -->
+    <div class="user-info-card">
+      <div class="user-info-header">
+        {% if request.user.photo %}
+          <img src="{{ request.user.photo.url }}" alt="Photo de profil" class="user-avatar">
+        {% else %}
+          <div class="user-avatar" style="background: rgba(255, 255, 255, 0.2); display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-user" style="font-size: 2rem;"></i>
+          </div>
+        {% endif %}
+        <div class="user-info">
+          <h3>{{ request.user.get_full_name }}</h3>
+          <p>{{ request.user.email }} | {{ request.user.phone_number }}</p>
+        </div>
+      </div>
+      <div class="user-stats">
+        <div class="user-stat">
+          <div class="user-stat-value">{{ request.user.registration_date|date:"d/m/Y" }}</div>
+          <div class="user-stat-label">Membre depuis</div>
+        </div>
+        <div class="user-stat">
+          <div class="user-stat-value">{{ request.user.user_type|title }}</div>
+          <div class="user-stat-label">Rôle</div>
+        </div>
+        {% if request.user.department %}
+        <div class="user-stat">
+          <div class="user-stat-value">{{ request.user.department }}</div>
+          <div class="user-stat-label">Département</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <section class="quick-actions">
+      <h2 class="section-title">
+        <i class="fas fa-bolt"></i>
+        Actions Rapides
+      </h2>
+      
+      <div class="action-grid">
+        <a href="{% url 'admin_register' %}" class="action-card primary">
+          <div class="action-icon">
+            <i class="fas fa-user-plus"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Administrateur</h3>
+          <p class="action-description">Créer un nouveau compte administrateur avec permissions spécifiques</p>
+        </a>
+        
+        <a href="{% url 'products' %}" class="action-card success">
+          <div class="action-icon">
+            <i class="fas fa-plus-circle"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Produit</h3>
+          <p class="action-description">Ajouter un nouveau produit à la boutique</p>
+        </a>
+        
+        <a href="{% url 'post_news' %}" class="action-card warning">
+          <div class="action-icon">
+            <i class="fas fa-edit"></i>
+          </div>
+          <h3 class="action-title">Créer un Article</h3>
+          <p class="action-description">Rédiger un nouvel article de blog</p>
+        </a>
+        
+        <a href="{% url 'testimonial_add' %}" class="action-card purple">
+          <div class="action-icon">
+            <i class="fas fa-comment"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Témoignage</h3>
+          <p class="action-description">Ajouter un nouveau témoignage client</p>
+        </a>
+        
+        <a href="{% url 'partner_add' %}" class="action-card danger">
+          <div class="action-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h3 class="action-title">Ajouter un Partenaire</h3>
+          <p class="action-description">Ajouter un nouveau partenaire à la liste</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- Statistics Cards -->
+    <section class="dashboard-stats">
+      <h2 class="section-title">
+        <i class="fas fa-chart-line"></i>
+        Statistiques
+      </h2>
+      
+      <div class="stats-grid">
+        <div class="stat-card users">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ user_count }}</div>
+              <div class="stat-label">Utilisateurs</div>
+            </div>
+            <div class="stat-icon users">
+              <i class="fas fa-users"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 12% ce mois
+          </div>
+        </div>
+        
+        <div class="stat-card orders">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ order_count }}</div>
+              <div class="stat-label">Commandes</div>
+            </div>
+            <div class="stat-icon orders">
+              <i class="fas fa-shopping-cart"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 8% ce mois
+          </div>
+        </div>
+        
+        <div class="stat-card products">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ product_count }}</div>
+              <div class="stat-label">Produits</div>
+            </div>
+            <div class="stat-icon products">
+              <i class="fas fa-box"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 5% ce mois
+          </div>
+        </div>
+        
+        <div class="stat-card revenue">
+          <div class="stat-card-header">
+            <div>
+              <div class="stat-value">{{ total_revenue|floatformat:0 }} FCFA</div>
+              <div class="stat-label">Revenu Total</div>
+            </div>
+            <div class="stat-icon revenue">
+              <i class="fas fa-money-bill-wave"></i>
+            </div>
+          </div>
+          <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i> 15% ce mois
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Orders -->
+    <section class="admin-tables">
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">
+            <i class="fas fa-shopping-cart"></i>
+            Commandes Récentes
+          </h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Montant</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in recent_orders %}
+              <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.ordered_by.get_full_name|default:order.ordered_by.email }}</td>
+                <td>{{ order.ordered_at|date:"d/m/Y H:i" }}</td>
+                <td>{{ order.total_price }} {{ order.currency }}</td>
+                <td>
+                  <span class="status-badge {{ order.status }}">
+                    {{ order.get_status_display }}
+                  </span>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="#" class="action-btn view">
+                      <i class="fas fa-eye"></i>
+                      Voir
+                    </a>
+                    <a href="#" class="action-btn edit">
+                      <i class="fas fa-edit"></i>
+                      Modifier
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem;">
+                  Aucune commande récente
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent Products -->
+      <div class="table-card">
+        <div class="table-header">
+          <h3 class="table-title">
+            <i class="fas fa-box"></i>
+            Produits Récents
+          </h3>
+        </div>
+        <div class="table-container">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Produit</th>
+                <th>Prix</th>
+                <th>Disponibilité</th>
+                <th>Ajouté par</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for product in recent_products %}
+              <tr>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 0.8rem;">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 40px; height: 40px; border-radius: 8px; object-fit: cover;">
+                    {% endif %}
+                    <span>{{ product.name|truncatechars:30 }}</span>
+                  </div>
+                </td>
+                <td>{{ product.price }} {{ product.currency }}</td>
+                <td>{{ product.available }}</td>
+                <td>{{ product.added_by.get_full_name|default:product.added_by.email }}</td>
+                <td>{{ product.created_at|date:"d/m/Y" }}</td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="{% url 'product_detail' product.id %}" class="action-btn view">
+                      <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="#" class="action-btn edit">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="#" class="action-btn delete">
+                      <i class="fas fa-trash"></i>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" style="text-align: center; padding: 2rem;">
+                  Aucun produit récent
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recent Activity -->
+    <section class="recent-activity">
+      <h2 class="section-title">
+        <i class="fas fa-history"></i>
+        Activité Récente
+      </h2>
+      
+      <div class="activity-card">
+        <div class="activity-list">
+          {% for activity in recent_activity %}
+          <div class="activity-item">
+            <div class="activity-icon {{ activity.type }}">
+              <i class="fas {{ activity.icon }}"></i>
+            </div>
+            <div class="activity-content">
+              <div class="activity-title">{{ activity.title }}</div>
+              <div class="activity-description">{{ activity.description }}</div>
+            </div>
+            <div class="activity-time">{{ activity.time }}</div>
+          </div>
+          {% empty %}
+          <div style="text-align: center; padding: 2rem; color: #718096;">
+            Aucune activité récente
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-spinner"></div>
+  <p style="font-family: 'Quicksand', sans-serif; color: #4a5568;">Chargement...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Sample data for charts (you should replace this with real data from your backend)
+    const revenueData = {
+      labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul'],
+      datasets: [{
+        label: 'Revenu (FCFA)',
+        data: [1500000, 1800000, 2200000, 2500000, 2800000, 3100000, 3500000],
+        borderColor: '#2980b9',
+        backgroundColor: 'rgba(41, 128, 185, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    };
+
+    const ordersData = {
+      labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul'],
+      datasets: [{
+        label: 'Commandes',
+        data: [45, 52, 60, 65, 70, 75, 85],
+        borderColor: '#27ae60',
+        backgroundColor: 'rgba(39, 174, 96, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    };
+
+    // Initialize charts
+    const revenueCtx = document.getElementById('revenueChart');
+    if (revenueCtx) {
+      new Chart(revenueCtx, {
+        type: 'line',
+        data: revenueData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value.toLocaleString() + ' FCFA';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    const ordersCtx = document.getElementById('ordersChart');
+    if (ordersCtx) {
+      new Chart(ordersCtx, {
+        type: 'bar',
+        data: ordersData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            }
+          }
+        }
+      });
+    }
+
+    // Auto-refresh data every 60 seconds
+    let refreshInterval;
+    function startAutoRefresh() {
+      refreshInterval = setInterval(refreshDashboard, 60000);
+    }
+
+    function refreshDashboard() {
+      showLoading();
+      fetch('/admin/dashboard/data/')
+        .then(response => response.json())
+        .then(data => {
+          updateDashboard(data);
+          hideLoading();
+        })
+        .catch(error => {
+          console.error('Error refreshing dashboard:', error);
+          hideLoading();
+        });
+    }
+
+    function showLoading() {
+      document.getElementById('loadingOverlay').classList.add('active');
+    }
+
+    function hideLoading() {
+      document.getElementById('loadingOverlay').classList.remove('active');
+    }
+
+    function updateDashboard(data) {
+      // Update stats
+      if (data.stats) {
+        document.querySelector('.stat-card.users .stat-value').textContent = data.stats.users;
+        document.querySelector('.stat-card.orders .stat-value').textContent = data.stats.orders;
+        document.querySelector('.stat-card.products .stat-value').textContent = data.stats.products;
+        document.querySelector('.stat-card.revenue .stat-value').textContent = data.stats.revenue;
+      }
+    }
+
+    // Start auto-refresh
+    startAutoRefresh();
+
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', function() {
+      if (refreshInterval) {
+        clearInterval(refreshInterval);
+      }
+    });
+
+    // Real-time notifications
+    const eventSource = new EventSource('/admin/dashboard/events/');
+    eventSource.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      showNotification(data.message, data.type);
+    };
+
+    eventSource.onerror = function(error) {
+      console.error('EventSource failed:', error);
+    };
+
+    function showNotification(message, type = 'info') {
+      // Create notification element
+      const notification = document.createElement('div');
+      notification.className = `notification notification-${type}`;
+      notification.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas fa-${getNotificationIcon(type)}" style="font-size: 1.2rem;"></i>
+          <div>
+            <div style="font-weight: 600; margin-bottom: 0.2rem;">${getNotificationTitle(type)}</div>
+            <div style="font-size: 0.9rem;">${message}</div>
+          </div>
+        </div>
+      `;
+      
+      // Add to page
+      document.body.appendChild(notification);
+      
+      // Animate in
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+        notification.style.opacity = '1';
+      }, 10);
+      
+      // Remove after 5 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        notification.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 5000);
+    }
+
+    function getNotificationIcon(type) {
+      switch(type) {
+        case 'success': return 'check-circle';
+        case 'error': return 'exclamation-circle';
+        case 'warning': return 'exclamation-triangle';
+        default: return 'info-circle';
+      }
+    }
+
+    function getNotificationTitle(type) {
+      switch(type) {
+        case 'success': return 'Succès';
+        case 'error': return 'Erreur';
+        case 'warning': return 'Avertissement';
+        default: return 'Information';
+      }
+    }
+
+    // Add notification styles
+    const style = document.createElement('style');
+    style.textContent = `
+      .notification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: white;
+        border-radius: 12px;
+        padding: 1.2rem 1.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        z-index: 9999;
+        max-width: 350px;
+        transform: translateX(100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        border-left: 4px solid;
+      }
+      
+      .notification-success {
+        border-left-color: #27ae60;
+        background: linear-gradient(135deg, #f0fff4 0%, #e6fffa 100%);
+      }
+      
+      .notification-error {
+        border-left-color: #e74c3c;
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+      }
+      
+      .notification-warning {
+        border-left-color: #e67e22;
+        background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%);
+      }
+      
+      .notification-info {
+        border-left-color: #2980b9;
+        background: linear-gradient(135deg, #ebf8ff 0%, #ceedff 100%);
+      }
+    `;
+    document.head.appendChild(style);
+  });
+</script>
+{% endblock %} {% endcomment %}

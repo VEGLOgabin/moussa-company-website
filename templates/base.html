@@ -442,7 +442,7 @@
           </a>
         </div>
 
-        <!-- Search Bar -->
+        <!-- Search Bar 
         <div class="navbar-center">
           <div class="search-container">
             <div class="search-box">
@@ -452,7 +452,8 @@
               <input class="input search-input" type="text" placeholder="Rechercher des produits...">
             </div>
           </div>
-        </div>
+        </div> 
+        -->
 
         <!-- User Actions -->
         <div class="navbar-end">
@@ -464,7 +465,7 @@
             <span class="cart-count">({{ request.session.cart|length|default:"0" }})</span>
           </a>
           
-          {% if user.is_authenticated %}
+          {% comment %} {% if user.is_authenticated %}
             <div class="navbar-item has-dropdown is-hoverable">
               <a class="navbar-link">
                 <span class="icon">
@@ -485,6 +486,108 @@
                   </span>
                   <span>Mes commandes</span>
                 </a>
+                <hr class="navbar-divider">
+                <a class="navbar-item has-text-danger" href="{% url 'logout' %}">
+                  <span class="icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                  </span>
+                  <span>Déconnexion</span>
+                </a>
+              </div>
+            </div>
+          {% else %}
+            <div class="navbar-item">
+              <div class="buttons">
+                <a class="button is-light" href="{% url 'login' %}">
+                  Connexion
+                </a>
+                <a class="button is-primary" href="{% url 'register' %}">
+                  <strong>S'inscrire</strong>
+                </a>
+              </div>
+            </div>
+          {% endif %} {% endcomment %}
+
+
+          {% if user.is_authenticated %}
+            <div class="navbar-item has-dropdown is-hoverable">
+
+                <span>{{ user.get_admin_display_name }}</span>
+              </a>
+              
+              <div class="navbar-dropdown is-right">
+                <!-- Admin Links -->
+                {% if user.is_admin %}
+                  <div class="navbar-item admin-section">
+                    <small class="has-text-weight-bold has-text-primary">ADMINISTRATION</small>
+                  </div>
+                  <a class="navbar-item" href="{% url 'admin_dashboard' %}">
+                    <span class="icon">
+                      <i class="fas fa-tachometer-alt"></i>
+                    </span>
+                    <span>Dashboard</span>
+                  </a>
+                  <hr class="navbar-divider">
+                {% endif %}
+                
+                <!-- User Links -->
+                <div class="navbar-item user-section">
+                  <small class="has-text-weight-bold">MON COMPTE</small>
+                </div>
+                <a class="navbar-item" href="{% url 'profile' %}">
+                  <span class="icon">
+                    <i class="fas fa-user"></i>
+                  </span>
+                  <span>Profil</span>
+                </a>
+                <a class="navbar-item" href="{% url 'payment_history' %}">
+                  <span class="icon">
+                    <i class="fas fa-history"></i>
+                  </span>
+                  <span>Historique</span>
+                </a>
+                
+                <!-- Admin Quick Actions -->
+                {% if user.is_admin %}
+                  <hr class="navbar-divider">
+                  <div class="navbar-item">
+                    <small class="has-text-weight-bold has-text-primary">ACTIONS RAPIDES</small>
+                  </div>
+                  {% for permission in user.admin_permissions %}
+                    {% if permission == 'manage_products' %}
+                      <a class="navbar-item" href="{% url 'products' %}">
+                        <span class="icon">
+                          <i class="fas fa-plus-circle has-text-success"></i>
+                        </span>
+                        <span>Ajouter produit</span>
+                      </a>
+                    {% elif permission == 'manage_orders' %}
+                      <a class="navbar-item" href="#">
+                        <span class="icon">
+                          <i class="fas fa-shopping-cart has-text-info"></i>
+                        </span>
+                        <span>Voir commandes</span>
+                      </a>
+                    {% elif permission == 'manage_users' %}
+                      <a class="navbar-item" href="#">
+                        <span class="icon">
+                          <i class="fas fa-users has-text-warning"></i>
+                        </span>
+                        <span>Gérer utilisateurs</span>
+                      </a>
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% if user.is_superadmin %}
+                    <a class="navbar-item" href="{% url 'admin_register' %}">
+                      <span class="icon">
+                        <i class="fas fa-user-plus has-text-danger"></i>
+                      </span>
+                      <span>Nouvel admin</span>
+                    </a>
+                  {% endif %}
+                {% endif %}
+                
                 <hr class="navbar-divider">
                 <a class="navbar-item has-text-danger" href="{% url 'logout' %}">
                   <span class="icon">

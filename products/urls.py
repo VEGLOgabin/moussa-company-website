@@ -58,8 +58,9 @@ urlpatterns = [
     path('register/',views.register,name="register"),
     path('profile/',views.profile,name="profile"),
     path('logout/',views.logout_view,name="logout"),
-    
-    
+    path('admin/register/', views.admin_register, name='admin_register'),
+    path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/register/', views.admin_register, name='admin_register'),
     
     
     # path('add-to-cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),

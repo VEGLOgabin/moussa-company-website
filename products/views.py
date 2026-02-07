@@ -20,9 +20,15 @@ from .models import UserActionLog
 from django.db import transaction
 import uuid
 from kkiapay import Kkiapay
+# views.py - Add admin registration function
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
 
-
-
+from django.db import models
+# Add this to your views.py
+from django.db.models import Sum, Count
+from datetime import datetime, timedelta
 
 
 
@@ -64,6 +70,9 @@ def home(request):
         'partners': Partner.objects.all()[:8]
     }
     return render(request, "products/home.html", context)
+
+
+
 
 
 
@@ -529,7 +538,7 @@ def delete_blog_post(request, post_id):
 # ----------------------
 
 def testimonials(request):
-    return render(request, "products/testimonials_1.html", {
+    return render(request, "products/testimonials.html", {
         "testimonials": Testimonial.objects.all(),
     })
 
@@ -595,7 +604,7 @@ def delete_testimonial(request, testimonial_id):
 # ----------------------
 
 def partners(request):
-    return render(request, "products/partners_1.html", {
+    return render(request, "products/partners.html", {
         "partners": Partner.objects.all(),
     })
 
@@ -670,9 +679,6 @@ def delete_partner(request, partner_id):
 
 
 
-# # Contact
-# def contact(request):
-#     return render(request, "products/contact.html")
 
 # Render the contact form page
 def contact(request):
@@ -745,16 +751,6 @@ def delete_contact_message(request, message_id):
 
 
 
-
-
-
-
-# @login_required
-# def payment_history(request):
-#     payments = PaymentHistory.objects.filter(user=request.user).order_by('-payment_date')
-#     return render(request, 'products/payment_history.html', {'payments': payments})
-# At the top of your views.py
-from django.db import models
 
 
 @login_required
@@ -869,20 +865,43 @@ def register(request):
 
 
 
+# def login_view(request):
+#     if request.method == 'POST':
+#         email = request.POST.get('email')
+#         password = request.POST.get('password')
+#         user = authenticate(request, email=email, password=password)
+#         if user is not None:
+#             login(request, user)
+#             return redirect('home')
+#         else:
+#             messages.error(request, 'Identifiants invalides')
+#             return redirect('login')
+#     return render(request, 'products/login.html')
+
+# Updated login_view with user type redirection
 def login_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = authenticate(request, email=email, password=password)
+        
         if user is not None:
             login(request, user)
-            return redirect('home')
+            
+            # Redirect based on user type
+            if user.user_type in ['admin', 'superadmin', 'manager']:
+                # Admin users go to admin dashboard
+                messages.success(request, f'Bienvenue Administrateur {user.first_name}!')
+                return redirect('admin_dashboard')
+            else:
+                # Regular customers go to home
+                messages.success(request, f'Bienvenue {user.first_name}!')
+                return redirect('home')
         else:
             messages.error(request, 'Identifiants invalides')
             return redirect('login')
+    
     return render(request, 'products/login.html')
-
-
 
 
 
@@ -1020,101 +1039,6 @@ def remove_from_cart(request, product_id):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### PREVIOUS VERSION OF CHECKOUT WITHOUT INTERNAL TRANSACTION ID AND ATOMICITY (KEPT FOR REFERENCE)
-# @login_required
-# def checkout(request):
-#     cart = request.session.get('cart', {})
-#     if not cart:
-#         messages.error(request, "Votre panier est vide.")
-#         return redirect('marketplace')
-
-#     # Fetch all products in the cart
-#     products = Product.objects.filter(id__in=cart.keys())
-#     cart_items = []
-#     total = 0
-
-#     for product in products:
-#         quantity = cart.get(str(product.id), 1)
-#         subtotal = product.price * quantity
-#         cart_items.append({
-#             'product': product,
-#             'quantity': quantity,
-#             'subtotal': subtotal
-#         })
-#         total += subtotal
-
-#     # Generate unique INTERNAL transaction ID for our reference
-#     internal_transaction_id = f"ORDER-{int(timezone.now().timestamp())}-{request.user.id}"
-
-#     # Create the order with our internal transaction ID
-#     order = Order.objects.create(
-#         ordered_by=request.user,
-#         total_price=total,
-#         currency="FCFA",
-#         status="pending",
-#         internal_transaction_id=internal_transaction_id
-#         # kkiapay_transaction_id remains null until payment is successful
-#     )
-
-#     # Create OrderProduct entries
-#     for item in cart_items:
-#         OrderProduct.objects.create(
-#             order=order,
-#             product=item['product'],
-#             quantity=item['quantity']
-#         )
-
-#     # Create pending payment record
-#     PaymentHistory.objects.create(
-#         user=request.user,
-#         order=order,
-#         amount=order.total_price,
-#         internal_transaction_id=internal_transaction_id,
-#         kkiapay_transaction_id=None,  # Will be updated on success
-#         status='pending',
-#         payment_method='KKIAPAY'
-#     )
-
-#     # Pass all necessary info to template
-#     context = {
-#         "cart_items": cart_items,
-#         "total": total,
-#         "order": order,
-#         "internal_transaction_id": internal_transaction_id,
-#         "timestamp": int(timezone.now().timestamp()),
-#         "public_key": settings.KKIAPAY_PUBLIC_KEY,
-#         "user": request.user,
-#         "callbackUrl" : "http://127.0.0.1:8000/payment/callback/",
-#     }
-
-#     return render(request, "products/checkout.html", context)
-
-
-
-
 ### LAST VERSION OF CHECKOUT WITH INTERNAL TRANSACTION ID AND ATOMIC ORDER/PAYMENT CREATION
 @login_required
 def checkout(request):
@@ -1165,7 +1089,7 @@ def checkout(request):
             amount=order.total_price,
             internal_transaction_id=internal_transaction_id,
             status='pending',
-            payment_method='KKIAPAY'
+            payment_method='MOMO'
         )
 
     context = {
@@ -1302,3 +1226,198 @@ def order_confirmation(request, order_id):
         'order_products': order_products,
     }
     return render(request, 'products/order_confirmation.html', context)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+###  ADMIN MANAGEMENT SESSION
+
+
+
+def admin_check(user):
+    """Check if user is admin/superadmin"""
+    return user.is_authenticated and user.is_superuser
+
+@login_required
+# @user_passes_test(admin_check, login_url='login')
+def admin_register(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        password = request.POST.get('password')
+        phone_number = request.POST.get('phone_number')
+        admin_role = request.POST.get('admin_role')
+        department = request.POST.get('department', '')
+        
+        # Admin-specific permissions
+        can_manage_users = request.POST.get('can_manage_users') == 'on'
+        can_manage_products = request.POST.get('can_manage_products') == 'on'
+        can_manage_orders = request.POST.get('can_manage_orders') == 'on'
+        
+        # Optional fields
+        sex = request.POST.get('sex', '')
+        birthdate = request.POST.get('birthdate', None)
+        photo = request.FILES.get('photo')
+
+        # Validation
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "Cet email est déjà utilisé par un administrateur")
+            return redirect('admin_register')
+
+        # Determine user_type based on admin_role
+        user_type = 'manager'  # Default for admin roles
+        
+        if admin_role == 'superadmin':
+            user_type = 'superadmin'
+        elif admin_role in ['content', 'order', 'support']:
+            user_type = 'admin'
+
+        try:
+            # Create admin user with elevated permissions
+            admin_user = User.objects.create_user(
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                password=password,
+                phone_number=phone_number,
+                sex=sex,
+                birthdate=birthdate,
+                photo=photo,
+                user_type=user_type,
+                admin_role=admin_role,
+                department=department,
+                can_manage_users=can_manage_users,
+                can_manage_products=can_manage_products,
+                can_manage_orders=can_manage_orders,
+                is_staff=True  # Admin users have staff access
+            )
+            
+            messages.success(request, f"Administrateur {first_name} {last_name} créé avec succès!")
+            return redirect('admin_dashboard')  # Or wherever you want to redirect
+            
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la création: {str(e)}")
+            return redirect('admin_register')
+    
+    return render(request, 'products/admin_register.html')
+
+
+
+
+
+@login_required
+# @user_passes_test(admin_check, login_url='login')
+def admin_dashboard(request):
+    # Get statistics
+    user_count = User.objects.count()
+    product_count = Product.objects.count()
+    order_count = Order.objects.count()
+    
+    # Calculate total revenue (sum of all paid orders)
+    total_revenue = Order.objects.filter(status='paid').aggregate(
+        total=Sum('total_price')
+    )['total'] or 0
+    
+    # Get recent orders (last 10)
+    recent_orders = Order.objects.select_related('ordered_by').order_by('-ordered_at')[:10]
+    
+    # Get recent products (last 10)
+    recent_products = Product.objects.select_related('added_by').order_by('-created_at')[:10]
+    
+    # Get recent activity from logs
+    recent_activity = UserActionLog.objects.select_related('user').order_by('-created_at')[:15]
+    
+    # Format activity for template
+    formatted_activity = []
+    for activity in recent_activity:
+        formatted_activity.append({
+            'type': get_activity_type(activity.action),
+            'icon': get_activity_icon(activity.action),
+            'title': get_activity_title(activity.action),
+            'description': activity.action,
+            'time': format_activity_time(activity.created_at)
+        })
+    
+    context = {
+        'user_count': user_count,
+        'product_count': product_count,
+        'order_count': order_count,
+        'total_revenue': total_revenue,
+        'recent_orders': recent_orders,
+        'recent_products': recent_products,
+        'recent_activity': formatted_activity,
+    }
+    
+    return render(request, 'products/admin_dashboard.html', context)
+
+def get_activity_type(action):
+    """Determine activity type based on action content"""
+    action_lower = action.lower()
+    if any(word in action_lower for word in ['user', 'login', 'register', 'profile']):
+        return 'user'
+    elif any(word in action_lower for word in ['order', 'cart', 'checkout', 'payment']):
+        return 'order'
+    elif any(word in action_lower for word in ['product', 'create', 'update', 'delete']):
+        return 'product'
+    else:
+        return 'payment'
+
+def get_activity_icon(action):
+    """Get appropriate icon for activity"""
+    action_lower = action.lower()
+    if any(word in action_lower for word in ['user', 'login', 'register']):
+        return 'fa-user'
+    elif any(word in action_lower for word in ['order', 'cart', 'checkout']):
+        return 'fa-shopping-cart'
+    elif any(word in action_lower for word in ['product', 'create', 'update', 'delete']):
+        return 'fa-box'
+    elif any(word in action_lower for word in ['payment', 'paid']):
+        return 'fa-money-bill-wave'
+    else:
+        return 'fa-info-circle'
+
+def get_activity_title(action):
+    """Extract title from action"""
+    words = action.split()
+    if len(words) > 3:
+        return ' '.join(words[:3]) + '...'
+    return action
+
+def format_activity_time(time):
+    """Format time for display"""
+    now = timezone.now()
+    diff = now - time
+    
+    if diff.days > 7:
+        return time.strftime("%d/%m/%Y")
+    elif diff.days > 0:
+        return f"{diff.days} jour(s) ago"
+    elif diff.seconds > 3600:
+        hours = diff.seconds // 3600
+        return f"{hours} heure(s) ago"
+    elif diff.seconds > 60:
+        minutes = diff.seconds // 60
+        return f"{minutes} minute(s) ago"
+    else:
+        return "À l'instant"
+    
+    
+    
+    
