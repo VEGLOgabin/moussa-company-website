@@ -58,17 +58,33 @@
     opacity: 0.8;
   }
 
+
+
+  /* Using static folder images */
   .hero-image-1 {
-    background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero1.jpeg");
   }
 
   .hero-image-2 {
-    background-image: url('https://images.unsplash.com/photo-1519996529931-28324d5a630e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero_2.jpeg");
   }
 
   .hero-image-3 {
-    background-image: url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero3.jpeg");
   }
+
+  .hero-image-4 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero4.jpeg");
+  }
+
+  .hero-image-5 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero5.jpeg");
+  }
+
+
+
+
+
 
   .hero-image::before {
     content: '';
@@ -1117,7 +1133,7 @@
     <span class="hero-dot" data-slide="2"></span>
   </div>
 </section>
-
+{% comment %} 
 <!-- ===== RATING & REVIEWS SECTION ===== -->
 <section class="rating-section">
   <div class="container">
@@ -1269,7 +1285,7 @@
       {% endif %}
     </div>
   </div>
-</section>
+</section> {% endcomment %}
 
 <!-- ===== RELATED PRODUCTS SECTION ===== -->
 <section class="related-products" style="padding: 4rem 0; background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);">

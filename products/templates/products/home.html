@@ -141,6 +141,47 @@
     transform: scale(1.2);
   }
 
+
+
+
+  /* ===== NOTIFICATION STYLES ===== */
+  .notification-modern {
+    border-radius: 15px;
+    margin: 2rem auto;
+    padding: 1.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 500;
+    border-left: 4px solid;
+    animation: slideIn 0.5s ease-out;
+    max-width: 1200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .notification-success {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    color: #155724;
+    border-left-color: #28a745;
+  }
+  
+  .notification-error {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    border-left-color: #dc3545;
+  }
+  
+  .notification-info {
+    background: linear-gradient(135deg, #cce7ff 0%, #b3d7ff 100%);
+    color: #004085;
+    border-left-color: #007bff;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+
+
   /* Features Section */
   .features-section {
     padding: 5rem 0;
@@ -649,6 +690,18 @@
   .blog-card:nth-child(1) { transition-delay: 0.1s; }
   .blog-card:nth-child(2) { transition-delay: 0.2s; }
   .blog-card:nth-child(3) { transition-delay: 0.3s; }
+
+  
+
+
+
+
+
+
+
+  .hero-image-5 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero5.jpeg");
+  }
 </style>
 {% endblock %}
 
@@ -657,10 +710,10 @@
 <section class="hero-section">
   <!-- Background Carousel -->
   <div class="hero-carousel">
-    <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
-    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
-    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1519996529931-28324d5a630e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
-    <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')"></div>
+    <div class="carousel-slide active" style="background-image: url('{{ MEDIA_URL }}static_files/IMG/hero1.jpeg')"></div>
+    <div class="carousel-slide" style="background-image: url('{{ MEDIA_URL }}static_files/IMG/hero_2.jpeg')"></div>
+    <div class="carousel-slide" style="background-image: url('{{ MEDIA_URL }}static_files/IMG/hero3.jpeg')"></div>
+    <div class="carousel-slide" style="background-image: url('{{ MEDIA_URL }}static_files/IMG/hero4.jpeg')"></div>
   </div>
   
   <!-- Content -->
@@ -688,6 +741,27 @@
     <span class="carousel-dot" data-slide="3"></span>
   </div>
 </section>
+
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container">
+      {% for message in messages %}
+        <div class="notification-modern 
+          {% if message.tags == 'success' %}notification-success
+          {% elif message.tags == 'error' %}notification-error
+          {% else %}notification-info{% endif %}">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <i class="fas 
+              {% if message.tags == 'success' %}fa-check-circle
+              {% elif message.tags == 'error' %}fa-exclamation-circle
+              {% else %}fa-info-circle{% endif %}"></i>
+            <span>{{ message }}</span>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+    {% endif %}
 
 <!-- Features Section -->
 <section class="features-section">
@@ -834,10 +908,30 @@
     <p class="subtitle is-5 has-text-white mb-4">
       Recevez nos dernières offres exclusives et actualités
     </p>
-    <form class="newsletter-form">
+    {% comment %} <form class="newsletter-form">
       <div class="field has-addons">
         <div class="control is-expanded">
           <input class="input newsletter-input" type="email" placeholder="Votre adresse email" required>
+        </div>
+        <div class="control">
+          <button class="button newsletter-btn" type="submit">
+            S'abonner
+          </button>
+        </div>
+      </div>
+    </form> {% endcomment %}
+
+    <form class="newsletter-form" method="POST" action="{% url 'newsletter_subscribe' %}">
+      {% csrf_token %}
+      <div class="field has-addons">
+        <div class="control is-expanded">
+          <input
+            class="input newsletter-input"
+            type="email"
+            name="email"
+            placeholder="Votre adresse email"
+            required
+          >
         </div>
         <div class="control">
           <button class="button newsletter-btn" type="submit">

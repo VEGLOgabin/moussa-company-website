@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.http import JsonResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.views.decorators.http import require_POST
-from .models import Product, Order, Testimonial, Partner, ContactMessage, BlogPost, PaymentHistory, OrderProduct, ProductRating
+from .models import Product, Order, Testimonial, Partner, ContactMessage, BlogPost, PaymentHistory, OrderProduct, ProductRating, NewsletterSubscriber
 from accounts.models import User
 import logging
 from django.utils import timezone
@@ -62,6 +62,7 @@ def home(request):
     
     context = {
         'user': request.user,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         'featured_products': featured_products,
         'new_arrivals': new_arrivals,
         'best_sellers': best_sellers,
@@ -123,7 +124,7 @@ def products(request):
     
     context = {
         'products': products_page,
-        'is_admin': True,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         'cart_product_ids': cart_product_ids,
         'search_query': search_query,  # Pass search back to template
         'sort_by': sort_by,            # Pass sort back to template
@@ -286,6 +287,7 @@ def product_detail(request, product_id):
     
     context = {
         'product': product,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         'related_products': related_products,
         'ratings': ratings,
         'user_rating': user_rating,
@@ -398,16 +400,19 @@ def payment_success(request):
 # About
 
 def about(request):
-    context = {}
+    context = {
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
+    }
     return render(request, "products/about.html", context)
 
 # Blog
 def blog(request):
     context  = {
         "posts": BlogPost.objects.all(),
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         "user": request.user
         }
-    return render(request, "products/blog_1_1.html", context)
+    return render(request, "products/blog.html", context)
 
 
 
@@ -467,8 +472,9 @@ def blog_detail(request, post_slug):
     # The context dictionary passes the blog_post object to the template
     context = {
         'blog_post': blog_post,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
     }
-    return render(request, 'products/blog_detail_2.html', context)
+    return render(request, 'products/blog_detail.html', context)
 
 
 
@@ -782,6 +788,7 @@ def payment_history(request):
     
     context = {
         'payments': payments,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         'total_payments': total_payments,
         'successful_payments': successful_payments,
         'pending_payments': pending_payments,
@@ -931,6 +938,7 @@ def profile(request):
         return redirect('profile')
     context = {
         'user': request.user, 
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
     }
     return render(request, 'products/profile.html', context)
 
@@ -1094,6 +1102,7 @@ def checkout(request):
 
     context = {
         "cart_items": cart_items,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         "total": total,
         "order": order,
         "internal_transaction_id": internal_transaction_id,
@@ -1223,6 +1232,7 @@ def order_confirmation(request, order_id):
 
     context = {
         'order': order,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         'order_products': order_products,
     }
     return render(request, 'products/order_confirmation.html', context)
@@ -1357,6 +1367,7 @@ def admin_dashboard(request):
     
     context = {
         'user_count': user_count,
+        'is_admin': request.user.is_authenticated and request.user.is_admin(),
         'product_count': product_count,
         'order_count': order_count,
         'total_revenue': total_revenue,
@@ -1421,3 +1432,20 @@ def format_activity_time(time):
     
     
     
+
+def newsletter_subscribe(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+        
+        
+
+        if email:
+            email = email.strip()
+            subscriber, created = NewsletterSubscriber.objects.get_or_create(email=email)
+
+            if created:
+                messages.success(request, "Merci pour votre abonnement 🎉")
+            else:
+                messages.info(request, "Vous êtes déjà abonné 😉")
+
+        return redirect("home")

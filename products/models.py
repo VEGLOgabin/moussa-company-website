@@ -3,11 +3,6 @@ from django.utils import timezone
 from accounts.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-
-
-
-
-
 class Product(models.Model):
     name = models.CharField(max_length=255)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products')
@@ -17,9 +12,6 @@ class Product(models.Model):
     currency = models.CharField(max_length=100, default="FCFA")
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
-    
-    
-    
     
     # ✅ NEW FIELD
     is_active = models.BooleanField(default=True)
@@ -47,9 +39,6 @@ class Product(models.Model):
         return self.name
 
         
-        
-        
-    
 class ProductRating(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='ratings')
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='product_ratings')
@@ -67,9 +56,6 @@ class ProductRating(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.product.name} - {self.rating} stars"
-
-
-
 
 
 
@@ -154,7 +140,6 @@ class BlogPost(models.Model):
     def __str__(self):
         return self.title
     
-    
 
    
 class PaymentHistory(models.Model):
@@ -212,10 +197,6 @@ class PaymentHistory(models.Model):
  
     
     
-    
-
-
-
 
 # -------------------- USER ACTION LOG --------------------
 class UserActionLog(models.Model):
@@ -239,3 +220,20 @@ class UserActionLog(models.Model):
     def __str__(self):
         user_str = f"{self.user}" if self.user else "Anonymous"
         return f"[{self.level}] {user_str} - {self.action[:50]}"
+    
+    
+    
+    
+    
+    
+    
+    
+class NewsletterSubscriber(models.Model):
+    email = models.EmailField(
+        unique=True,
+        db_index=True
+    )
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.email

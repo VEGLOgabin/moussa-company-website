@@ -1,98 +1,1194 @@
+
 {% extends 'base.html' %}
 
-{% block title %}Accueil | Sojainnovation{% endblock %}
+{% block title %}Actualités & Blog | Ecofeed{% endblock %}
 
 {% block style %}
 <style>
+  /* Modern Blog Page */
+  :root {
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --card-border: rgba(48, 126, 51, 0.1);
+    --tag-bg: rgba(232, 245, 233, 0.8);
+    --modal-bg: rgba(255, 255, 255, 0.98);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Hero Section with Background Carousel */
+  .blog-hero {
+    position: relative;
+    height: 50vh;
+    min-height: 400px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 4rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  {% comment %} .hero-image-1 {
+    background-image: url('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1490818387583-1baba5e638af?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  } {% endcomment %}
+
+  /* Using static folder images */
+  .hero-image-1 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero1.jpeg");
+  }
+
+  .hero-image-2 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero_2.jpeg");
+  }
+
+  .hero-image-3 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero3.jpeg");
+  }
+
+  .hero-image-4 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero4.jpeg");
+  }
+
+  .hero-image-5 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero5.jpeg");
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.9) 0%, rgba(30, 109, 45, 0.85) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .blog-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.2rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .blog-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
+    opacity: 0.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .hero-cta {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 1.1s forwards;
+  }
+
+  .hero-cta:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(239, 125, 18, 0.3);
+  }
+
+  /* Blog Section */
+  .blog-section {
+    padding: 0 0 6rem;
+    position: relative;
+  }
+
+  .blog-container {
+    position: relative;
+    z-index: 10;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    color: var(--dark);
+    margin: 0;
+  }
+
+  .section-subtitle {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+  }
+
+  /* Blog Grid */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+
+  @media (max-width: 768px) {
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* Blog Card */
+  .blog-card {
+    background: var(--card-bg);
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--card-border);
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .blog-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .blog-card:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .blog-image {
+    height: 220px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .blog-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+  }
+
+  .blog-tag {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    background: var(--tag-bg);
+    color: var(--primary-green);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    z-index: 2;
+  }
+
+  .blog-content {
+    padding: 2rem;
+  }
+
+  .blog-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+  }
+
+  .blog-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--gray);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+  }
+
+  .blog-date {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .blog-excerpt {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .blog-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Action Buttons */
+  .action-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .read-btn {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+  }
+
+  .edit-btn {
+    background: var(--primary-green-light);
+    color: var(--primary-green);
+    border: 2px solid var(--primary-green);
+  }
+
+  .delete-btn {
+    background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%);
+    color: white;
+    border: none;
+  }
+
+  .action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: white;
+    border-radius: 25px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .empty-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: var(--primary-green);
+    font-size: 2.5rem;
+  }
+
+  .empty-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--dark);
+    margin-bottom: 1rem;
+  }
+
+  .empty-description {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    max-width: 400px;
+    margin: 0 auto 2.5rem;
+    line-height: 1.6;
+  }
+
+  /* Modal Styles */
+  .modal-card {
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    background: var(--modal-bg);
+    border: 1px solid var(--card-border);
+  }
+
+  .modal-card-head {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    border-bottom: none;
+    padding: 2rem;
+  }
+
+  .modal-card-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: white;
+  }
+
+  .modal-card-body {
+    padding: 2rem;
+  }
+
+  .modal-card-foot {
+    background: var(--primary-green-light);
+    border-top: 1px solid var(--card-border);
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+  }
+
+  /* Form Styling */
+  .form-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    border: 2px solid var(--input-border);
+    border-radius: 15px;
+    background: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 0 4px rgba(48, 126, 51, 0.1);
+  }
+
+  .form-textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+
+  /* File Upload */
+  .file-upload-container {
+    margin-top: 1rem;
+  }
+
+  .file-upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background-color: white;
+    border: 2px dashed var(--input-border);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-label:hover {
+    background-color: rgba(232, 245, 233, 0.5);
+    border-color: var(--primary-green);
+  }
+
+  .file-upload-text {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+  }
+
+  .file-upload-button {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .file-upload-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(252, 193, 16, 0.3);
+  }
+
+  .file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+
+  .image-preview {
+    margin-top: 1.5rem;
+  }
+
+  .image-preview img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 15px;
+    border: 2px solid var(--card-border);
+  }
+
+  /* Notifications */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error {
+    border-left-color: #F44336;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .blog-hero h1 {
+      font-size: 2.5rem;
+    }
+    
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .blog-hero {
+      height: 40vh;
+      min-height: 300px;
+    }
+    
+    .blog-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .blog-hero p {
+      font-size: 1.1rem;
+    }
+    
+    .blog-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .blog-card {
+      border-radius: 20px;
+    }
+    
+    .modal-card {
+      margin: 1rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .blog-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+    }
+    
+    .blog-actions {
+      flex-direction: column;
+    }
+    
+    .action-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* Staggered animations */
+  .blog-card:nth-child(1) { transition-delay: 0.1s; }
+  .blog-card:nth-child(2) { transition-delay: 0.2s; }
+  .blog-card:nth-child(3) { transition-delay: 0.3s; }
+  .blog-card:nth-child(4) { transition-delay: 0.4s; }
+  .blog-card:nth-child(5) { transition-delay: 0.5s; }
+  .blog-card:nth-child(6) { transition-delay: 0.6s; }
 </style>
 {% endblock %}
 
 {% block content %}
-
-<div>
-
-
-<!-- Hero -->
-<section class="hero is-light is-medium">
-  <div class="hero-body has-text-centered">
-    <p class="title is-2">Actualités & Blog</p>
-    <p class="subtitle is-5">Découvrez nos dernières nouvelles, événements et projets innovants</p>
+<!-- Hero Section with Background Carousel -->
+<section class="blog-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>Actualités & Blog</h1>
+    <p>Découvrez nos articles, conseils et actualités sur les produits naturels et le bien-être</p>
+    <button class="hero-cta js-modal-trigger" data-target="createModal">
+      <i class="fas fa-plus-circle mr-2"></i>Ajouter un article
+    </button>
   </div>
 </section>
 
-<!-- Blog Articles -->
-<section class="section">
-  <div class="container">
-    <div class="columns is-multiline">
-
-      <!-- Blog Post 1 -->
-      <div class="column is-4">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-4by3">
-              <img src="https://source.unsplash.com/800x600/?organic,food" alt="Article 1">
-            </figure>
-          </div>
-          <div class="card-content">
-            <p class="title is-5">Lancement officiel de nos snacks au manioc</p>
-            <p class="subtitle is-7 has-text-grey">Publié le 10 juillet 2025</p>
-            <div class="content">
-              Nous avons lancé une nouvelle gamme de snacks 100% bio à base de manioc. Découvrez les bienfaits de cette innovation...
-              <br><br>
-              <a href="#" class="button is-small is-link mt-2">Lire la suite</a>
-            </div>
-          </div>
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% else %}is-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
         </div>
       </div>
-
-      <!-- Blog Post 2 -->
-      <div class="column is-4">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-4by3">
-              <img src="https://source.unsplash.com/800x600/?cassava,farming" alt="Article 2">
-            </figure>
-          </div>
-          <div class="card-content">
-            <p class="title is-5">Sojainnovation participe au Salon de l’agroalimentaire</p>
-            <p class="subtitle is-7 has-text-grey">Publié le 3 juillet 2025</p>
-            <div class="content">
-              Nous étions présents au plus grand salon agricole du Bénin. Un événement riche en échanges et en partenariats prometteurs...
-              <br><br>
-              <a href="#" class="button is-small is-link mt-2">Lire la suite</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Blog Post 3 -->
-      <div class="column is-4">
-        <div class="card">
-          <div class="card-image">
-            <figure class="image is-4by3">
-              <img src="https://source.unsplash.com/800x600/?youth,entrepreneurship" alt="Article 3">
-            </figure>
-          </div>
-          <div class="card-content">
-            <p class="title is-5">Formation sur l'entrepreneuriat agroalimentaire</p>
-            <p class="subtitle is-7 has-text-grey">Publié le 20 juin 2025</p>
-            <div class="content">
-              Retour sur notre atelier de formation destiné aux jeunes entrepreneurs intéressés par le secteur agroalimentaire...
-              <br><br>
-              <a href="#" class="button is-small is-link mt-2">Lire la suite</a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add more posts dynamically via Django later -->
-
-    </div>
-  </div>
-</section>
+    {% endfor %}
+  {% endif %}
 </div>
 
+<!-- Main Blog Section -->
+<section class="blog-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container blog-container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Nos Derniers Articles</h2>
+        <p class="section-subtitle">{{ posts|length }} article{{ posts|pluralize }} publié{{ posts|pluralize }}</p>
+      </div>
+      <button class="action-btn read-btn js-modal-trigger" data-target="createModal">
+        <i class="fas fa-plus-circle"></i>Nouvel article
+      </button>
+    </div>
+
+    {% if posts %}
+    <!-- Blog Grid -->
+    <div class="blog-grid">
+      {% for post in posts %}
+      <div class="blog-card" id="post-{{ post.id }}">
+        <!-- Blog Image -->
+        <div class="blog-image" 
+             style="background-image: url('{% if post.cover_image %}{{ post.cover_image.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80{% endif %}')">
+          <span class="blog-tag">
+            <i class="fas fa-tag mr-1"></i>Blog
+          </span>
+        </div>
+        
+        <!-- Blog Content -->
+        <div class="blog-content">
+          <h3 class="blog-title">{{ post.title }}</h3>
+          
+          <!-- Meta Information -->
+          <div class="blog-meta">
+            <span class="blog-date">
+              <i class="far fa-calendar"></i>
+              {{ post.published_at|date:"j M Y" }}
+            </span>
+            <span>
+              <i class="far fa-clock"></i>
+              {{ post.read_time }} min
+            </span>
+          </div>
+          
+          <!-- Excerpt -->
+          <p class="blog-excerpt">
+            {{ post.content|truncatechars:200 }}
+          </p>
+          
+          <!-- Actions -->
+          <div class="blog-actions">
+            <a href="{% url 'blog_detail' post.slug %}" class="action-btn read-btn">
+              <i class="fas fa-book-reader"></i>Lire la suite
+            </a>
+            <button class="action-btn edit-btn js-modal-trigger-edit"
+                    data-target="editModal"
+                    data-id="{{ post.id }}"
+                    data-title="{{ post.title|escapejs }}"
+                    data-content="{{ post.content|escapejs }}"
+                    data-image="{% if post.cover_image %}{{ post.cover_image.url }}{% endif %}">
+              <i class="fas fa-edit"></i>Modifier
+            </button>
+            <button class="action-btn delete-btn js-modal-trigger-delete"
+                    data-target="deleteModal"
+                    data-id="{{ post.id }}">
+              <i class="fas fa-trash"></i>Supprimer
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="fas fa-newspaper"></i>
+      </div>
+      <h2 class="empty-title">Aucun article disponible</h2>
+      <p class="empty-description">
+        Vous n'avez pas encore créé d'articles. Commencez par ajouter votre premier article
+        pour partager des conseils et actualités avec votre communauté.
+      </p>
+      <button class="action-btn read-btn js-modal-trigger" data-target="createModal">
+        <i class="fas fa-plus-circle"></i>Créer un article
+      </button>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Create Modal -->
+<div id="createModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Créer un article</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form method="POST" enctype="multipart/form-data" action="{% url 'post_news' %}">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="form-label">Titre</label>
+          <input class="form-input" type="text" name="title" placeholder="Titre de l'article" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Contenu</label>
+          <textarea class="form-textarea" name="content" placeholder="Contenu de l'article..." required></textarea>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Image de couverture</label>
+          <div class="file-upload-container">
+            <div class="file-upload-label" id="createFileUploadLabel">
+              <span class="file-upload-text">Choisir un fichier</span>
+              <span class="file-upload-button">Parcourir</span>
+              <input class="file-input" type="file" name="cover_image" id="createFileInput" accept="image/*">
+            </div>
+            <div class="file-name" id="createFileName">Aucun fichier choisi</div>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="action-btn read-btn">
+          <i class="fas fa-save"></i>Enregistrer
+        </button>
+        <button class="action-btn edit-btn js-modal-close" type="button">
+          <i class="fas fa-times"></i>Annuler
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier l'article</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <form id="editForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <section class="modal-card-body">
+        <div class="field">
+          <label class="form-label">Titre</label>
+          <input class="form-input" type="text" name="title" id="editPostTitle" required>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Contenu</label>
+          <textarea class="form-textarea" name="content" id="editPostContent" required></textarea>
+        </div>
+
+        <div class="field">
+          <label class="form-label">Image de couverture actuelle</label>
+          {% if post.cover_image %}
+          <div class="image-preview">
+            <img id="editPostImagePreview" src="" alt="Aperçu de l'image">
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="field">
+          <label class="form-label">Changer l'image</label>
+          <div class="file-upload-container">
+            <div class="file-upload-label" id="editFileUploadLabel">
+              <span class="file-upload-text">Choisir un fichier</span>
+              <span class="file-upload-button">Parcourir</span>
+              <input class="file-input" type="file" name="cover_image" id="editFileInput" accept="image/*">
+            </div>
+            <div class="file-name" id="editFileName">Garder l'image actuelle</div>
+          </div>
+        </div>
+      </section>
+      <footer class="modal-card-foot">
+        <button type="submit" class="action-btn read-btn">
+          <i class="fas fa-sync-alt"></i>Mettre à jour
+        </button>
+        <button class="action-btn edit-btn js-modal-close" type="button">
+          <i class="fas fa-times"></i>Annuler
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div id="deleteModal" class="modal">
+  <div class="modal-background js-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title has-text-white">Supprimer l'article</p>
+      <button class="delete js-modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p style="font-family: 'Quicksand', sans-serif; font-size: 1.1rem; line-height: 1.6;">
+        Êtes-vous sûr de vouloir supprimer cet article ? Cette action est irréversible.
+      </p>
+    </section>
+    <footer class="modal-card-foot">
+      <form id="deleteForm" method="post">
+        {% csrf_token %}
+        <button type="submit" class="action-btn delete-btn">
+          <i class="fas fa-trash"></i>Oui, Supprimer
+        </button>
+        <button class="action-btn edit-btn js-modal-close" type="button">
+          <i class="fas fa-times"></i>Annuler
+        </button>
+      </form>
+    </footer>
+  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-{% endblock scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Background carousel
+  const heroImages = document.querySelectorAll('.hero-image');
+  let currentHeroImage = 0;
+  
+  function rotateHeroImages() {
+    heroImages.forEach(img => img.classList.remove('active'));
+    currentHeroImage = (currentHeroImage + 1) % heroImages.length;
+    heroImages[currentHeroImage].classList.add('active');
+  }
+  
+  // Start carousel
+  let heroInterval = setInterval(rotateHeroImages, 4000);
+
+  // Modal functionality
+  function openModal(modalId) {
+    const target = document.getElementById(modalId);
+    if (target) {
+      target.classList.add('is-active');
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeAllModals() {
+    (document.querySelectorAll('.modal') || []).forEach(($modal) => {
+      $modal.classList.remove('is-active');
+    });
+    document.body.style.overflow = 'auto';
+  }
+
+  // Open create modal
+  (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      openModal(modalId);
+    });
+  });
+
+  // Open edit modal & fill form
+  (document.querySelectorAll('.js-modal-trigger-edit') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const postId = $trigger.dataset.id;
+      const postTitle = $trigger.dataset.title;
+      const postContent = $trigger.dataset.content;
+      const postImage = $trigger.dataset.image;
+
+      const form = document.getElementById('editForm');
+      form.action = `/post/update/${postId}/`;
+      document.getElementById('editPostTitle').value = postTitle;
+      document.getElementById('editPostContent').value = postContent;
+      
+      if (postImage) {
+        document.getElementById('editPostImagePreview').src = postImage;
+      }
+
+      openModal(modalId);
+    });
+  });
+
+  // Open delete modal & set form action
+  (document.querySelectorAll('.js-modal-trigger-delete') || []).forEach(($trigger) => {
+    $trigger.addEventListener('click', () => {
+      const modalId = $trigger.dataset.target;
+      const postId = $trigger.dataset.id;
+
+      const form = document.getElementById('deleteForm');
+      form.action = `/post/delete/${postId}/`;
+
+      openModal(modalId);
+    });
+  });
+
+  // Close modals
+  (document.querySelectorAll('.js-modal-close') || []).forEach(($close) => {
+    $close.addEventListener('click', () => {
+      closeAllModals();
+    });
+  });
+
+  // File upload handling for create modal
+  const createFileInput = document.getElementById('createFileInput');
+  const createFileName = document.getElementById('createFileName');
+  const createFileUploadLabel = document.getElementById('createFileUploadLabel');
+
+  if (createFileInput) {
+    createFileUploadLabel.addEventListener('click', () => {
+      createFileInput.click();
+    });
+
+    createFileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        createFileName.textContent = this.files[0].name;
+        createFileName.style.color = 'var(--primary-green)';
+      } else {
+        createFileName.textContent = "Aucun fichier choisi";
+        createFileName.style.color = 'var(--gray)';
+      }
+    });
+  }
+
+  // File upload handling for edit modal
+  const editFileInput = document.getElementById('editFileInput');
+  const editFileName = document.getElementById('editFileName');
+  const editFileUploadLabel = document.getElementById('editFileUploadLabel');
+
+  if (editFileInput) {
+    editFileUploadLabel.addEventListener('click', () => {
+      editFileInput.click();
+    });
+
+    editFileInput.addEventListener('change', function() {
+      if (this.files.length > 0) {
+        editFileName.textContent = this.files[0].name;
+        editFileName.style.color = 'var(--primary-green)';
+        
+        // Preview new image
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById('editPostImagePreview');
+          if (preview) {
+            preview.src = e.target.result;
+          }
+        };
+        reader.readAsDataURL(this.files[0]);
+      } else {
+        editFileName.textContent = "Garder l'image actuelle";
+        editFileName.style.color = 'var(--gray)';
+      }
+    });
+  }
+
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll('.notification');
+  notifications.forEach(notification => {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // Animate blog cards on scroll
+  const blogCards = document.querySelectorAll('.blog-card');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, index * 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  blogCards.forEach(card => observer.observe(card));
+
+  // Close modal on Escape key
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeAllModals();
+    }
+  });
+
+  // Animate hero elements
+  const heroTitle = document.querySelector('.blog-hero h1');
+  const heroSubtitle = document.querySelector('.blog-hero p');
+  const heroButton = document.querySelector('.hero-cta');
+
+  if (heroTitle) {
+    heroTitle.style.opacity = '0';
+    heroTitle.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroTitle.style.transition = 'all 0.8s ease';
+      heroTitle.style.opacity = '1';
+      heroTitle.style.transform = 'translateY(0)';
+    }, 300);
+  }
+
+  if (heroSubtitle) {
+    heroSubtitle.style.opacity = '0';
+    heroSubtitle.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroSubtitle.style.transition = 'all 0.8s ease 0.3s';
+      heroSubtitle.style.opacity = '1';
+      heroSubtitle.style.transform = 'translateY(0)';
+    }, 600);
+  }
+
+  if (heroButton) {
+    heroButton.style.opacity = '0';
+    heroButton.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroButton.style.transition = 'all 0.8s ease 0.6s';
+      heroButton.style.opacity = '1';
+      heroButton.style.transform = 'translateY(0)';
+    }, 900);
+  }
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+

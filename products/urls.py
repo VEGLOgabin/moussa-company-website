@@ -84,4 +84,11 @@ urlpatterns = [
     # path('payment/failed/', views.payment_failed, name='payment_failed'),
     
 
+
+
+
+    path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+
+
+
 ]

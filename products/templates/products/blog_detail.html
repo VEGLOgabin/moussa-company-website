@@ -1,73 +1,1276 @@
+
+
+
 {% extends 'base.html' %}
 
+{% block title %}{{ blog_post.title }} | Ecofeed{% endblock %}
 
+{% block style %}
+<style>
+  /* Modern Blog Detail Page */
+  :root {
+    --content-bg: rgba(255, 255, 255, 0.98);
+    --sidebar-bg: rgba(248, 249, 250, 0.95);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
 
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Hero Section with Background */
+  .blog-detail-hero {
+    position: relative;
+    height: 60vh;
+    min-height: 500px;
+    color: white;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 4rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  .hero-image-1 {
+    background-image: url('{% if blog_post.cover_image %}{{ blog_post.cover_image.url }}{% else %}https://images.unsplash.com/photo-1546069901-ba9599a7e63c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80{% endif %}');
+  }
+
+  .hero-image-2 {
+    background-image: url('https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image-3 {
+    background-image: url('https://images.unsplash.com/photo-1519996529931-28324d5a630e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to top, rgba(48, 126, 51, 0.95) 0%, rgba(30, 109, 45, 0.8) 50%, transparent 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 3rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    width: 100%;
+  }
+
+  .hero-content h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .hero-meta {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.1rem;
+    opacity: 0.9;
+  }
+
+  .meta-item i {
+    color: var(--primary-yellow);
+  }
+
+  /* Back Button */
+  .back-button-container {
+    position: sticky;
+    top: 100px;
+    z-index: 100;
+    margin-bottom: 2rem;
+  }
+
+  .back-button {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  .back-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Main Content */
+  .blog-content-section {
+    padding: 0 0 6rem;
+    position: relative;
+  }
+
+  .content-container {
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    gap: 3rem;
+    position: relative;
+    z-index: 10;
+  }
+
+  @media (max-width: 1024px) {
+    .content-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+
+  /* Article Content */
+  .article-content {
+    background: var(--content-bg);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s ease;
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  .article-content.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .article-content:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  /* Article Text Styling */
+  .article-body {
+    font-family: 'Quicksand', sans-serif;
+    line-height: 1.8;
+    font-size: 1.1rem;
+    color: var(--dark);
+  }
+
+  .article-body h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 2.5rem 0 1rem;
+    color: var(--primary-green);
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid var(--primary-green-light);
+  }
+
+  .article-body h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 2rem 0 1rem;
+    color: var(--dark);
+  }
+
+  .article-body p {
+    margin-bottom: 1.5rem;
+  }
+
+  .article-body ul,
+  .article-body ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .article-body li {
+    margin-bottom: 0.5rem;
+  }
+
+  .article-body strong {
+    color: var(--primary-green);
+    font-weight: 600;
+  }
+
+  .article-body em {
+    color: var(--primary-orange);
+    font-style: italic;
+  }
+
+  .article-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    margin: 2rem 0;
+    box-shadow: var(--shadow-md);
+    transition: all 0.4s ease;
+  }
+
+  .article-body img:hover {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .article-body blockquote {
+    border-left: 4px solid var(--primary-yellow);
+    padding-left: 2rem;
+    margin: 2rem 0;
+    font-style: italic;
+    color: var(--gray);
+    font-size: 1.2rem;
+    background: var(--primary-green-light);
+    padding: 2rem;
+    border-radius: 15px;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: sticky;
+    top: 120px;
+    height: fit-content;
+  }
+
+  .sidebar-card {
+    background: var(--sidebar-bg);
+    border-radius: 25px;
+    padding: 2.5rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+    border: 1px solid rgba(48, 126, 51, 0.1);
+  }
+
+  .sidebar-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--primary-green);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--primary-green-light);
+  }
+
+  /* Author Info */
+  .author-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .author-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-green);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .author-details h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .author-details p {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.95rem;
+  }
+
+  /* Share Buttons */
+  .share-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .share-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    text-decoration: none;
+  }
+
+  .share-facebook {
+    background: linear-gradient(135deg, #1877F2 0%, #0D65D9 100%);
+    color: white;
+  }
+
+  .share-twitter {
+    background: linear-gradient(135deg, #1DA1F2 0%, #0D8AE5 100%);
+    color: white;
+  }
+
+  .share-linkedin {
+    background: linear-gradient(135deg, #0077B5 0%, #0065A4 100%);
+    color: white;
+  }
+
+  .share-whatsapp {
+    background: linear-gradient(135deg, #25D366 0%, #1EAE56 100%);
+    color: white;
+  }
+
+  .share-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  }
+
+  /* Related Posts */
+  .related-post {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .related-post:hover {
+    background: var(--primary-green-light);
+    transform: translateX(5px);
+  }
+
+  .related-post img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+
+  .related-post h5 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .related-post span {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 0.85rem;
+  }
+
+  /* Article Footer */
+  .article-footer {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 2px solid var(--primary-green-light);
+  }
+
+  .article-tags {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .tag {
+    background: var(--primary-green-light);
+    color: var(--primary-green);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .tag:hover {
+    background: var(--primary-green);
+    color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Reading Progress */
+  .reading-progress {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: var(--primary-green-light);
+    z-index: 999;
+  }
+
+  .reading-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-green) 0%, var(--primary-yellow) 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 0 2px 2px 0;
+  }
+
+  /* Notifications */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification {
+    background: white;
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .notification.is-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.95) 0%, rgba(232, 245, 233, 0.8) 100%);
+  }
+
+  .notification.is-error {
+    border-left-color: #F44336;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+  }
+
+  .notification.is-info {
+    border-left-color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .blog-detail-hero h1 {
+      font-size: 2.5rem;
+    }
     
+    .content-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .sidebar {
+      position: static;
+    }
+  }
 
-    {% block title %}{{ blog_post.title }}| Sojainnovation{% endblock %}
-    <script src="https://cdn.tailwindcss.com"></script>
+  @media (max-width: 768px) {
+    .blog-detail-hero {
+      height: 50vh;
+      min-height: 400px;
+    }
+    
+    .blog-detail-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .hero-meta {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .article-content {
+      padding: 2rem;
+    }
+    
+    .sidebar-card {
+      padding: 1.5rem;
+    }
+    
+    .author-info {
+      flex-direction: column;
+      text-align: center;
+    }
+    
+    .share-buttons {
+      flex-direction: column;
+    }
+    
+    .share-btn {
+      width: 100%;
+    }
+  }
 
-    {% block style %}
-
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7fafc;
-        }
-        /* Custom styles for image and content formatting */
-        .blog-content img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 0.5rem;
-            margin: 1.5rem 0;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .blog-content p {
-            margin-bottom: 1rem;
-            line-height: 1.75;
-        }
-    </style>
-
-    {% endblock %}
-
+  @media (max-width: 480px) {
+    .blog-detail-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .hero-content {
+      padding: 2rem 1rem;
+    }
+    
+    .article-body h2 {
+      font-size: 1.5rem;
+    }
+    
+    .article-body h3 {
+      font-size: 1.3rem;
+    }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-12">
+<!-- Reading Progress Bar -->
+<div class="reading-progress">
+  <div class="reading-progress-bar" id="readingProgress"></div>
+</div>
+
+<!-- Hero Section with Background Carousel -->
+<section class="blog-detail-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>{{ blog_post.title }}</h1>
+    
+    <div class="hero-meta">
+      <div class="meta-item">
+        <i class="far fa-calendar"></i>
+        <span>{{ blog_post.published_at|date:"d M Y" }}</span>
+      </div>
+      <div class="meta-item">
+        <i class="far fa-clock"></i>
+        <span id="readingTime">5 min de lecture</span>
+      </div>
+      <div class="meta-item">
+        <i class="fas fa-user-edit"></i>
+        <span>{{ blog_post.posted_by.get_full_name|default:"Équipe Ecofeed" }}</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification 
+        {% if message.tags == 'success' %}is-success
+        {% elif message.tags == 'error' %}is-error
+        {% else %}is-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<!-- Main Content Section -->
+<section class="blog-content-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <!-- Back Button -->
+    <div class="back-button-container">
+      <a href="{% url 'blog' %}" class="back-button">
+        <i class="fas fa-arrow-left"></i>
+        Retour au blog
+      </a>
+    </div>
+
+    <div class="content-container">
+      <!-- Main Article Content -->
+      <main class="article-content" id="articleContent">
+        <article class="article-body">
+          {{ blog_post.content|safe }}
+        </article>
+
+        <!-- Article Footer -->
+        <footer class="article-footer">
+          <!-- Tags -->
+          {% if blog_post.tags.all %}
+          <div class="article-tags">
+            {% for tag in blog_post.tags.all %}
+            <a href="#" class="tag">#{{ tag.name }}</a>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          <!-- Action Buttons -->
+          <div class="buttons">
+            <button class="button is-primary" onclick="window.location.href='{% url 'blog' %}'">
+              <i class="fas fa-list mr-2"></i>Voir tous les articles
+            </button>
+            {% comment %} <button class="button is-warning" id="openModal">
+              <i class="fas fa-edit mr-2"></i>Modifier l'article
+            </button> {% endcomment %}
+          </div>
+        </footer>
+      </main>
+
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <!-- Author Info -->
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">À propos de l'auteur</h3>
+          <div class="author-info">
+            {% if blog_post.posted_by.photo %}
+            <img src="{{ blog_post.posted_by.photo.url }}" 
+                 alt="{{ blog_post.posted_by.get_full_name }}" 
+                 class="author-avatar">
+            {% else %}
+            <div class="author-avatar" 
+                 style="background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%); 
+                        display: flex; align-items: center; justify-content: center; color: white;">
+              <i class="fas fa-user fa-2x"></i>
+            </div>
+            {% endif %}
+            <div class="author-details">
+              <h4>{{ blog_post.posted_by.get_full_name|default:"Équipe Ecofeed" }}</h4>
+              <p>Expert en produits naturels et bien-être</p>
+              <p style="color: var(--primary-green); font-size: 0.9rem;">
+                <i class="fas fa-star"></i> {{ blog_post.posted_by.blog_posts.count }} articles
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share Article -->
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Partager l'article</h3>
+          <div class="share-buttons">
+            <button class="share-btn share-facebook" onclick="shareOnFacebook()">
+              <i class="fab fa-facebook-f"></i> Facebook
+            </button>
+            <button class="share-btn share-twitter" onclick="shareOnTwitter()">
+              <i class="fab fa-twitter"></i> Twitter
+            </button>
+            <button class="share-btn share-linkedin" onclick="shareOnLinkedIn()">
+              <i class="fab fa-linkedin-in"></i> LinkedIn
+            </button>
+            <button class="share-btn share-whatsapp" onclick="shareOnWhatsApp()">
+              <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+          </div>
+        </div>
+
+        <!-- Related Posts -->
+        {% if related_posts %}
+        <div class="sidebar-card">
+          <h3 class="sidebar-title">Articles similaires</h3>
+          {% for post in related_posts %}
+          <a href="{% url 'blog_detail' post.slug %}" class="related-post">
+            {% if post.cover_image %}
+            <img src="{{ post.cover_image.url }}" alt="{{ post.title }}">
+            {% else %}
+            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%); 
+                      border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white;">
+              <i class="fas fa-newspaper"></i>
+            </div>
+            {% endif %}
+            <div>
+              <h5>{{ post.title|truncatechars:50 }}</h5>
+              <span>{{ post.published_at|date:"d M Y" }}</span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- Modal for Updating Blog Post -->
+<div class="modal" id="updateModal">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Modifier l'article</p>
+      <button class="delete" aria-label="close" id="closeModal"></button>
+    </header>
+    <section class="modal-card-body">
+      <form>
+        <div class="field">
+          <label class="form-label">Titre</label>
+          <input class="form-input" type="text" value="{{ blog_post.title }}">
+        </div>
+        <div class="field">
+          <label class="form-label">Contenu</label>
+          <textarea class="form-textarea" rows="6">{{ blog_post.content|striptags }}</textarea>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success">Enregistrer</button>
+      <button class="button" id="cancelModal">Annuler</button>
+    </footer>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Background carousel
+  const heroImages = document.querySelectorAll('.hero-image');
+  let currentHeroImage = 0;
+  
+  function rotateHeroImages() {
+    heroImages.forEach(img => img.classList.remove('active'));
+    currentHeroImage = (currentHeroImage + 1) % heroImages.length;
+    heroImages[currentHeroImage].classList.add('active');
+  }
+  
+  // Start carousel
+  let heroInterval = setInterval(rotateHeroImages, 4000);
+
+  // Calculate reading time
+  function calculateReadingTime() {
+    const articleContent = document.querySelector('.article-body');
+    if (articleContent) {
+      const text = articleContent.textContent;
+      const wordCount = text.split(/\s+/).length;
+      const readingTime = Math.ceil(wordCount / 200); // 200 words per minute
+      document.getElementById('readingTime').textContent = `${readingTime} min de lecture`;
+    }
+  }
+
+  // Reading progress bar
+  function updateReadingProgress() {
+    const article = document.getElementById('articleContent');
+    const progressBar = document.getElementById('readingProgress');
+    
+    if (article && progressBar) {
+      const articleTop = article.offsetTop;
+      const articleHeight = article.offsetHeight;
+      const windowHeight = window.innerHeight;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > articleTop) {
+        const scrolled = scrollTop - articleTop;
+        const progress = Math.min((scrolled / (articleHeight - windowHeight)) * 100, 100);
+        progressBar.style.width = `${progress}%`;
+      } else {
+        progressBar.style.width = '0%';
+      }
+    }
+  }
+
+  // Animate article content on scroll
+  const articleContent = document.querySelector('.article-content');
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, 300);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  if (articleContent) {
+    observer.observe(articleContent);
+  }
+
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll('.notification');
+  notifications.forEach(notification => {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // Modal handling
+  const modal = document.getElementById('updateModal');
+  const openModalBtn = document.getElementById('openModal');
+  const closeModalBtn = document.getElementById('closeModal');
+  const cancelModalBtn = document.getElementById('cancelModal');
+
+  if (openModalBtn) {
+    openModalBtn.addEventListener('click', () => {
+      modal.classList.add('is-active');
+    });
+  }
+
+  if (closeModalBtn) {
+    closeModalBtn.addEventListener('click', () => {
+      modal.classList.remove('is-active');
+    });
+  }
+
+  if (cancelModalBtn) {
+    cancelModalBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.remove('is-active');
+    });
+  }
+
+  // Share functions
+  function shareOnFacebook() {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+  }
+
+  function shareOnTwitter() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("{{ blog_post.title }}");
+    window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+  }
+
+  function shareOnLinkedIn() {
+    const url = encodeURIComponent(window.location.href);
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+  }
+
+  function shareOnWhatsApp() {
+    const url = encodeURIComponent(window.location.href);
+    const text = encodeURIComponent("{{ blog_post.title }}");
+    window.open(`https://wa.me/?text=${text}%20${url}`, '_blank');
+  }
+
+  // Smooth scroll for internal links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Image lazy loading
+  const images = document.querySelectorAll('.article-body img');
+  images.forEach(img => {
+    img.style.opacity = '0';
+    img.style.transition = 'opacity 0.5s ease';
+    
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const image = entry.target;
+          image.style.opacity = '1';
+          observer.unobserve(image);
+        }
+      });
+    }, { threshold: 0.1 });
+    
+    observer.observe(img);
+  });
+
+  // Initialize
+  calculateReadingTime();
+  window.addEventListener('scroll', updateReadingProgress);
+  updateReadingProgress(); // Initial call
+
+  // Add subtle animation to back button
+  const backButton = document.querySelector('.back-button');
+  if (backButton) {
+    backButton.style.opacity = '0';
+    backButton.style.transform = 'translateX(-20px)';
+    
+    setTimeout(() => {
+      backButton.style.transition = 'all 0.6s ease';
+      backButton.style.opacity = '1';
+      backButton.style.transform = 'translateX(0)';
+    }, 500);
+  }
+
+  // Add hover effect to related posts
+  const relatedPosts = document.querySelectorAll('.related-post');
+  relatedPosts.forEach(post => {
+    post.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateX(10px)';
+    });
+    
+    post.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateX(5px)';
+    });
+  });
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+
+{% block title %}{{ blog_post.title }} | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f7fafc;
+        overflow-x: hidden;
+    }
+
+    /* Hero section */
+    .hero {
+        position: relative;
+        background-size: cover;
+        background-position: center;
+        height: 50vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+    }
+    .hero-overlay {
+        position: absolute;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+    }
+    .hero h1 {
+        position: relative;
+        z-index: 2;
+        font-size: 2.5rem;
+        animation: fadeInDown 1s ease-in-out;
+    }
+
+    /* Blog content */
+    .blog-container {
+        max-width: 900px;
+        margin: auto;
+        padding: 2rem;
+    }
+    .blog-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+        margin: 1.5rem 0;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .blog-content img:hover {
+        transform: scale(1.03);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .blog-content p {
+        margin-bottom: 1rem;
+        line-height: 1.75;
+        font-size: 1.1rem;
+    }
+
+    /* Sticky back button */
+    .back-button {
+        position: sticky;
+        top: 20px;
+        z-index: 50;
+    }
+
+    /* Modal */
+    .modal.is-active {
+        display: flex;
+    }
+
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero" style="background-image: url('{{ blog_post.cover_image.url }}')">
+    <div class="hero-overlay"></div>
+    <h1>{{ blog_post.title }}</h1>
+</div>
+
+
+
+
+<!-- Messages -->
+{% if messages %}
+<div class="container mt-4">
+  {% for message in messages %}
+    <div class="notification 
+      {% if message.tags == 'success' %}is-success
+      {% elif message.tags == 'error' %}is-danger
+      {% else %}is-info{% endif %}">
+      {{ message }}
+    </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+
+
+
+<div class="blog-container">
     <!-- Back to blog link -->
-    <div class="mb-8">
-        <a href="{% url 'blog' %}" 
-           class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-200">
-            <svg class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Retour au blog
+    <div class="mb-5 back-button">
+        <a href="{% url 'blog' %}" class="button is-link is-light">
+            <span class="icon">
+                <i class="fas fa-arrow-left"></i>
+            </span>
+            <span>Retour au blog</span>
         </a>
     </div>
 
     <!-- Blog Post Content Section -->
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden p-8 lg:p-12 max-w-4xl mx-auto">
-        <!-- Post Header -->
-        <header class="mb-8 border-b pb-6">
-            <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">
-                {{ blog_post.title }}
-            </h1>
-            <p class="text-gray-500 mt-2 text-sm">
-                Publié par <span class="text-gray-700 font-semibold">{{ blog_post.posted_by.get_full_name }}</span> le 
-                <time datetime="{{ blog_post.date_posted|date:'c' }}">{{ blog_post.date_posted|date:"d M Y" }}</time>
-            </p>
-        </header>
+    <div class="card" id="blogCard">
+        <div class="card-content">
+            <header class="mb-5">
+                <p class="subtitle is-6 has-text-grey">
+                    Publié par 
+                    <span class="has-text-dark has-text-weight-semibold">{{ blog_post.posted_by.get_full_name }}</span>
+                    le <time datetime="{{ blog_post.published_at|date:'c' }}">{{ blog_post.published_at|date:"d M Y" }}</time>
+                </p>
+            </header>
 
-        <!-- Cover Image -->
-        {% if blog_post.cover_image %}
-        <div class="mb-8">
-            <img src="{{ blog_post.cover_image.url }}" alt="{{ blog_post.title }}" class="w-full h-auto rounded-lg">
-        </div>
-        {% endif %}
+            <div class="content blog-content">
+                {{ blog_post.content|safe }}
+            </div>
 
-        <!-- Main Content -->
-        <div class="prose max-w-none text-gray-700 blog-content">
-            {{ blog_post.content|safe }}
+            <!-- Update Blog Post Button -->
+            <button class="button is-primary mt-4" id="openModal">Modifier l'article</button> 
         </div>
     </div>
 </div>
-{% endblock content %}
+
+<!-- Modal for Updating Blog Post -->
+<div class="modal" id="updateModal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Modifier l'article</p>
+            <button class="delete" aria-label="close" id="closeModal"></button>
+        </header>
+        <section class="modal-card-body">
+            <form>
+                <div class="field">
+                    <label class="label">Titre</label>
+                    <div class="control">
+                        <input class="input" type="text" value="{{ blog_post.title }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Contenu</label>
+                    <div class="control">
+                        <textarea class="textarea" rows="6">{{ blog_post.content|striptags }}</textarea>
+                    </div>
+                </div>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success">Enregistrer</button>
+            <button class="button" id="cancelModal">Annuler</button>
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    // Intersection Observer for fade-in
+    const blogCard = document.getElementById('blogCard');
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                blogCard.style.animation = 'fadeInDown 0.8s ease forwards';
+            }
+        });
+    });
+    observer.observe(blogCard);
+
+    // Modal handling
+    const modal = document.getElementById('updateModal');
+    document.getElementById('openModal').addEventListener('click', () => {
+        modal.classList.add('is-active');
+    });
+    document.getElementById('closeModal').addEventListener('click', () => {
+        modal.classList.remove('is-active');
+    });
+    document.getElementById('cancelModal').addEventListener('click', (e) => {
+        e.preventDefault();
+        modal.classList.remove('is-active');
+    });
+</script>
+{% endblock %} {% endcomment %}

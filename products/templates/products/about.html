@@ -1,5 +1,1268 @@
 {% extends 'base.html' %}
 
+{% block title %}About Us | Ecofeed{% endblock %}
+
+{% block style %}
+<style>
+  /* Modern About Page */
+  :root {
+    --value-bg: rgba(255, 255, 255, 0.95);
+    --value-border: rgba(48, 126, 51, 0.1);
+    --team-bg: rgba(248, 249, 250, 0.95);
+    --shadow-sm: 0 2px 10px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Hero Section with Background Carousel */
+  .about-hero {
+    position: relative;
+    height: 60vh;
+    min-height: 500px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 4rem;
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  /* Using static folder images */
+  .hero-image-1 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero1.jpeg");
+  }
+
+  .hero-image-2 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero_2.jpeg");
+  }
+
+  .hero-image-3 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero3.jpeg");
+  }
+
+  .hero-image-4 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero4.jpeg");
+  }
+
+  .hero-image-5 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero5.jpeg");
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(48, 126, 51, 0.9) 0%, rgba(30, 109, 45, 0.85) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .about-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.5rem;
+    margin-bottom: 1.5rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .about-hero p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.4rem;
+    opacity: 0.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  /* Mission & Vision Section */
+  .mission-vision-section {
+    padding: 4rem 0;
+    position: relative;
+  }
+
+  .mission-vision-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-bottom: 4rem;
+  }
+
+  @media (max-width: 768px) {
+    .mission-vision-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .mission-card,
+  .vision-card {
+    background: var(--value-bg);
+    border-radius: 25px;
+    padding: 3rem;
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid var(--value-border);
+    opacity: 0;
+    transform: translateY(40px);
+  }
+
+  .mission-card.visible,
+  .vision-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .mission-card:hover,
+  .vision-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .mission-icon,
+  .vision-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+    color: white;
+    font-size: 2rem;
+    box-shadow: 0 10px 25px rgba(48, 126, 51, 0.2);
+  }
+
+  .mission-card .mission-icon {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+  }
+
+  .vision-card .vision-icon {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+  }
+
+  .mission-card h2,
+  .vision-card h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    color: var(--dark);
+  }
+
+  .mission-card p,
+  .vision-card p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--gray);
+  }
+
+  /* Story Section */
+  .story-section {
+    padding: 4rem 0;
+    background: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(232, 245, 233, 0.2)"/></svg>') bottom left/contain no-repeat;
+  }
+
+  .story-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  @media (max-width: 1024px) {
+    .story-container {
+      grid-template-columns: 1fr;
+      gap: 3rem;
+    }
+  }
+
+  .story-image {
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    transition: all 0.5s ease;
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+
+  .story-image.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .story-image:hover {
+    transform: scale(1.05) rotate(2deg);
+  }
+
+  .story-image img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    transition: transform 0.8s ease;
+  }
+
+  .story-image:hover img {
+    transform: scale(1.1);
+  }
+
+  .story-content {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+
+  .story-content.visible {
+    opacity: 1;
+    transform: translateX(0);
+    transition: all 0.8s ease 0.3s;
+  }
+
+  .story-content h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+  }
+
+  .story-content p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.15rem;
+    line-height: 1.8;
+    color: var(--gray);
+    margin-bottom: 1.5rem;
+  }
+
+  .story-highlight {
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    padding: 2rem;
+    border-radius: 20px;
+    margin-top: 2rem;
+    border-left: 4px solid var(--primary-green);
+  }
+
+  .story-highlight strong {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: var(--primary-green);
+  }
+
+  /* Values Section */
+  .values-section {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .section-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 2.8rem;
+    text-align: center;
+    margin-bottom: 4rem;
+    color: var(--dark);
+    position: relative;
+    z-index: 2;
+  }
+
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    position: relative;
+    z-index: 2;
+  }
+
+  .value-card {
+    background: white;
+    border-radius: 25px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+    opacity: 0;
+    transform: translateY(40px) scale(0.95);
+  }
+
+  .value-card.visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .value-card:hover {
+    transform: translateY(-15px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-green);
+  }
+
+  .value-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--primary-green-light) 0%, rgba(232, 245, 233, 0.8) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 2rem;
+    color: var(--primary-green);
+    font-size: 2.5rem;
+    transition: all 0.4s ease;
+  }
+
+  .value-card:hover .value-icon {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+    transform: rotate(15deg) scale(1.1);
+  }
+
+  .value-card:nth-child(2) .value-icon {
+    background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+    color: var(--primary-orange);
+  }
+
+  .value-card:nth-child(2):hover .value-icon {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+  }
+
+  .value-card:nth-child(3) .value-icon {
+    background: linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%);
+    color: #1976D2;
+  }
+
+  .value-card:nth-child(3):hover .value-icon {
+    background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);
+  }
+
+  .value-card:nth-child(4) .value-icon {
+    background: linear-gradient(135deg, #F3E5F5 0%, #E1BEE7 100%);
+    color: #7B1FA2;
+  }
+
+  .value-card:nth-child(4):hover .value-icon {
+    background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
+  }
+
+  .value-card h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--dark);
+  }
+
+  .value-card p {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--gray);
+  }
+
+  /* Team Section */
+  .team-section {
+    padding: 6rem 0;
+    background: white;
+  }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2.5rem;
+    margin-top: 3rem;
+  }
+
+  .team-card {
+    background: var(--team-bg);
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    padding: 2.5rem 2rem;
+    position: relative;
+  }
+
+  .team-card:hover {
+    transform: translateY(-15px) scale(1.03);
+    box-shadow: var(--shadow-lg), 0 25px 50px rgba(48, 126, 51, 0.15);
+    border: 2px solid rgba(48, 126, 51, 0.2);
+  }
+
+  .team-avatar {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    border: 5px solid white;
+    box-shadow: var(--shadow-md);
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 3.5rem;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+
+  .team-card:hover .team-avatar {
+    transform: scale(1.1);
+    border-color: var(--primary-yellow);
+    box-shadow: 0 15px 35px rgba(48, 126, 51, 0.3);
+  }
+
+  .team-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .team-card:hover .team-avatar img {
+    transform: scale(1.1);
+  }
+
+  .team-info h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.5rem;
+    margin-bottom: 0.3rem;
+    color: var(--dark);
+  }
+
+  .team-info .title {
+    font-family: 'Inter', sans-serif;
+    color: var(--primary-green);
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+    letter-spacing: 0.5px;
+  }
+
+  .team-info p {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--gray);
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 0;
+  }
+
+  /* Team Role Badges */
+  .team-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.8rem;
+  }
+
+  .founder-badge {
+    background: linear-gradient(135deg, var(--primary-green) 0%, var(--primary-green-dark) 100%);
+    color: white;
+  }
+
+  .cofounder-badge {
+    background: linear-gradient(135deg, var(--primary-yellow) 0%, var(--primary-orange) 100%);
+    color: white;
+  }
+
+  .director-badge {
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+  }
+
+  .manager-badge {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    color: white;
+  }
+
+  /* Social Links */
+  .team-social {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    margin-top: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .team-card:hover .team-social {
+    opacity: 1;
+  }
+
+  .social-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+
+  .social-icon:hover {
+    transform: translateY(-3px) scale(1.1);
+  }
+
+  .social-linkedin {
+    background: #0077B5;
+  }
+
+  .social-twitter {
+    background: #1DA1F2;
+  }
+
+  .social-email {
+    background: var(--primary-green);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: var(--primary-green);
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 5%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 150px;
+    height: 150px;
+    top: 60%;
+    right: 10%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 80px;
+    height: 80px;
+    bottom: 20%;
+    left: 20%;
+    animation-delay: -10s;
+  }
+
+  /* Hero Dots */
+  .hero-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .hero-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hero-dot.active {
+    background: var(--primary-yellow);
+    transform: scale(1.2);
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .about-hero h1 {
+      font-size: 2.8rem;
+    }
+    
+    .section-title {
+      font-size: 2.3rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .about-hero {
+      height: 50vh;
+      min-height: 400px;
+    }
+    
+    .about-hero h1 {
+      font-size: 2.2rem;
+    }
+    
+    .about-hero p {
+      font-size: 1.2rem;
+    }
+    
+    .story-content h2 {
+      font-size: 2rem;
+    }
+    
+    .mission-card,
+    .vision-card {
+      padding: 2rem;
+    }
+
+    .team-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .team-avatar {
+      width: 150px;
+      height: 150px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .about-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .section-title {
+      font-size: 1.8rem;
+    }
+    
+    .value-card {
+      padding: 2rem 1.5rem;
+    }
+
+    .team-card {
+      padding: 1.5rem;
+    }
+
+    .team-avatar {
+      width: 140px;
+      height: 140px;
+    }
+  }
+
+  /* Staggered animations */
+  .mission-card { transition-delay: 0.1s; }
+  .vision-card { transition-delay: 0.2s; }
+  
+  .value-card:nth-child(1) { transition-delay: 0.1s; }
+  .value-card:nth-child(2) { transition-delay: 0.2s; }
+  .value-card:nth-child(3) { transition-delay: 0.3s; }
+  .value-card:nth-child(4) { transition-delay: 0.4s; }
+
+  .team-card:nth-child(1) { transition-delay: 0.1s; }
+  .team-card:nth-child(2) { transition-delay: 0.2s; }
+  .team-card:nth-child(3) { transition-delay: 0.3s; }
+  .team-card:nth-child(4) { transition-delay: 0.4s; }
+  .team-card:nth-child(5) { transition-delay: 0.5s; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Background Carousel -->
+<section class="about-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+    <div class="hero-image hero-image-4"></div>
+    <div class="hero-image hero-image-5"></div>
+  </div>
+  
+  <!-- Content -->
+  <div class="hero-content">
+    <h1>About Us</h1>
+    <p>A local dream transformed into an innovative food solution.</p>
+  </div>
+
+  <!-- Carousel Dots -->
+  <div class="hero-dots">
+    <span class="hero-dot active" data-slide="0"></span>
+    <span class="hero-dot" data-slide="1"></span>
+    <span class="hero-dot" data-slide="2"></span>
+    <span class="hero-dot" data-slide="3"></span>
+    <span class="hero-dot" data-slide="4"></span>
+  </div>
+</section>
+
+<!-- Mission & Vision Section -->
+<section class="mission-vision-section">
+  <div class="container">
+    <div class="mission-vision-grid">
+      <!-- Mission Card -->
+      <div class="mission-card">
+        <div class="mission-icon">
+          <i class="fas fa-bullseye"></i>
+        </div>
+        <h2>Our Mission</h2>
+        <p>
+          To provide the Beninese and African population with healthy, accessible, and gluten-free food products,
+          while valorizing cassava through modern and sustainable processing methods. We believe in food that
+          nourishes the body while respecting the earth.
+        </p>
+      </div>
+
+      <!-- Vision Card -->
+      <div class="vision-card">
+        <div class="vision-icon">
+          <i class="fas fa-eye"></i>
+        </div>
+        <h2>Our Vision</h2>
+        <p>
+          To become a major player in food innovation in Benin, combining tradition, nutrition,
+          and local development to build a healthier future. We aspire to redefine the standards of
+          natural food in Africa.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Story Section -->
+<section class="story-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <div class="story-container">
+      <!-- Story Image -->
+      <div class="story-image">
+        <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Ecofeed Logo">
+      </div>
+
+      <!-- Story Content -->
+      <div class="story-content">
+        <h2>Our Story</h2>
+        <p>
+          Founded by <strong>Moussa DARI</strong>, Ecofeed was born from a simple observation: many people
+          suffering from gluten intolerance did not have access to healthy, local, and affordable products.
+          Leveraging the abundance of cassava in our region, we undertook to transform this traditional root
+          into innovative food alternatives.
+        </p>
+        <p>
+          From the initial idea to our current products, every step has been guided by our commitment to quality,
+          authenticity, and positive social impact.
+        </p>
+        
+        <div class="story-highlight">
+          <p>
+            Our commitment goes beyond food: we actively support local agriculture,
+            create sustainable jobs in our communities, and raise awareness among the population about the benefits of
+            eating healthy and local. Every Ecofeed product represents a step towards a more sustainable future.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Values Section -->
+<section class="values-section">
+  <!-- Floating Background Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="container">
+    <h2 class="section-title">Our Core Values</h2>
+    
+    <div class="values-grid">
+      <!-- Value 1: Health -->
+      <div class="value-card">
+        <div class="value-icon">
+          <i class="fas fa-heart"></i>
+        </div>
+        <h3>Health & Wellness</h3>
+        <p>
+          We create nutritious, balanced, and beneficial products for everyone. Our customers' health
+          is our absolute priority.
+        </p>
+      </div>
+
+      <!-- Value 2: Tradition -->
+      <div class="value-card">
+        <div class="value-icon">
+          <i class="fas fa-leaf"></i>
+        </div>
+        <h3>Respect for Traditions</h3>
+        <p>
+          Inspired by our roots and local know-how, we modernize traditional techniques
+          without losing their essence.
+        </p>
+      </div>
+
+      <!-- Value 3: Innovation -->
+      <div class="value-card">
+        <div class="value-icon">
+          <i class="fas fa-lightbulb"></i>
+        </div>
+        <h3>Continuous Innovation</h3>
+        <p>
+          We constantly develop modern solutions for quality food, pushing the boundaries of
+          the agri-food industry.
+        </p>
+      </div>
+
+      <!-- Value 4: Community -->
+      <div class="value-card">
+        <div class="value-icon">
+          <i class="fas fa-handshake"></i>
+        </div>
+        <h3>Proximity & Community</h3>
+        <p>
+          We cultivate a direct relationship with our consumers and producers, creating a
+          fair and transparent value chain.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+  <div class="container">
+    <h2 class="section-title">Our Founding Team</h2>
+    
+    <div class="team-grid">
+      <!-- Founder - Moussa DARI -->
+      <div class="team-card">
+        <div class="team-avatar">
+          <img src="{{ MEDIA_URL }}static_files/IMG/IMG_2442.JPG.jpeg" alt="Moussa DARI">
+        </div>
+        <div class="team-info">
+          <h4>Moussa DARI</h4>
+          <div class="title">Founder & CEO</div>
+          <span class="team-badge founder-badge">Founder</span>
+          <p>
+            Visionary passionate about sustainable agri-food, Moussa transformed his expertise into
+            a social enterprise. His mission: to make healthy food accessible to everyone in Africa.
+          </p>
+          <div class="team-social">
+            <a href="#" class="social-icon social-linkedin">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-icon social-twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="mailto:moussa@ecofeed.bj" class="social-icon social-email">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Co-founder - Limata Naro DARI -->
+      <div class="team-card">
+        <div class="team-avatar">
+          <img src="{{ MEDIA_URL }}static_files/IMG/IMG_7362.JPG.jpeg" alt="Limata Naro DARI">
+        </div>
+        <div class="team-info">
+          <h4>Limata Naro DARI</h4>
+          <div class="title">Co-founder</div>
+          <span class="team-badge cofounder-badge">Co-founder</span>
+          <p>
+            With extensive experience in business development, Limata brings strategic vision and
+            operational excellence to scale our impact across West Africa.
+          </p>
+          <div class="team-social">
+            <a href="#" class="social-icon social-linkedin">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-icon social-twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="mailto:limata@ecofeed.bj" class="social-icon social-email">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Co-founder - Maxime KASSA -->
+      <div class="team-card">
+        <div class="team-avatar">
+          <img src="{{ MEDIA_URL }}static_files/IMG/1PP _I1A7636.jpg.jpeg" alt="Maxime KASSA">
+        </div>
+        <div class="team-info">
+          <h4>Maxime KASSA</h4>
+          <div class="title">Co-founder & Technical Director</div>
+          <span class="team-badge cofounder-badge">Co-founder</span>
+          <p>
+            Expert in food processing technology, Maxime oversees product development and quality control,
+            ensuring our products meet the highest standards.
+          </p>
+          <div class="team-social">
+            <a href="#" class="social-icon social-linkedin">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-icon social-twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="mailto:maxime@ecofeed.bj" class="social-icon social-email">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nutrition Director -->
+      <div class="team-card">
+        <div class="team-avatar">
+          <img src="{{ MEDIA_URL }}static_files/IMG/IMG_0005.JPG.jpeg" alt="Nutrition Director">
+        </div>
+        <div class="team-info">
+          <h4>Amara DIALLO</h4>
+          <div class="title">Nutrition Director</div>
+          <span class="team-badge director-badge">Director</span>
+          <p>
+            A graduate nutritionist, Amara ensures that every product meets the highest nutritional
+            standards while preserving authentic flavors loved by our customers.
+          </p>
+          <div class="team-social">
+            <a href="#" class="social-icon social-linkedin">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-icon social-twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="mailto:nutrition@ecofeed.bj" class="social-icon social-email">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operations Manager -->
+      <div class="team-card">
+        <div class="team-avatar">
+          <img src="{{ MEDIA_URL }}static_files/IMG/IMG_2447.JPG.jpeg" alt="Operations Manager">
+        </div>
+        <div class="team-info">
+          <h4>Kofi MENSAH</h4>
+          <div class="title">Operations Manager</div>
+          <span class="team-badge manager-badge">Manager</span>
+          <p>
+            Expert in agri-food transformation, Kofi optimizes our processes to guarantee quality
+            and sustainability at every stage of production.
+          </p>
+          <div class="team-social">
+            <a href="#" class="social-icon social-linkedin">
+              <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="#" class="social-icon social-twitter">
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a href="mailto:operations@ecofeed.bj" class="social-icon social-email">
+              <i class="fas fa-envelope"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Background carousel
+  const heroImages = document.querySelectorAll('.hero-image');
+  const heroDots = document.querySelectorAll('.hero-dot');
+  let currentHeroImage = 0;
+  
+  function showHeroImage(n) {
+    heroImages.forEach(img => img.classList.remove('active'));
+    heroDots.forEach(dot => dot.classList.remove('active'));
+    
+    currentHeroImage = (n + heroImages.length) % heroImages.length;
+    heroImages[currentHeroImage].classList.add('active');
+    heroDots[currentHeroImage].classList.add('active');
+  }
+  
+  function nextHeroImage() {
+    showHeroImage(currentHeroImage + 1);
+  }
+  
+  // Start carousel
+  let heroInterval = setInterval(nextHeroImage, 4000);
+  
+  // Dot click handlers
+  heroDots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      clearInterval(heroInterval);
+      showHeroImage(parseInt(this.dataset.slide));
+      heroInterval = setInterval(nextHeroImage, 4000);
+    });
+  });
+
+  // Animate elements on scroll
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  };
+  
+  const observer = new IntersectionObserver(function(entries) {
+    entries.forEach((entry, index) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => {
+          entry.target.classList.add('visible');
+        }, index * 100);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, observerOptions);
+
+  // Observe all animatable elements
+  const animatedElements = document.querySelectorAll(
+    '.mission-card, .vision-card, .story-image, .story-content, .value-card, .team-card'
+  );
+  
+  animatedElements.forEach(el => {
+    observer.observe(el);
+  });
+
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll('.notification');
+  notifications.forEach(notification => {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // Add hover sound effect to value cards (optional)
+  const valueCards = document.querySelectorAll('.value-card');
+  valueCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-15px) scale(1.05)';
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1)';
+    });
+  });
+
+  // Smooth scroll for internal links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const targetId = this.getAttribute('href');
+      if (targetId === '#') return;
+      
+      const targetElement = document.querySelector(targetId);
+      if (targetElement) {
+        window.scrollTo({
+          top: targetElement.offsetTop - 100,
+          behavior: 'smooth'
+        });
+      }
+    });
+  });
+
+  // Animate hero elements
+  const heroTitle = document.querySelector('.about-hero h1');
+  const heroSubtitle = document.querySelector('.about-hero p');
+
+  if (heroTitle) {
+    heroTitle.style.opacity = '0';
+    heroTitle.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroTitle.style.transition = 'all 0.8s ease';
+      heroTitle.style.opacity = '1';
+      heroTitle.style.transform = 'translateY(0)';
+    }, 300);
+  }
+
+  if (heroSubtitle) {
+    heroSubtitle.style.opacity = '0';
+    heroSubtitle.style.transform = 'translateY(30px)';
+    setTimeout(() => {
+      heroSubtitle.style.transition = 'all 0.8s ease 0.3s';
+      heroSubtitle.style.opacity = '1';
+      heroSubtitle.style.transform = 'translateY(0)';
+    }, 600);
+  }
+
+  // Add parallax effect to hero section
+  window.addEventListener('scroll', function() {
+    const scrolled = window.pageYOffset;
+    const heroSection = document.querySelector('.about-hero');
+    const heroContent = document.querySelector('.hero-content');
+    
+    if (heroSection && heroContent) {
+      const rate = scrolled * -0.5;
+      heroContent.style.transform = `translateY(${rate}px)`;
+    }
+  });
+
+  // Add team member hover effects
+  const teamCards = document.querySelectorAll('.team-card');
+  teamCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      const socialLinks = this.querySelector('.team-social');
+      if (socialLinks) {
+        socialLinks.style.opacity = '1';
+      }
+    });
+    
+    card.addEventListener('mouseleave', function() {
+      const socialLinks = this.querySelector('.team-social');
+      if (socialLinks) {
+        socialLinks.style.opacity = '0';
+      }
+    });
+  });
+
+  // Add animation styles
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideOut {
+      from {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%) scale(0.8);
+        opacity: 0;
+      }
+    }
+    
+    @keyframes teamCardFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+
 {% block title %}À propos | Ecofeed{% endblock %}
 
 {% block style %}
@@ -58,17 +1321,33 @@
     opacity: 1;
   }
 
+
+
+    /* Using static folder images */
   .hero-image-1 {
-    background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero1.jpeg");
   }
 
   .hero-image-2 {
-    background-image: url('https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero_2.jpeg");
   }
 
   .hero-image-3 {
-    background-image: url('https://images.unsplash.com/photo-1552664730-d307ca884978?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero3.jpeg");
   }
+
+  .hero-image-4 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero4.jpeg");
+  }
+
+  .hero-image-5 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero5.jpeg");
+  }
+
+
+
+
+
 
   .hero-image::before {
     content: '';
@@ -772,7 +2051,6 @@
       <!-- Founder -->
       <div class="team-card">
         <div class="team-avatar">
-          {% comment %} <img src="{{ MEDIA_URL }}team/moussa-dari.jpg" alt="Moussa DARI"> {% endcomment %}
           <i class="fas fa-user-tie"></i>
         </div>
         <div class="team-info">
@@ -939,191 +2217,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-
-
-
-
-
-
-
-
-
-{% comment %} {% extends 'base.html' %}
-
-{% block title %}À propos | Ecofeed{% endblock %}
-
-{% block style %}
-<style>
-    /* Hero Section */
-    .hero.is-info {
-        position: relative;
-        background-image: url('{{ MEDIA_URL }}products/prod_decor1.png');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        color: white;
-        overflow: hidden;
-    }
-
-    /* Add blur overlay */
-    .hero.is-info::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-image: inherit; /* use same image */
-        background-size: inherit;
-        background-position: inherit;
-        background-repeat: inherit;
-        filter: blur(6px) brightness(0.5); /* blur + darken for readability */
-        z-index: 0;
-    }
-
-    /* Ensure text is above the overlay */
-    .hero.is-info .hero-body {
-        position: relative;
-        z-index: 1;
-    }
-
-
-</style>
-{% endblock %}
-
-{% block content %}
-
-<div>
-
-
-
-<!-- Hero -->
-<section class="hero is-medium is-info">
-  <div class="hero-body">
-    <div class="container has-text-centered">
-      <h1 class="title is-1 has-text-white has-text-weight-bold">À propos de nous</h1>
-      <p class="subtitle is-4 has-text-white">Un rêve local devenu une solution alimentaire innovante.</p>
-    </div>
-  </div>
-</section>
-
-
-
-<!-- Messages -->
-{% if messages %}
-<div class="container mt-4">
-  {% for message in messages %}
-    <div class="notification 
-      {% if message.tags == 'success' %}is-success
-      {% elif message.tags == 'error' %}is-danger
-      {% else %}is-info{% endif %}">
-      {{ message }}
-    </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-
-
-
-<!-- Mission / Vision -->
-<section class="section has-light-bg">
-  <div class="container">
-    <div class="columns is-multiline">
-      <div class="column is-half">
-        <div class="box">
-          <h2 class="title is-4">🎯 Notre mission</h2>
-          <p>
-            Offrir à la population béninoise et africaine des produits alimentaires sains, accessibles et sans gluten,
-            en valorisant le manioc à travers des méthodes de transformation modernes et durables.
-          </p>
-        </div>
-      </div>
-      <div class="column is-half">
-        <div class="box">
-          <h2 class="title is-4">🌱 Notre vision</h2>
-          <p>
-            Devenir un acteur majeur de l’innovation agroalimentaire au Bénin, en combinant tradition, nutrition,
-            et développement local pour bâtir un avenir plus sain.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Story -->
-<section class="section">
-  <div class="container">
-    <h2 class="title is-3 has-text-centered">Notre histoire</h2>
-    <div class="columns is-vcentered">
-      <div class="column is-6">
-        <figure class="image is-4by3">
-          <img src="{{ MEDIA_URL }}PROFIL_IMG/LOGO.jpg" alt="Cassava farming">
-        </figure>
-      </div>
-      <div class="column is-6">
-        <p class="subtitle is-5">
-          Fondée par <strong>Moussa DARI</strong>, l'entreprise est née du constat que de nombreuses personnes
-          souffrant d’intolérance au gluten n’avaient pas accès à des produits sains, locaux et abordables. En s’appuyant sur
-          l’abondance du manioc dans la région, Sojainnovation transforme cette racine en alternatives alimentaires innovantes.
-        </p>
-        <p>
-          Notre engagement ne se limite pas à l’alimentation : nous soutenons l’agriculture locale, créons des emplois durables,
-          et sensibilisons la population aux bienfaits du manger sain et local.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Values Cards -->
-<section class="section has-background-white-ter">
-  <div class="container">
-    <h2 class="title is-3 has-text-centered">Nos Piliers</h2>
-    <div class="columns is-multiline is-centered mt-5">
-      <div class="column is-3">
-        <div class="card has-text-centered">
-          <div class="card-content">
-            <span class="icon is-large has-text-success"><i class="fas fa-heart fa-2x"></i></span>
-            <h3 class="title is-5 mt-3">Santé</h3>
-            <p>Des produits nutritifs, équilibrés et bons pour tous.</p>
-          </div>
-        </div>
-      </div>
-      <div class="column is-3">
-        <div class="card has-text-centered">
-          <div class="card-content">
-            <span class="icon is-large has-text-link"><i class="fas fa-leaf fa-2x"></i></span>
-            <h3 class="title is-5 mt-3">Tradition</h3>
-            <p>Inspirés par nos racines et les savoir-faire locaux.</p>
-          </div>
-        </div>
-      </div>
-      <div class="column is-3">
-        <div class="card has-text-centered">
-          <div class="card-content">
-            <span class="icon is-large has-text-warning"><i class="fas fa-lightbulb fa-2x"></i></span>
-            <h3 class="title is-5 mt-3">Innovation</h3>
-            <p>Des solutions modernes pour une alimentation de qualité.</p>
-          </div>
-        </div>
-      </div>
-      <div class="column is-3">
-        <div class="card has-text-centered">
-          <div class="card-content">
-            <span class="icon is-large has-text-danger"><i class="fas fa-handshake fa-2x"></i></span>
-            <h3 class="title is-5 mt-3">Proximité</h3>
-            <p>Une relation directe avec les consommateurs et les producteurs.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-</div>
-
-{% endblock %}
-
-{% block scripts %}
-{% endblock scripts %} {% endcomment %}
+ {% endcomment %}
