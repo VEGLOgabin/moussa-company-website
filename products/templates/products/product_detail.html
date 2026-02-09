@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ product.name }} | Ecofeed - Produits Naturels{% endblock %}
+{% block title %}{{ product.name }} | ECOFEED - Produits Naturels{% endblock %}
 
 {% block style %}
 <style>
@@ -1425,7 +1425,7 @@
       if (navigator.share) {
         navigator.share({
           title: productName,
-          text: `Découvrez ${productName} sur Ecofeed`,
+          text: `Découvrez ${productName} sur ECOFEED`,
           url: productUrl,
         })
         .then(() => console.log('Successful share'))

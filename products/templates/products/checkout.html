@@ -3,6 +3,1459 @@
 
 {% block style %}
 <style>
+  /* Modern Checkout Page with same design system */
+  :root {
+    --primary-green: #307E33;
+    --primary-green-dark: #1E6D2D;
+    --primary-yellow: #FCC110;
+    --primary-orange: #EF7D12;
+    --card-bg: rgba(255, 255, 255, 0.98);
+    --card-border: rgba(48, 126, 51, 0.15);
+    --shadow-sm: 0 2px 15px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 10px 35px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.2);
+  }
+
+  body {
+    background: linear-gradient(135deg, #f8f9fa 0%, #f0f4f7 100%);
+    min-height: 100vh;
+  }
+
+  /* Enhanced Hero Section with Carousel - Keeping your existing colors */
+  .checkout-hero {
+    position: relative;
+    height: 40vh;
+    min-height: 300px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-bottom: 3rem;
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+  }
+
+  .hero-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+
+  .hero-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+  }
+
+  .hero-image.active {
+    opacity: 1;
+  }
+
+  /* Using your existing hero images - update these URLs as needed */
+  .hero-image-1 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero1.jpeg");
+  }
+
+  .hero-image-2 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero_2.jpeg");
+  }
+
+  .hero-image-3 {
+    background-image: url("{{ MEDIA_URL }}static_files/IMG/hero3.jpeg");
+  }
+
+  .hero-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(76, 175, 80, 0.85) 0%, rgba(69, 160, 73, 0.8) 100%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .checkout-hero h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 3.2rem;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .checkout-hero .subtitle {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 1.3rem;
+    opacity: 0.9;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.8s forwards;
+  }
+
+  .hero-dots {
+    position: absolute;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+  }
+
+  .hero-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .hero-dot.active {
+    background: var(--primary-yellow);
+    transform: scale(1.2);
+  }
+
+  /* Floating Elements */
+  .floating-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .floating-element {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    background: white;
+    animation: floatElement 20s infinite linear;
+  }
+
+  .floating-element:nth-child(1) {
+    width: 80px;
+    height: 80px;
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+  }
+
+  .floating-element:nth-child(2) {
+    width: 120px;
+    height: 120px;
+    top: 60%;
+    right: 15%;
+    animation-delay: -5s;
+  }
+
+  .floating-element:nth-child(3) {
+    width: 60px;
+    height: 60px;
+    bottom: 30%;
+    left: 25%;
+    animation-delay: -10s;
+  }
+
+  /* Enhanced Notifications */
+  .notification-container {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    z-index: 1000;
+    max-width: 400px;
+    width: 100%;
+  }
+
+  .notification-modern {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-md);
+    border-left: 5px solid;
+    animation: slideIn 0.5s ease-out;
+    transform-origin: top right;
+    font-family: 'Quicksand', sans-serif;
+    max-width: 400px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .notification-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: inherit;
+  }
+
+  .notification-success {
+    border-left-color: var(--primary-green);
+    background: linear-gradient(135deg, rgba(232, 245, 233, 0.98) 0%, rgba(232, 245, 233, 0.9) 100%);
+  }
+
+  .notification-error {
+    border-left-color: #F44336;
+    background: linear-gradient(135deg, rgba(244, 67, 54, 0.1) 0%, rgba(211, 47, 47, 0.05) 100%);
+  }
+
+  .notification-info {
+    border-left-color: #2196F3;
+    background: linear-gradient(135deg, rgba(33, 150, 243, 0.1) 0%, rgba(30, 136, 229, 0.05) 100%);
+  }
+
+  /* Enhanced Checkout Container */
+  .checkout-container {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 3rem;
+    margin-bottom: 4rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease 0.3s forwards;
+  }
+
+  /* Enhanced Checkout Steps */
+  .checkout-steps {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 4rem;
+    gap: 3rem;
+    position: relative;
+  }
+
+  .checkout-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-green) 30%, rgba(48, 126, 51, 0.2) 100%);
+    z-index: 1;
+  }
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .step:nth-child(1) { animation: fadeInUp 0.5s ease 0.4s forwards; }
+  .step:nth-child(2) { animation: fadeInUp 0.5s ease 0.6s forwards; }
+  .step:nth-child(3) { animation: fadeInUp 0.5s ease 0.8s forwards; }
+
+  .step-number {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: white;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 3px solid rgba(108, 117, 125, 0.2);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .step.active .step-number {
+    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    color: white;
+    border-color: #9c27b0;
+    transform: scale(1.1);
+    box-shadow: 0 10px 25px rgba(156, 39, 176, 0.3);
+    animation: pulse 2s infinite;
+  }
+
+  .step.completed .step-number {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border-color: #4caf50;
+  }
+
+  .step-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .step.active .step-label {
+    color: #9c27b0;
+    font-weight: 700;
+    transform: scale(1.05);
+  }
+
+  .step.completed .step-label {
+    color: #4caf50;
+  }
+
+  /* Enhanced Order Summary */
+  .order-summary {
+    background: var(--card-bg);
+    border-radius: 25px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(156, 39, 176, 0.15);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+  }
+
+  .order-summary:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .summary-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #343a40;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(156, 39, 176, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .summary-title i {
+    color: #9c27b0;
+  }
+
+  .order-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .order-item {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.2rem;
+    background: rgba(243, 229, 245, 0.3);
+    border-radius: 15px;
+    border: 1px solid rgba(156, 39, 176, 0.1);
+    transition: all 0.3s ease;
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+
+  .order-item:nth-child(1) { animation: fadeInRight 0.5s ease 0.4s forwards; }
+  .order-item:nth-child(2) { animation: fadeInRight 0.5s ease 0.5s forwards; }
+  .order-item:nth-child(3) { animation: fadeInRight 0.5s ease 0.6s forwards; }
+
+  .order-item:hover {
+    background: rgba(243, 229, 245, 0.5);
+    transform: translateX(5px);
+    box-shadow: 0 5px 15px rgba(156, 39, 176, 0.1);
+  }
+
+  .item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 3px solid white;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+  }
+
+  .order-item:hover .item-image {
+    transform: scale(1.05);
+    border-color: #9c27b0;
+  }
+
+  .item-details {
+    flex: 1;
+  }
+
+  .item-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+  }
+
+  .item-meta {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    color: #9c27b0;
+    font-weight: 600;
+  }
+
+  .item-quantity {
+    background: #9c27b0;
+    color: white;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 3px 10px rgba(156, 39, 176, 0.3);
+  }
+
+  .item-price {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #9c27b0;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+  }
+
+  /* Enhanced Order Totals */
+  .order-totals {
+    border-top: 2px solid rgba(156, 39, 176, 0.2);
+    padding-top: 2rem;
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .total-label {
+    color: #6c757d;
+    font-weight: 600;
+  }
+
+  .total-value {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: #343a40;
+  }
+
+  .grand-total {
+    border-top: 3px solid rgba(156, 39, 176, 0.3);
+    margin-top: 1rem;
+    padding-top: 1.5rem;
+    animation: pulse 2s infinite;
+  }
+
+  .grand-total .total-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #343a40;
+  }
+
+  .grand-total .total-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #9c27b0;
+    text-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+  }
+
+  /* Enhanced Customer Info */
+  .customer-info {
+    background: var(--card-bg);
+    border-radius: 25px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(156, 39, 176, 0.15);
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease;
+  }
+
+  .customer-info:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .info-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #343a40;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .info-title i {
+    color: #9c27b0;
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  .info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  .info-item:nth-child(1) { animation: fadeInUp 0.5s ease 0.3s forwards; }
+  .info-item:nth-child(2) { animation: fadeInUp 0.5s ease 0.4s forwards; }
+  .info-item:nth-child(3) { animation: fadeInUp 0.5s ease 0.5s forwards; }
+  .info-item:nth-child(4) { animation: fadeInUp 0.5s ease 0.6s forwards; }
+
+  .info-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #9c27b0;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .info-value {
+    font-family: 'Quicksand', sans-serif;
+    color: #343a40;
+    padding: 1rem;
+    background: rgba(243, 229, 245, 0.3);
+    border-radius: 12px;
+    border: 2px solid rgba(156, 39, 176, 0.1);
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+  }
+
+  .info-value:hover {
+    background: rgba(243, 229, 245, 0.5);
+    border-color: #9c27b0;
+  }
+
+  /* Enhanced Payment Section */
+  .payment-section {
+    background: var(--card-bg);
+    border-radius: 25px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(156, 39, 176, 0.15);
+    padding: 2.5rem;
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 2rem;
+    transition: transform 0.3s ease;
+  }
+
+  .payment-section:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .payment-title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #343a40;
+    margin-bottom: 2rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .payment-title i {
+    color: #9c27b0;
+  }
+
+  .payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .payment-method {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border: 2px solid rgba(156, 39, 176, 0.2);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: white;
+    opacity: 0;
+    transform: translateX(20px);
+  }
+
+  .payment-method:nth-child(1) { animation: fadeInLeft 0.5s ease 0.4s forwards; }
+  .payment-method:nth-child(2) { animation: fadeInLeft 0.5s ease 0.5s forwards; }
+  .payment-method:nth-child(3) { animation: fadeInLeft 0.5s ease 0.6s forwards; }
+
+  .payment-method:hover:not([style*="opacity: 0.5"]) {
+    border-color: #9c27b0;
+    background: rgba(243, 229, 245, 0.3);
+    transform: translateX(5px);
+  }
+
+  .payment-method.selected {
+    border-color: #9c27b0;
+    background: linear-gradient(135deg, rgba(243, 229, 245, 0.8) 0%, rgba(243, 229, 245, 0.6) 100%);
+    box-shadow: 0 5px 20px rgba(156, 39, 176, 0.2);
+    transform: scale(1.02);
+  }
+
+  .method-icon {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5rem;
+    box-shadow: 0 5px 15px rgba(156, 39, 176, 0.3);
+  }
+
+  .method-info {
+    flex: 1;
+  }
+
+  .method-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: #343a40;
+    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
+  }
+
+  .method-description {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+
+  .method-radio {
+    width: 24px;
+    height: 24px;
+    border: 3px solid rgba(156, 39, 176, 0.3);
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .payment-method.selected .method-radio {
+    border-color: #9c27b0;
+  }
+
+  .payment-method.selected .method-radio::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px;
+    height: 12px;
+    background: #9c27b0;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(156, 39, 176, 0.5);
+  }
+
+  /* Enhanced Pay Button - Keeping your green color */
+  .pay-button {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 1.5rem 2rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pay-button:hover:not(:disabled) {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(76, 175, 80, 0.4);
+  }
+
+  .pay-button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .pay-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .pay-button:hover::before {
+    left: 100%;
+  }
+
+  /* Enhanced Security Badges */
+  .security-badges {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(156, 39, 176, 0.2);
+  }
+
+  .security-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: 'Quicksand', sans-serif;
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .security-badge:hover {
+    color: #9c27b0;
+    transform: translateY(-3px);
+  }
+
+  .security-badge i {
+    color: #4caf50;
+    font-size: 1.5rem;
+    background: rgba(212, 237, 218, 0.5);
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .security-badge:hover i {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    transform: scale(1.1);
+  }
+
+  /* Enhanced Empty Cart */
+  .empty-cart {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: var(--card-bg);
+    border-radius: 25px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(156, 39, 176, 0.15);
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeInUp 1s ease 0.5s forwards;
+  }
+
+  .empty-cart .icon {
+    font-size: 5rem;
+    color: #dee2e6;
+    margin-bottom: 2rem;
+    animation: bounce 2s infinite;
+  }
+
+  .empty-cart h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #495057;
+  }
+
+  .empty-cart p {
+    font-family: 'Quicksand', sans-serif;
+    color: #6c757d;
+    max-width: 400px;
+    margin: 0 auto 2rem;
+    line-height: 1.6;
+  }
+
+  .continue-shopping {
+    background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 1rem 2.5rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .continue-shopping:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.3);
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes floatElement {
+    0% {
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      transform: translateY(-1000px) rotate(720deg);
+    }
+  }
+
+  @keyframes slideIn {
+    from {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideOut {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 1024px) {
+    .checkout-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .payment-section {
+      position: static;
+    }
+    
+    .checkout-hero h1 {
+      font-size: 2.5rem;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .checkout-hero {
+      height: 35vh;
+      min-height: 250px;
+    }
+    
+    .checkout-hero h1 {
+      font-size: 2rem;
+    }
+    
+    .checkout-hero .subtitle {
+      font-size: 1.1rem;
+    }
+    
+    .checkout-steps {
+      flex-direction: column;
+      gap: 2rem;
+    }
+    
+    .checkout-steps::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(90deg);
+      width: 80%;
+      height: 3px;
+    }
+    
+    .step {
+      flex-direction: row;
+      gap: 1.5rem;
+    }
+    
+    .step-label {
+      min-width: 100px;
+      text-align: left;
+    }
+    
+    .payment-method {
+      padding: 1rem;
+    }
+    
+    .method-icon {
+      width: 40px;
+      height: 40px;
+      font-size: 1.2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .checkout-hero h1 {
+      font-size: 1.8rem;
+    }
+    
+    .step-number {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .info-item {
+      grid-column: 1 / -1;
+    }
+    
+    .security-badges {
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .pay-button {
+      padding: 1.2rem 1.5rem;
+      font-size: 1.1rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Enhanced Hero Section with Carousel -->
+<section class="checkout-hero">
+  <!-- Background Images -->
+  <div class="hero-background">
+    <div class="hero-image hero-image-1 active"></div>
+    <div class="hero-image hero-image-2"></div>
+    <div class="hero-image hero-image-3"></div>
+  </div>
+  
+  <!-- Floating Elements -->
+  <div class="floating-elements">
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+    <div class="floating-element"></div>
+  </div>
+
+  <div class="hero-content">
+    <h1>Finaliser ma commande</h1>
+    <p class="subtitle">Vérifiez vos informations et procédez au paiement en toute sécurité</p>
+  </div>
+  
+  <!-- Carousel Dots -->
+  <div class="hero-dots">
+    <span class="hero-dot active" data-slide="0"></span>
+    <span class="hero-dot" data-slide="1"></span>
+    <span class="hero-dot" data-slide="2"></span>
+  </div>
+</section>
+
+<!-- Enhanced Messages Container -->
+<div class="notification-container">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="notification-modern 
+        {% if message.tags == 'success' %}notification-success
+        {% elif message.tags == 'error' %}notification-error
+        {% else %}notification-info{% endif %}">
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <i class="fas 
+            {% if message.tags == 'success' %}fa-check-circle
+            {% elif message.tags == 'error' %}fa-exclamation-circle
+            {% else %}fa-info-circle{% endif %}"
+            style="font-size: 1.2rem;"></i>
+          <span>{{ message }}</span>
+        </div>
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
+
+<div class="container">
+  <!-- Enhanced Checkout Steps -->
+  <div class="checkout-steps">
+    <div class="step completed">
+      <div class="step-number">1</div>
+      <span class="step-label">Panier</span>
+    </div>
+    <div class="step active">
+      <div class="step-number">2</div>
+      <span class="step-label">Paiement</span>
+    </div>
+    <div class="step">
+      <div class="step-number">3</div>
+      <span class="step-label">Confirmation</span>
+    </div>
+  </div>
+
+  {% if cart_items %}
+  <div class="checkout-container">
+    <!-- Left Column - Order Details -->
+    <div>
+      <!-- Enhanced Customer Information -->
+      <div class="customer-info">
+        <h3 class="info-title">
+          <i class="fas fa-user-circle"></i>
+          Informations client
+        </h3>
+        <div class="info-grid">
+          <div class="info-item">
+            <span class="info-label">Nom complet</span>
+            <div class="info-value">{{ user.get_full_name }}</div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Email</span>
+            <div class="info-value">{{ user.email }}</div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Téléphone</span>
+            <div class="info-value">{{ user.phone_number|default:"Non renseigné" }}</div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Numéro de commande</span>
+            <div class="info-value">#{{ order.pk }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Enhanced Order Summary -->
+      <div class="order-summary">
+        <h3 class="summary-title">
+          <i class="fas fa-receipt"></i>
+          Résumé de votre commande
+        </h3>
+        
+        <div class="order-items">
+          {% for item in cart_items %}
+          <div class="order-item">
+            {% if item.product.image %}
+              <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="item-image">
+            {% else %}
+              <div class="item-image" style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); display: flex; align-items: center; justify-content: center; color: #9c27b0;">
+                <i class="fas fa-leaf" style="font-size: 2rem;"></i>
+              </div>
+            {% endif %}
+            <div class="item-details">
+              <div class="item-name">{{ item.product.name }}</div>
+              <div class="item-meta">{{ item.product.type|title }} • {{ item.product.added_by.get_full_name }}</div>
+            </div>
+            <div class="item-quantity">×{{ item.quantity }}</div>
+            <div class="item-price">{{ item.subtotal }} {{ item.product.currency }}</div>
+          </div>
+          {% endfor %}
+        </div>
+        
+        <div class="order-totals">
+          <div class="total-row">
+            <span class="total-label">Sous-total</span>
+            <span class="total-value">{{ total }} FCFA</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Frais de service</span>
+            <span class="total-value">Gratuits</span>
+          </div>
+          <div class="total-row">
+            <span class="total-label">Livraison</span>
+            <span class="total-value">À définir</span>
+          </div>
+          <div class="total-row grand-total">
+            <span class="total-label">Total à payer</span>
+            <span class="total-value">{{ total }} FCFA</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column - Enhanced Payment -->
+    <div class="payment-section">
+      <h3 class="payment-title">
+        <i class="fas fa-credit-card"></i>
+        Méthode de paiement
+      </h3>
+      
+      <div class="payment-methods">
+        <div class="payment-method selected" data-method="kkiapay">
+          <div class="method-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">Paiement Mobile</div>
+            <div class="method-description">KkiaPay - Paiement sécurisé</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+        
+        <div class="payment-method" data-method="card" style="opacity: 0.5; cursor: not-allowed;">
+          <div class="method-icon">
+            <i class="fas fa-credit-card"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">Carte Bancaire</div>
+            <div class="method-description">Bientôt disponible</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+        
+        <div class="payment-method" data-method="transfer" style="opacity: 0.5; cursor: not-allowed;">
+          <div class="method-icon">
+            <i class="fas fa-university"></i>
+          </div>
+          <div class="method-info">
+            <div class="method-name">Virement Bancaire</div>
+            <div class="method-description">Bientôt disponible</div>
+          </div>
+          <div class="method-radio"></div>
+        </div>
+      </div>
+      
+      <button class="pay-button" id="pay-button">
+        <i class="fas fa-lock"></i>
+        Payer {{ total }} FCFA
+      </button>
+      
+      <div class="security-badges">
+        <div class="security-badge">
+          <i class="fas fa-shield-alt"></i>
+          <span>Paiement sécurisé</span>
+        </div>
+        <div class="security-badge">
+          <i class="fas fa-lock"></i>
+          <span>SSL crypté</span>
+        </div>
+        <div class="security-badge">
+          <i class="fas fa-check-circle"></i>
+          <span>Garantie</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <!-- Enhanced Empty Cart -->
+  <div class="empty-cart">
+    <div class="icon">
+      <i class="fas fa-shopping-cart"></i>
+    </div>
+    <h3>Votre panier est vide</h3>
+    <p>Ajoutez des articles à votre panier avant de procéder au paiement.</p>
+    <a href="{% url 'marketplace' %}" class="continue-shopping">
+      <i class="fas fa-store"></i>
+      Retour au marketplace
+    </a>
+  </div>
+  {% endif %}
+</div>
+
+<!-- KkiaPay Script -->
+<script src="https://cdn.kkiapay.me/k.js"></script>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  // Hero background carousel
+  const heroImages = document.querySelectorAll('.hero-image');
+  const heroDots = document.querySelectorAll('.hero-dot');
+  let currentHeroImage = 0;
+  
+  function showHeroImage(n) {
+    heroImages.forEach(img => img.classList.remove('active'));
+    heroDots.forEach(dot => dot.classList.remove('active'));
+    
+    currentHeroImage = (n + heroImages.length) % heroImages.length;
+    heroImages[currentHeroImage].classList.add('active');
+    heroDots[currentHeroImage].classList.add('active');
+  }
+  
+  function nextHeroImage() {
+    showHeroImage(currentHeroImage + 1);
+  }
+  
+  // Auto rotate hero images
+  let heroInterval = setInterval(nextHeroImage, 4000);
+  
+  // Dot click handlers
+  heroDots.forEach(dot => {
+    dot.addEventListener('click', function() {
+      clearInterval(heroInterval);
+      showHeroImage(parseInt(this.dataset.slide));
+      heroInterval = setInterval(nextHeroImage, 4000);
+    });
+  });
+
+  const payButton = document.getElementById('pay-button');
+  
+  // Enhanced Payment method selection with animations
+  const paymentMethods = document.querySelectorAll('.payment-method');
+  paymentMethods.forEach(method => {
+    if (!method.style.opacity) { 
+      method.addEventListener('click', function() {
+        // Animate deselection
+        paymentMethods.forEach(m => {
+          if (m.classList.contains('selected')) {
+            m.style.transform = 'scale(1)';
+            m.style.boxShadow = 'none';
+            m.classList.remove('selected');
+          }
+        });
+        
+        // Animate selection
+        this.classList.add('selected');
+        this.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+          this.style.transform = 'scale(1.02)';
+        }, 300);
+        
+        // Add click animation
+        this.style.animation = 'pulse 0.3s ease';
+        setTimeout(() => {
+          this.style.animation = '';
+        }, 300);
+      });
+    }
+  });
+
+  // KKIAPAY config
+  const amount = parseInt("{{ total }}");
+  const transactionId = "{{ order.internal_transaction_id }}";
+  const publicKey = "{{ public_key }}";
+  const phone = "{{ user.phone_number|default:'22900000000' }}";
+  const callbackUrl = "{{ callbackUrl }}";
+
+  function openKkiapay() {
+    openKkiapayWidget({
+      amount: amount,
+      position: "center",
+      callback: callbackUrl,
+      data: "{{ order.internal_transaction_id }}",
+      theme: "#9c27b0", // Keeping your purple theme
+      sandbox: true,
+      key: publicKey,
+      phone: phone,
+      name: "{{ user.first_name|default:'Client' }}",
+      email: "{{ user.email|default:'client@example.com' }}",
+    });
+  }
+
+  // Enhanced Pay button handler with animations
+  if (payButton) {
+    payButton.addEventListener('click', function() {
+      const originalText = this.innerHTML;
+      
+      // Button loading animation
+      this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Préparation du paiement...';
+      this.disabled = true;
+      this.style.animation = 'pulse 1s ease infinite';
+      
+      // Add shimmer effect
+      const shimmer = document.createElement('div');
+      shimmer.style.position = 'absolute';
+      shimmer.style.top = '0';
+      shimmer.style.left = '-100%';
+      shimmer.style.width = '100%';
+      shimmer.style.height = '100%';
+      shimmer.style.background = 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent)';
+      shimmer.style.animation = 'shimmer 1s infinite';
+      this.style.position = 'relative';
+      this.style.overflow = 'hidden';
+      this.appendChild(shimmer);
+
+      setTimeout(() => {
+        // Open payment widget
+        openKkiapay();
+
+        setTimeout(() => {
+          // Restore button state
+          this.innerHTML = originalText;
+          this.disabled = false;
+          this.style.animation = '';
+          shimmer.remove();
+        }, 5000);
+      }, 1500);
+    });
+  }
+
+  // Animate checkout elements on load with staggered delays
+  const animateElements = [
+    ...document.querySelectorAll('.order-item'),
+    ...document.querySelectorAll('.payment-method'),
+    ...document.querySelectorAll('.info-item')
+  ];
+  
+  animateElements.forEach((element, index) => {
+    setTimeout(() => {
+      element.style.opacity = '1';
+      element.style.transform = 'translateY(0)';
+    }, 300 + (index * 100));
+  });
+
+  // Animate security badges on hover
+  const securityBadges = document.querySelectorAll('.security-badge');
+  securityBadges.forEach(badge => {
+    badge.addEventListener('mouseenter', function() {
+      const icon = this.querySelector('i');
+      icon.style.transform = 'scale(1.1) rotate(5deg)';
+    });
+    
+    badge.addEventListener('mouseleave', function() {
+      const icon = this.querySelector('i');
+      icon.style.transform = 'scale(1) rotate(0deg)';
+    });
+  });
+
+  // Auto-hide notifications
+  const notifications = document.querySelectorAll('.notification-modern');
+  notifications.forEach(notification => {
+    setTimeout(() => {
+      notification.style.animation = 'slideOut 0.5s ease forwards';
+      setTimeout(() => {
+        notification.remove();
+      }, 500);
+    }, 5000);
+  });
+
+  // Add keyframe for shimmer effect
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes shimmer {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+  `;
+  document.head.appendChild(style);
+});
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% comment %} {% extends 'base.html' %}
+{% block title %}Finaliser la commande | Réseau Élevage{% endblock %}
+
+{% block style %}
+<style>
 
 
     .notification-modern {
@@ -775,4 +2228,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
+ {% endcomment %}

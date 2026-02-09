@@ -3,7 +3,7 @@
 
 {% extends 'base.html' %}
 
-{% block title %}{{ blog_post.title }} | Ecofeed{% endblock %}
+{% block title %}{{ blog_post.title }} | ECOFEED{% endblock %}
 
 {% block style %}
 <style>
@@ -698,7 +698,7 @@
       </div>
       <div class="meta-item">
         <i class="fas fa-user-edit"></i>
-        <span>{{ blog_post.posted_by.get_full_name|default:"Équipe Ecofeed" }}</span>
+        <span>{{ blog_post.posted_by.get_full_name|default:"Équipe ECOFEED" }}</span>
       </div>
     </div>
   </div>
@@ -790,7 +790,7 @@
             </div>
             {% endif %}
             <div class="author-details">
-              <h4>{{ blog_post.posted_by.get_full_name|default:"Équipe Ecofeed" }}</h4>
+              <h4>{{ blog_post.posted_by.get_full_name|default:"Équipe ECOFEED" }}</h4>
               <p>Expert en produits naturels et bien-être</p>
               <p style="color: var(--primary-green); font-size: 0.9rem;">
                 <i class="fas fa-star"></i> {{ blog_post.posted_by.blog_posts.count }} articles
@@ -1075,202 +1075,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-
-
-{% comment %} {% extends 'base.html' %}
-
-{% block title %}{{ blog_post.title }} | Ecofeed{% endblock %}
-
-{% block style %}
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        background-color: #f7fafc;
-        overflow-x: hidden;
-    }
-
-    /* Hero section */
-    .hero {
-        position: relative;
-        background-size: cover;
-        background-position: center;
-        height: 50vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        text-align: center;
-    }
-    .hero-overlay {
-        position: absolute;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5);
-    }
-    .hero h1 {
-        position: relative;
-        z-index: 2;
-        font-size: 2.5rem;
-        animation: fadeInDown 1s ease-in-out;
-    }
-
-    /* Blog content */
-    .blog-container {
-        max-width: 900px;
-        margin: auto;
-        padding: 2rem;
-    }
-    .blog-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 6px;
-        margin: 1.5rem 0;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .blog-content img:hover {
-        transform: scale(1.03);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-    .blog-content p {
-        margin-bottom: 1rem;
-        line-height: 1.75;
-        font-size: 1.1rem;
-    }
-
-    /* Sticky back button */
-    .back-button {
-        position: sticky;
-        top: 20px;
-        z-index: 50;
-    }
-
-    /* Modal */
-    .modal.is-active {
-        display: flex;
-    }
-
-    @keyframes fadeInDown {
-        from { opacity: 0; transform: translateY(-30px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Hero Section -->
-<div class="hero" style="background-image: url('{{ blog_post.cover_image.url }}')">
-    <div class="hero-overlay"></div>
-    <h1>{{ blog_post.title }}</h1>
-</div>
-
-
-
-
-<!-- Messages -->
-{% if messages %}
-<div class="container mt-4">
-  {% for message in messages %}
-    <div class="notification 
-      {% if message.tags == 'success' %}is-success
-      {% elif message.tags == 'error' %}is-danger
-      {% else %}is-info{% endif %}">
-      {{ message }}
-    </div>
-  {% endfor %}
-</div>
-{% endif %}
-
-
-
-
-<div class="blog-container">
-    <!-- Back to blog link -->
-    <div class="mb-5 back-button">
-        <a href="{% url 'blog' %}" class="button is-link is-light">
-            <span class="icon">
-                <i class="fas fa-arrow-left"></i>
-            </span>
-            <span>Retour au blog</span>
-        </a>
-    </div>
-
-    <!-- Blog Post Content Section -->
-    <div class="card" id="blogCard">
-        <div class="card-content">
-            <header class="mb-5">
-                <p class="subtitle is-6 has-text-grey">
-                    Publié par 
-                    <span class="has-text-dark has-text-weight-semibold">{{ blog_post.posted_by.get_full_name }}</span>
-                    le <time datetime="{{ blog_post.published_at|date:'c' }}">{{ blog_post.published_at|date:"d M Y" }}</time>
-                </p>
-            </header>
-
-            <div class="content blog-content">
-                {{ blog_post.content|safe }}
-            </div>
-
-            <!-- Update Blog Post Button -->
-            <button class="button is-primary mt-4" id="openModal">Modifier l'article</button> 
-        </div>
-    </div>
-</div>
-
-<!-- Modal for Updating Blog Post -->
-<div class="modal" id="updateModal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Modifier l'article</p>
-            <button class="delete" aria-label="close" id="closeModal"></button>
-        </header>
-        <section class="modal-card-body">
-            <form>
-                <div class="field">
-                    <label class="label">Titre</label>
-                    <div class="control">
-                        <input class="input" type="text" value="{{ blog_post.title }}">
-                    </div>
-                </div>
-                <div class="field">
-                    <label class="label">Contenu</label>
-                    <div class="control">
-                        <textarea class="textarea" rows="6">{{ blog_post.content|striptags }}</textarea>
-                    </div>
-                </div>
-            </form>
-        </section>
-        <footer class="modal-card-foot">
-            <button class="button is-success">Enregistrer</button>
-            <button class="button" id="cancelModal">Annuler</button>
-        </footer>
-    </div>
-</div>
-{% endblock %}
-
-{% block script %}
-<script>
-    // Intersection Observer for fade-in
-    const blogCard = document.getElementById('blogCard');
-    const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                blogCard.style.animation = 'fadeInDown 0.8s ease forwards';
-            }
-        });
-    });
-    observer.observe(blogCard);
-
-    // Modal handling
-    const modal = document.getElementById('updateModal');
-    document.getElementById('openModal').addEventListener('click', () => {
-        modal.classList.add('is-active');
-    });
-    document.getElementById('closeModal').addEventListener('click', () => {
-        modal.classList.remove('is-active');
-    });
-    document.getElementById('cancelModal').addEventListener('click', (e) => {
-        e.preventDefault();
-        modal.classList.remove('is-active');
-    });
-</script>
-{% endblock %} {% endcomment %}
